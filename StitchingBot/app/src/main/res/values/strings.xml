@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">StitchingBot</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="menu_logos_list">logos List</string>
+    <string name="menu_create_logo">Create logo</string>
+    <string name="menu_load_file">Load file</string>
+    <string name="menu_sewing_machines">Sewing machines</string>
+    <string name="menu_arduino_config">Arduino configuration</string>
+    <string name="img_logo">Logo\'s image</string>
+    <string name="logo_name">Logo\'s name</string>
+    <string name="btn_free_drawing_description">Free drawing button selector</string>
+    <string name="btn_circle_drawing_description">Circle drawing button selector</string>
+    <string name="btn_square_drawing_description">Square drawing button selector</string>
+    <string name="btn_line_drawing_description">Line drawing button selector</string>
+    <string name="btn_erase_option_description">Erase option button description</string>
+    <string name="btn_text_option_description">Text option button description</string>
+    <string name="available_devices_header">Dispositivos disponibles</string>
+    <string name="connected_devices_header">Dispositivos emparejados</string>
+    <string name="fab_find_devices">Buscar dispositivos</string>
+    <string name="title_activity_bluetooth_try">BluetoothTryActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

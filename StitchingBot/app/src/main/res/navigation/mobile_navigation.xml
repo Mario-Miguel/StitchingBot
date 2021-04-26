@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_logo_list">
+
+    <fragment
+        android:id="@+id/nav_logo_list"
+        android:name="es.uniovi.eii.stitchingbot.ui.LogosListFragment"
+        android:label="@string/menu_logos_list"
+        tools:layout="@layout/fragment_logos_list" />
+
+    <fragment
+        android:id="@+id/nav_create_logo"
+        android:name="es.uniovi.eii.stitchingbot.ui.CreateLogoFragment"
+        android:label="@string/menu_create_logo"
+        tools:layout="@layout/fragment_create_logo" />
+
+    <fragment
+        android:id="@+id/nav_load_file"
+        android:name="es.uniovi.eii.stitchingbot.ui.LoadFileFragment"
+        android:label="@string/menu_load_file"
+        tools:layout="@layout/fragment_load_file" />
+
+    <fragment
+        android:id="@+id/nav_sewing_machines"
+        android:name="es.uniovi.eii.stitchingbot.ui.SewingMachinesFragment"
+        android:label="@string/menu_sewing_machines"
+        tools:layout="@layout/fragment_sewing_machines" />
+
+    <fragment
+        android:id="@+id/nav_arduino_configuration"
+        android:name="es.uniovi.eii.stitchingbot.ui.ArduinoConfigurationFragment"
+        android:label="@string/menu_arduino_config"
+        tools:layout="@layout/fragment_arduino_configuration" />
+
+<!--    <activity android:id="@+id/nav_arduino_configuration"-->
+<!--        android:name="es.uniovi.eii.stitchingbot.ui.BluetoothSearchActivity"-->
+<!--        android:label="@string/menu_arduino_config"-->
+<!--        tools:layout="@layout/activity_bluetooth_search"/>-->
+</navigation>
