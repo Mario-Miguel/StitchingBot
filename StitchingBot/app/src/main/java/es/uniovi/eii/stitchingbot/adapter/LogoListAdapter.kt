@@ -14,7 +14,7 @@ class LogoListAdapter(logosList: List<Logo>, val listener: (Logo) -> Unit) : Rec
     var logos : List<Logo> = logosList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogoViewHolder {
-        var itemView = LayoutInflater.from(parent.context).inflate(R.layout.card_recycler_view_logo, parent, false);
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.card_recycler_view_logo, parent, false)
         return LogoViewHolder(itemView)
     }
 

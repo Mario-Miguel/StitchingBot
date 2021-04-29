@@ -48,7 +48,7 @@
 //        }
 //    }
 //
-//    private val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+//    private val es.uniovi.eii.stitchingbot.bluetooth.getBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 //    private val deviceListAdapter = DevicesAdapter()
 //
 //    override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,9 +67,9 @@
 //
 //    private fun initBluetooth() {
 //
-//        if (bluetoothAdapter.isDiscovering) return
+//        if (es.uniovi.eii.stitchingbot.bluetooth.getBluetoothAdapter.isDiscovering) return
 //
-//        if (bluetoothAdapter.isEnabled) {
+//        if (es.uniovi.eii.stitchingbot.bluetooth.getBluetoothAdapter.isEnabled) {
 //            enableDiscovery()
 //        } else {
 //            // Bluetooth isn't enabled - prompt user to turn it on
@@ -90,7 +90,7 @@
 //
 //    private fun startDiscovery() {
 //        if (hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
-//            if (bluetoothAdapter.isEnabled && !bluetoothAdapter.isDiscovering) {
+//            if (es.uniovi.eii.stitchingbot.bluetooth.getBluetoothAdapter.isEnabled && !es.uniovi.eii.stitchingbot.bluetooth.getBluetoothAdapter.isDiscovering) {
 //                beginDiscovery()
 //            }
 //        } else {
@@ -106,7 +106,7 @@
 //        registerReceiver(bluetoothDiscoveryResult, IntentFilter(BluetoothDevice.ACTION_FOUND))
 //        deviceListAdapter.clearDevices()
 //        monitorDiscovery()
-//        bluetoothAdapter.startDiscovery()
+//        es.uniovi.eii.stitchingbot.bluetooth.getBluetoothAdapter.startDiscovery()
 //    }
 //
 //    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
