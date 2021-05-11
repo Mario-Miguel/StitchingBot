@@ -30,13 +30,16 @@
         tools:layout="@layout/fragment_sewing_machines" />
 
     <fragment
+        android:id="@+id/nav_arduino_connection"
+        android:name="es.uniovi.eii.stitchingbot.ui.arduino.ArduinoConnectionFragment"
+        android:label="@string/menu_arduino_connection"
+        tools:layout="@layout/fragment_arduino_connection" />
+
+    <fragment
         android:id="@+id/nav_arduino_configuration"
-        android:name="es.uniovi.eii.stitchingbot.ui.ArduinoConfigurationFragment"
+        android:name="es.uniovi.eii.stitchingbot.ui.arduino.ArduinoConfigurationFragment"
         android:label="@string/menu_arduino_config"
         tools:layout="@layout/fragment_arduino_configuration" />
 
-<!--    <activity android:id="@+id/nav_arduino_configuration"-->
-<!--        android:name="es.uniovi.eii.stitchingbot.ui.BluetoothSearchActivity"-->
-<!--        android:label="@string/menu_arduino_config"-->
-<!--        tools:layout="@layout/activity_bluetooth_search"/>-->
+
 </navigation>

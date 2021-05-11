@@ -26,9 +26,9 @@
             android:title="@string/menu_sewing_machines" />
 
         <item
-            android:id="@+id/nav_arduino_configuration"
+            android:id="@+id/nav_arduino_connection"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/menu_arduino_config" />
+            android:title="@string/menu_arduino_connection" />
 
     </group>
 </menu>

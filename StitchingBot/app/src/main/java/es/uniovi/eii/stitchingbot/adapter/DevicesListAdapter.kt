@@ -1,12 +1,11 @@
 package es.uniovi.eii.stitchingbot.adapter
 
 import android.bluetooth.BluetoothDevice
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.model.Device
-import es.uniovi.eii.stitchingbot.ui.extension.inflate
 import kotlinx.android.synthetic.main.device_list_item.view.*
 
 class DevicesListAdapter(private val listener : OnItemClickListener) : RecyclerView.Adapter<DevicesListAdapter.ViewHolder>() {
@@ -15,7 +14,7 @@ class DevicesListAdapter(private val listener : OnItemClickListener) : RecyclerV
     private val devices = ArrayList<BluetoothDevice>()
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)= ViewHolder (parent.inflate(R.layout.device_list_item))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)= ViewHolder (LayoutInflater.from(parent.context).inflate(R.layout.device_list_item, parent, false))
 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

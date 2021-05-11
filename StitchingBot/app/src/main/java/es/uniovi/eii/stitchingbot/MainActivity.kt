@@ -1,6 +1,9 @@
 package es.uniovi.eii.stitchingbot
 
+import android.bluetooth.BluetoothSocket
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import android.view.Menu
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -12,6 +15,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
+import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,13 +31,20 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
 
-        drawerLayout= findViewById(R.id.drawer_layout)
+        drawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        appBarConfiguration = AppBarConfiguration(setOf(
-                R.id.nav_logo_list, R.id.nav_create_logo, R.id.nav_load_file, R.id.nav_sewing_machines, R.id.nav_arduino_configuration), drawerLayout)
+        appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.nav_logo_list,
+                R.id.nav_create_logo,
+                R.id.nav_load_file,
+                R.id.nav_sewing_machines,
+                R.id.nav_arduino_connection
+            ), drawerLayout
+        )
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
@@ -51,10 +62,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
-        }
-        else {
+        } else {
             super.onBackPressed()
         }
     }
@@ -62,34 +72,8 @@ class MainActivity : AppCompatActivity() {
 
 
 
-//    /* Broadcast receiver to listen for discovery results. */
-//    public val bluetoothDiscoveryResult = object : BroadcastReceiver() {
-//        override fun onReceive(context: Context?, intent: Intent?) {
-//            Log.i("BluetoothStitching", "Un dispositivo mas")
-//            if (intent?.action == BluetoothDevice.ACTION_FOUND) {
-//                Log.i("BluetoothStitching", "Un dispositivo mas")
-//                val device: BluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)!!
-//                deviceListAdapter.addDevice(device)
-//            }
-//        }
-//    }
-//
-//    /* Broadcast receiver to listen for discovery updates. */
-//    public val bluetoothDiscoveryMonitor = object : BroadcastReceiver() {
-//        override fun onReceive(context: Context?, intent: Intent?) {
-//            Log.i("BluetoothStitching", "Un dispositivo mas")
-//            when (intent?.action) {
-//                BluetoothAdapter.ACTION_DISCOVERY_STARTED -> {
-//                    //progress_bar.visible()
-//                    toast("Scan started...")
-//                }
-//                BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
-//                    //progress_bar.invisible()
-//                    toast("Scan complete. Found ${deviceListAdapter.itemCount} devices.")
-//                }
-//            }
-//        }
-//    }
+
+
 
 
 }
