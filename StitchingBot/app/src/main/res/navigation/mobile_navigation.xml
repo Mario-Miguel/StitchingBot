@@ -25,9 +25,16 @@
 
     <fragment
         android:id="@+id/nav_sewing_machines"
-        android:name="es.uniovi.eii.stitchingbot.ui.SewingMachinesFragment"
+        android:name="es.uniovi.eii.stitchingbot.ui.sewingMachines.SewingMachinesFragment"
         android:label="@string/menu_sewing_machines"
         tools:layout="@layout/fragment_sewing_machines" />
+
+    <fragment
+        android:id="@+id/nav_sewing_machine_details"
+        android:name="es.uniovi.eii.stitchingbot.ui.sewingMachines.SewingMachineDetailsFragment"
+        android:label="@string/menu_sewing_machine_details"
+        tools:layout="@layout/fragment_sewing_machine_details" />
+
 
     <fragment
         android:id="@+id/nav_arduino_connection"

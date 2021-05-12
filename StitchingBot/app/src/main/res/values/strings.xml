@@ -36,4 +36,11 @@
     <string name="search_button_description">Search button</string>
     <string name="txt_devices_list_header">Dispositivos encontrados</string>
     <string name="menu_arduino_connection">Arduino configuration</string>
+    <string name="img_machine">Imagen de la máquina de coser</string>
+    <string name="machine_name">Nombre de la máquina</string>
+    <string name="menu_sewing_machine_details">Detalles de la máquina de coser</string>
+    <string name="txtSewingMachineName">Nombre</string>
+    <string name="menuPedalDetails">Pedal electrico</string>
+    <string name="imgSewingMachineDetails">Imagen de la máquina de coser</string>
+    <string name="btnSewingmachinesActionDefault">Agregar</string>
 </resources>
