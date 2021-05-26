@@ -60,6 +60,8 @@ class DatabaseHelper(context: Context) :
         return values
     }
 
+
+
     fun getAllSewingMachinesColumns(): Array<String>{
         return arrayOf(SewingMachineTable.ID, SewingMachineTable.COLUMN_NAME, SewingMachineTable.COLUMN_IMG, SewingMachineTable.COLUMN_PEDAL)
     }

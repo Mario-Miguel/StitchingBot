@@ -40,7 +40,8 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:singleLine="true" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -66,7 +67,7 @@
             app:layout_constraintVertical_bias="0.715" />
 
         <Button
-            android:id="@+id/btnSewingmachineAction"
+            android:id="@+id/btnSewingMachineAction"
             android:layout_width="289dp"
             android:layout_height="56dp"
             android:layout_marginBottom="16dp"
@@ -74,6 +75,20 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btnDeleteSewingMachine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:src="@drawable/ic_baseline_delete_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.955"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.023" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

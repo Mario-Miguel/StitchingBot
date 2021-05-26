@@ -30,6 +30,23 @@ class SewingMachinedatabaseConnection(context: Context) {
         database!!.insert(DatabaseHelper.TABLE_SEWING_MACHINES, null, values)
     }
 
+    fun update(machine: SewingMachine){
+        val values = ContentValues()
+        values.putAll(dbHelper!!.getInsertParamsSewingMachinesTable(machine))
+        val where = "id=?"
+        val whereArgs = arrayOf("${machine.id}")
+
+        database!!.update(DatabaseHelper.TABLE_SEWING_MACHINES, values, where, whereArgs)
+    }
+
+    fun delete(machine: SewingMachine){
+        val where = "id=?"
+        val whereArgs = arrayOf("${machine.id}")
+
+        database!!.delete(DatabaseHelper.TABLE_SEWING_MACHINES, where, whereArgs)
+
+    }
+
     fun getAllData(): ArrayList<SewingMachine> {
         val machines = ArrayList<SewingMachine>()
 
@@ -44,7 +61,7 @@ class SewingMachinedatabaseConnection(context: Context) {
         )
         cursor.moveToFirst()
         while (!cursor.isAfterLast) {
-            var machine = SewingMachine(
+            val machine = SewingMachine(
                 cursor.getInt(0),
                 cursor.getString(1),
                 cursor.getString(2),

@@ -1,10 +1,15 @@
 package es.uniovi.eii.stitchingbot.adapter
 
-import android.bluetooth.BluetoothDevice
+import android.app.Activity
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.exifinterface.media.ExifInterface
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import es.uniovi.eii.stitchingbot.R
@@ -53,7 +58,7 @@ class SewingMachinesListAdapter(
                 Log.i(TAG, "Imagen con el +")
                 txtSewingMachineName.text = "Añadir máquina de coser"
                 Picasso.get().load(R.drawable.ic_baseline_add_24).into(imgMachine)
-            } else if (machine.imgUrl.isNotEmpty()) {
+            } else if (machine.imgUrl!!.isNotEmpty()) {
                 Picasso.get().load(machine.imgUrl).into(imgMachine)
             }
 
@@ -61,5 +66,9 @@ class SewingMachinesListAdapter(
         }
 
 
+
     }
+
+
+
 }

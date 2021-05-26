@@ -47,7 +47,7 @@ class SewingMachinesFragment : Fragment() {
 
     private fun createListener(machine: SewingMachine) {
         val isCreationMode = (machine.id<0)
-        val bundle = bundleOf("creation" to isCreationMode)
+        val bundle = bundleOf("creation" to isCreationMode, "machine" to machine)
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.navigate(R.id.nav_sewing_machine_details, bundle)
 

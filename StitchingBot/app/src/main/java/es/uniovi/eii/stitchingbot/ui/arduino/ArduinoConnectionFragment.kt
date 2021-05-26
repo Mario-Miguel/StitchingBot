@@ -115,9 +115,7 @@ class ArduinoConnectionFragment : Fragment() {
                 )
             ) {
 
-                // Not to annoy user.
                 Log.i("BluetoothStitching", "Permission must be granted to use the app.")
-                //Toast.makeText(this, "Permission must be granted to use the app.", Toast.LENGTH_SHORT).show();
             } else {
 
                 // Request permission.
@@ -130,7 +128,6 @@ class ArduinoConnectionFragment : Fragment() {
         } else {
             // Permission has already been granted.
             Log.i("BluetoothStitching", "Permission already granted.")
-            //Toast.makeText(this, "Permission already granted.", Toast.LENGTH_SHORT).show();
         }
 
     }
