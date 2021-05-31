@@ -4,11 +4,14 @@ import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.graphics.drawable.VectorDrawable
 import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.exifinterface.media.ExifInterface
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
@@ -57,7 +60,7 @@ class SewingMachinesListAdapter(
             if (machine.id == -1) {
                 Log.i(TAG, "Imagen con el +")
                 txtSewingMachineName.text = "Añadir máquina de coser"
-                Picasso.get().load(R.drawable.ic_baseline_add_24).into(imgMachine)
+                imgMachine.setImageResource(R.drawable.ic_baseline_add_24)
             } else if (machine.imgUrl!!.isNotEmpty()) {
                 Picasso.get().load(machine.imgUrl).into(imgMachine)
             }

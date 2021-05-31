@@ -35,6 +35,7 @@ import es.uniovi.eii.stitchingbot.database.SewingMachinedatabaseConnection
 import es.uniovi.eii.stitchingbot.model.SewingMachine
 import kotlinx.android.synthetic.main.fragment_sewing_machine_details.*
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -64,6 +65,8 @@ class SewingMachineDetailsFragment : Fragment() {
     private var isCreation: Boolean = false
 
     private var sewingMachine = SewingMachine()
+    private lateinit var currentPhotoPath: String
+    private lateinit var currentPhotoUri: Uri
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,9 +81,9 @@ class SewingMachineDetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-
         return inflater.inflate(R.layout.fragment_sewing_machine_details, container, false)
     }
+
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -89,6 +92,39 @@ class SewingMachineDetailsFragment : Fragment() {
         if (arguments != null)
             isCreation = requireArguments().getBoolean(CREATION_MODE)
 
+        loadDefaultScreen()
+
+        if (!isCreation) {
+            loadUpdateScreen()
+        }
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != RESULT_CANCELED) {
+            when (requestCode) {
+                REQUEST_IMAGE_CAPTURE -> if (resultCode == RESULT_OK) {
+                    sewingMachine.imgUrl = currentPhotoUri.toString()
+                    imgSewingMachineDetails.setImageBitmap(getImageFromUri(currentPhotoUri))
+                }
+                REQUEST_IMAGE_PICK -> if (resultCode == RESULT_OK && data != null) {
+                    val selectedImage = data.data
+                    val currentPhotoFile= createImageFile()
+                    currentPhotoUri = Uri.fromFile(currentPhotoFile)
+
+                    copyImage(getImageFromUri(selectedImage), currentPhotoFile)
+
+                    sewingMachine.imgUrl = currentPhotoUri.toString()
+                    imgSewingMachineDetails.setImageBitmap(getImageFromUri(currentPhotoUri))
+                }
+            }
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun loadDefaultScreen(){
         createSpinner()
         btnSewingMachineAction.setOnClickListener { confirmButtonAction() }
         imgSewingMachineDetails.setOnClickListener {
@@ -98,32 +134,28 @@ class SewingMachineDetailsFragment : Fragment() {
             } else
                 selectImage(requireContext())
         }
-
-
-        if (!isCreation) {
-            sewingMachine = requireArguments().getParcelable("machine")!!
-            Log.i(TAG, "Sewing machine: ${sewingMachine.name}")
-            btnSewingMachineAction.text = "Modificar"
-            txtSewingMachineName.editText!!.setText(sewingMachine.name)
-            spinnerSewingMachineDetails.setSelection(if (sewingMachine.hasPedal) 1 else 0)
-
-            showDeleteButton()
-        }
-
-
     }
+
+
+    private fun loadUpdateScreen(){
+        sewingMachine = requireArguments().getParcelable("machine")!!
+        Log.i(TAG, "Sewing machine: ${sewingMachine.name}")
+        btnSewingMachineAction.text = "Modificar"
+        txtSewingMachineName.editText!!.setText(sewingMachine.name)
+        spinnerSewingMachineDetails.setSelection(if (sewingMachine.hasPedal) 1 else 0)
+        if(sewingMachine.imgUrl?.isNotEmpty() == true) {
+            currentPhotoUri=Uri.parse(sewingMachine.imgUrl)
+            imgSewingMachineDetails.setImageBitmap(getImageFromUri(currentPhotoUri))
+        }
+        showDeleteButton()
+    }
+
 
     private fun showDeleteButton(){
         btnDeleteSewingMachine.visibility=View.VISIBLE
         btnDeleteSewingMachine.isClickable=true
         btnDeleteSewingMachine.setOnClickListener { deleteMachine() }
     }
-
-
-    private fun hasPermissions(context: Context, vararg permissions: String): Boolean =
-        permissions.all {
-            ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-        }
 
 
     private fun createSpinner() {
@@ -138,6 +170,7 @@ class SewingMachineDetailsFragment : Fragment() {
             spinnerSewingMachineDetails.adapter = adapter
         }
     }
+
 
     private fun confirmButtonAction() {
         if (checkFields()) {
@@ -170,10 +203,105 @@ class SewingMachineDetailsFragment : Fragment() {
             val navController = requireActivity().findNavController(R.id.nav_host_fragment)
             navController.popBackStack()
         }
-
     }
 
+    private fun checkFields(): Boolean {
+        return txtSewingMachineName.editText!!.text.isNotBlank() && txtSewingMachineName.editText!!.text.isNotEmpty()
+    }
+
+
+    private fun hasPermissions(context: Context, vararg permissions: String): Boolean =
+        permissions.all {
+            ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+        }
+
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            PERMISSION_ALL -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this.requireContext(), "Permission granted.", Toast.LENGTH_SHORT)
+                        .show()
+
+                } else {
+                    Toast.makeText(
+                        this.requireContext(),
+                        "Permission must be granted to use the application.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+//####################################################################################################
+                val perms: MutableMap<String, Int> = HashMap()
+
+                // Initialize the map with both permissions
+                perms[Manifest.permission.CAMERA] = PackageManager.PERMISSION_GRANTED
+                perms[Manifest.permission.READ_EXTERNAL_STORAGE] = PackageManager.PERMISSION_GRANTED
+                perms[Manifest.permission.WRITE_EXTERNAL_STORAGE] =
+                    PackageManager.PERMISSION_GRANTED
+
+                // Fill with actual results from user
+                if (grantResults.isNotEmpty()) {
+                    for (i in permissions.indices) perms[permissions[i]] = grantResults[i]
+                    // Check for both permissions
+                    if (perms[Manifest.permission.CAMERA] == PackageManager.PERMISSION_GRANTED
+                        && perms[Manifest.permission.READ_EXTERNAL_STORAGE] == PackageManager.PERMISSION_GRANTED
+                        && perms[Manifest.permission.WRITE_EXTERNAL_STORAGE] == PackageManager.PERMISSION_GRANTED
+                    ) {
+
+                        Log.d(TAG, "all permissions granted")
+                        selectImage(requireContext())
+
+                    } else {
+                        Log.d(TAG, "Some permissions are not granted ask again ")
+
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                                requireActivity(),
+                                Manifest.permission.CAMERA
+                            ) || ActivityCompat.shouldShowRequestPermissionRationale(
+                                requireActivity(),
+                                Manifest.permission.READ_EXTERNAL_STORAGE
+                            ) || ActivityCompat.shouldShowRequestPermissionRationale(
+                                requireActivity(),
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                            )
+                        ) {
+                            showDialogOK(
+                                "Camera and Storage Read Permission required for this app"
+                            ) { _, which ->
+                                when (which) {
+                                    DialogInterface.BUTTON_POSITIVE -> ActivityCompat.requestPermissions(
+                                        requireActivity(),
+                                        PERMISSIONS,
+                                        PERMISSION_ALL
+                                    )
+                                    DialogInterface.BUTTON_NEGATIVE -> {
+                                    }
+                                }
+                            }
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "Go to settings and enable permissions",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            //proceed with logic by disabling the related features or quit the app.
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     private fun deleteMachine(){
+        deleteImageFile()
         val databaseConnection = SewingMachinedatabaseConnection(requireContext())
         databaseConnection.open()
         databaseConnection.delete(sewingMachine)
@@ -182,9 +310,15 @@ class SewingMachineDetailsFragment : Fragment() {
         navController.popBackStack()
     }
 
-    private fun checkFields(): Boolean {
-        return txtSewingMachineName.editText!!.text.isNotBlank() && txtSewingMachineName.editText!!.text.isNotEmpty()
+    private fun deleteImageFile(){
+        //TODO
+        val file = File(currentPhotoUri.path)
+        if (file.exists()){
+            file.delete()
+        }
+
     }
+
 
     private fun selectImage(context: Context) {
         val options = arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")
@@ -209,28 +343,17 @@ class SewingMachineDetailsFragment : Fragment() {
     }
 
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode != RESULT_CANCELED) {
-            when (requestCode) {
-                REQUEST_IMAGE_CAPTURE -> if (resultCode == RESULT_OK) {
-                    sewingMachine.imgUrl = currentPhotoUri.toString()
-                    setImageFromUri(currentPhotoUri)
-                }
-                REQUEST_IMAGE_PICK -> if (resultCode == RESULT_OK && data != null) {
-                    val selectedImage = data.data
-                    if (selectedImage != null) {
-                        currentPhotoUri = selectedImage
-                    }
-                    sewingMachine.imgUrl = currentPhotoUri.toString()
-                    setImageFromUri(currentPhotoUri)
-
-                }
-            }
+    private fun copyImage(bitmap: Bitmap?, createdImageFile: File) {
+        val destination = FileOutputStream(createdImageFile)
+        if(bitmap!=null){
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, destination)
+            destination.flush()
         }
+
+        destination.close()
     }
 
-    private fun setImageFromUri(imageUri: Uri?) {
+    private fun getImageFromUri(imageUri: Uri?): Bitmap? {
         var image: Bitmap
         if (imageUri != null) {
             requireActivity().contentResolver.openFileDescriptor(imageUri, "r")
@@ -250,20 +373,20 @@ class SewingMachineDetailsFragment : Fragment() {
                             ExifInterface.ORIENTATION_UNDEFINED
                         )
 
-                        val rotatedBitmap: Bitmap? = when (orientation) {
+                        return when (orientation) {
                             ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(image, 90F)
                             ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(image, 180F)
                             ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(image, 270F)
                             ExifInterface.ORIENTATION_NORMAL -> image
                             else -> image
                         }
-
-                        imgSewingMachineDetails.setImageBitmap(rotatedBitmap)
                     }
                 }
 
         }
+        return null
     }
+
 
     private fun rotateImage(source: Bitmap, angle: Float): Bitmap? {
         val matrix = Matrix()
@@ -274,9 +397,6 @@ class SewingMachineDetailsFragment : Fragment() {
         )
     }
 
-
-    private lateinit var currentPhotoPath: String
-    lateinit var currentPhotoUri: Uri
 
     @SuppressLint("SimpleDateFormat")
     private fun createImageFile(): File {
@@ -323,92 +443,7 @@ class SewingMachineDetailsFragment : Fragment() {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            PERMISSION_ALL -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this.requireContext(), "Permission granted.", Toast.LENGTH_SHORT)
-                        .show()
 
-                } else {
-                    Toast.makeText(
-                        this.requireContext(),
-                        "Permission must be granted to use the application.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-
-//####################################################################################################
-                val perms: MutableMap<String, Int> = HashMap()
-
-                // Initialize the map with both permissions
-                perms[Manifest.permission.CAMERA] = PackageManager.PERMISSION_GRANTED
-                perms[Manifest.permission.READ_EXTERNAL_STORAGE] = PackageManager.PERMISSION_GRANTED
-                perms[Manifest.permission.WRITE_EXTERNAL_STORAGE] =
-                    PackageManager.PERMISSION_GRANTED
-
-                // Fill with actual results from user
-                if (grantResults.isNotEmpty()) {
-                    for (i in permissions.indices) perms[permissions[i]] = grantResults[i]
-                    // Check for both permissions
-                    if (perms[Manifest.permission.CAMERA] == PackageManager.PERMISSION_GRANTED
-                        && perms[Manifest.permission.READ_EXTERNAL_STORAGE] == PackageManager.PERMISSION_GRANTED
-                        && perms[Manifest.permission.WRITE_EXTERNAL_STORAGE] == PackageManager.PERMISSION_GRANTED
-                    ) {
-
-                        Log.d(TAG, "all permissions granted")
-                        selectImage(requireContext())
-
-                    } else {
-
-                        Log.d(TAG, "Some permissions are not granted ask again ")
-                        //permission is denied (this is the first time, when "never ask again" is not checked) so ask again explaining the usage of permission
-//                        // shouldShowRequestPermissionRationale will return true
-                        //show the dialog or snackbar saying its necessary and try again otherwise proceed with setup.
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(
-                                requireActivity(),
-                                Manifest.permission.CAMERA
-                            ) || ActivityCompat.shouldShowRequestPermissionRationale(
-                                requireActivity(),
-                                Manifest.permission.READ_EXTERNAL_STORAGE
-                            ) || ActivityCompat.shouldShowRequestPermissionRationale(
-                                requireActivity(),
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                            )
-                        ) {
-                            showDialogOK(
-                                "Camera and Storage Read Permission required for this app"
-                            ) { _, which ->
-                                when (which) {
-                                    DialogInterface.BUTTON_POSITIVE -> ActivityCompat.requestPermissions(
-                                        requireActivity(),
-                                        PERMISSIONS,
-                                        PERMISSION_ALL
-                                    )
-                                    DialogInterface.BUTTON_NEGATIVE -> {
-                                    }
-                                }
-                            }
-                        } else {
-                            Toast.makeText(
-                                requireContext(),
-                                "Go to settings and enable permissions",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            //proceed with logic by disabling the related features or quit the app.
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     private fun showDialogOK(message: String, okListener: DialogInterface.OnClickListener) {
         AlertDialog.Builder(requireContext())
