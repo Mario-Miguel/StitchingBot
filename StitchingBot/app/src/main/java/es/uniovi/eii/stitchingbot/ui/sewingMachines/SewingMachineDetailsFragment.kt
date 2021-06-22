@@ -311,7 +311,7 @@ class SewingMachineDetailsFragment : Fragment() {
     }
 
     private fun deleteImageFile(){
-        //TODO
+        //TODO hacer mensaje de confirmación
         val file = File(currentPhotoUri.path)
         if (file.exists()){
             file.delete()
@@ -405,7 +405,7 @@ class SewingMachineDetailsFragment : Fragment() {
         val storageDir: File? =
             requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
-            "JPEG_${timeStamp}_", /* prefix */
+            "SEWMACH_${timeStamp}_", /* prefix */
             ".jpg", /* suffix */
             storageDir /* directory */
         ).apply {

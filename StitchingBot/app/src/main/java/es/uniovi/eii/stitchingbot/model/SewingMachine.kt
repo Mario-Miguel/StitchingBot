@@ -17,8 +17,6 @@ data class SewingMachine(
     ) {
     }
 
-    constructor(name: String, imgUrl: String="", hasPedal: Boolean ) : this(0, name, imgUrl, hasPedal)
-
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(id)
         parcel.writeString(name)

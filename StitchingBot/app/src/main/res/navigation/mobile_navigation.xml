@@ -7,13 +7,13 @@
 
     <fragment
         android:id="@+id/nav_logo_list"
-        android:name="es.uniovi.eii.stitchingbot.ui.LogosListFragment"
+        android:name="es.uniovi.eii.stitchingbot.ui.logos.LogosListFragment"
         android:label="@string/menu_logos_list"
         tools:layout="@layout/fragment_logos_list" />
 
     <fragment
         android:id="@+id/nav_create_logo"
-        android:name="es.uniovi.eii.stitchingbot.ui.CreateLogoFragment"
+        android:name="es.uniovi.eii.stitchingbot.ui.logos.CreateLogoFragment"
         android:label="@string/menu_create_logo"
         tools:layout="@layout/fragment_create_logo" />
 

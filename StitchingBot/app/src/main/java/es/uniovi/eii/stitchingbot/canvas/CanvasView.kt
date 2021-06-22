@@ -55,7 +55,7 @@ class CanvasView : View {
     var paintStrokeColor = Color.BLACK
 
     var paintFillColor = Color.BLACK
-    private var paintStrokeWidth = 3f
+    private var paintStrokeWidth = 8f
     private var opacity = 255
     private var blur = 0f
 

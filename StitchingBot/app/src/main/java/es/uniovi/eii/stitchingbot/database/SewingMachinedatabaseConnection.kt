@@ -2,52 +2,36 @@ package es.uniovi.eii.stitchingbot.database
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
 import es.uniovi.eii.stitchingbot.model.SewingMachine
 
-class SewingMachinedatabaseConnection(context: Context) {
-
-    private var dbHelper: DatabaseHelper? = null
-    private var database: SQLiteDatabase? = null
-
-    init {
-        dbHelper = DatabaseHelper(context)
-    }
-
-    fun open() {
-        database = dbHelper!!.writableDatabase
-    }
-
-    fun close() {
-        dbHelper!!.close()
-    }
+class SewingMachinedatabaseConnection(context: Context) : DatabaseConnection<SewingMachine>(context){
 
 
-    fun insert(machine: SewingMachine) {
+    override fun insert(element: SewingMachine) {
         val values = ContentValues()
-        values.putAll(dbHelper!!.getInsertParamsSewingMachinesTable(machine))
+        values.putAll(dbHelper!!.getInsertParamsSewingMachinesTable(element))
 
         database!!.insert(DatabaseHelper.TABLE_SEWING_MACHINES, null, values)
     }
 
-    fun update(machine: SewingMachine){
+    override fun update(element: SewingMachine){
         val values = ContentValues()
-        values.putAll(dbHelper!!.getInsertParamsSewingMachinesTable(machine))
+        values.putAll(dbHelper!!.getInsertParamsSewingMachinesTable(element))
         val where = "id=?"
-        val whereArgs = arrayOf("${machine.id}")
+        val whereArgs = arrayOf("${element.id}")
 
         database!!.update(DatabaseHelper.TABLE_SEWING_MACHINES, values, where, whereArgs)
     }
 
-    fun delete(machine: SewingMachine){
+    override fun delete(element: SewingMachine){
         val where = "id=?"
-        val whereArgs = arrayOf("${machine.id}")
+        val whereArgs = arrayOf("${element.id}")
 
         database!!.delete(DatabaseHelper.TABLE_SEWING_MACHINES, where, whereArgs)
 
     }
 
-    fun getAllData(): ArrayList<SewingMachine> {
+    override fun getAllData(): ArrayList<SewingMachine> {
         val machines = ArrayList<SewingMachine>()
 
         val cursor = database!!.query(
