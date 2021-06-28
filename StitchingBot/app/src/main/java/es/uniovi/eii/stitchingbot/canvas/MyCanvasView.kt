@@ -28,6 +28,7 @@ import es.uniovi.eii.stitchingbot.canvas.tools.FreeDrawingTool
 import es.uniovi.eii.stitchingbot.canvas.tools.Tool
 import kotlin.math.abs
 
+
 // Stroke width for the the paint.
 private const val STROKE_WIDTH = 12f
 
@@ -44,6 +45,7 @@ class MyCanvasView : View {
     private val drawColor = ResourcesCompat.getColor(resources, R.color.black, null)
     private val backgroundColor = ResourcesCompat.getColor(resources, R.color.white, null)
     private lateinit var extraCanvas: Canvas
+    private var logoImage: Bitmap? = null
     private lateinit var extraBitmap: Bitmap
     private lateinit var frame: Rect
 
@@ -87,8 +89,11 @@ class MyCanvasView : View {
         extraCanvas.drawColor(backgroundColor)
 
         // Calculate a rectangular frame around the picture.
-        val inset = 60
-        frame = Rect(inset + 3, inset + 3, width - inset, height - inset)
+        val inset = 50
+        frame = Rect(inset, inset, width - inset, width - inset)
+
+        if (logoImage != null)
+            extraCanvas.drawBitmap(logoImage!!, frame.left.toFloat(), frame.top.toFloat(), null)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -96,9 +101,15 @@ class MyCanvasView : View {
         // Draw the bitmap that has the saved path.
         canvas.drawBitmap(extraBitmap, 0f, 0f, paint)
         // Draw a frame around the canvas.
-        paint.color = ResourcesCompat.getColor(resources, R.color.editor_frame, null)
         extraCanvas.drawRect(frame, paint)
-        paint.color = ResourcesCompat.getColor(resources, R.color.black, null)
+
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val length =
+            if (widthMeasureSpec < heightMeasureSpec) widthMeasureSpec else heightMeasureSpec
+
+        super.onMeasure(length, length)
     }
 
     /**
@@ -142,24 +153,6 @@ class MyCanvasView : View {
         //invalidate()
     }
 
-    //TODO overridear esti metodo pa hacer les herramientes
-//    private fun touchMove() {
-//        val dx = abs(motionTouchEventX - currentX)
-//        val dy = abs(motionTouchEventY - currentY)
-//        if (dx >= touchTolerance || dy >= touchTolerance) {
-//            // QuadTo() adds a quadratic bezier from the last point,
-//            // approaching control point (x1,y1), and ending at (x2,y2).
-//            path.quadTo(currentX, currentY, (motionTouchEventX + currentX) / 2, (motionTouchEventY + currentY) / 2)
-//            currentX = motionTouchEventX
-//            currentY = motionTouchEventY
-//            // Draw the path in the extra bitmap to save it.
-//            extraCanvas.drawPath(path, paint)
-//        }
-//        // Invalidate() is inside the touchMove() under ACTION_MOVE because there are many other
-//        // types of motion events passed into this listener, and we don't want to invalidate the
-//        // view for those.
-//        invalidate()
-//    }
 
     private fun touchMove() {
         val dx = abs(motionTouchEventX - currentX)
@@ -172,26 +165,34 @@ class MyCanvasView : View {
         invalidate()
     }
 
+
     private fun touchUp() {
         // Reset the path so it doesn't get drawn again.
         //path.reset()
+
         tool.touchUp(path, extraCanvas)
         invalidate()
     }
 
+
     fun getBitmapToSave(): Bitmap {
         val cutBitmap = Bitmap.createBitmap(
-            extraBitmap.width - frame.left,
-            extraBitmap.height - frame.top,
+            frame.width(),
+            frame.height(),
             Bitmap.Config.ARGB_8888
         )
+
         val auxCanvas = Canvas(cutBitmap)
-        val srcRect = Rect(frame.left+5, frame.top+5, frame.right-5, frame.bottom-5)
-        val destRect = Rect(frame.left, frame.top, frame.right, frame.bottom)
+        val srcRect = Rect(frame.left + 5, frame.top + 5, frame.right - 5, frame.bottom - 5)
+        val destRect = Rect(0, 0, 1000, 1000)
 
         auxCanvas.drawBitmap(extraBitmap, srcRect, destRect, null)
 
         return cutBitmap
+    }
+
+    fun setImage(bitmap: Bitmap) {
+        logoImage = bitmap
     }
 
 

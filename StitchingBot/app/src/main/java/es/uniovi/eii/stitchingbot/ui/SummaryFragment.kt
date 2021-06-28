@@ -1,82 +1,55 @@
-package es.uniovi.eii.stitchingbot.ui.logos
+package es.uniovi.eii.stitchingbot.ui
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.exifinterface.media.ExifInterface
-import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.adapter.LogoListAdapter
-import es.uniovi.eii.stitchingbot.adapter.SewingMachinesListAdapter
-import es.uniovi.eii.stitchingbot.database.LogoDatabaseConnection
-import es.uniovi.eii.stitchingbot.database.SewingMachinedatabaseConnection
 import es.uniovi.eii.stitchingbot.model.Logo
 import es.uniovi.eii.stitchingbot.model.SewingMachine
-import es.uniovi.eii.stitchingbot.translator.Main
-import es.uniovi.eii.stitchingbot.translator.TAG
-import kotlinx.android.synthetic.main.fragment_logos_list.*
-import kotlinx.android.synthetic.main.fragment_sewing_machines.*
+import kotlinx.android.synthetic.main.fragment_summary.*
 
-class LogosListFragment : Fragment() {
+// TODO: Rename parameter arguments, choose names that match
+// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+private const val LOGO = "logo"
+private const val SEWING_MACHINE = "machine"
 
-    lateinit var logosList: List<Logo>
-    lateinit var databaseConnection: LogoDatabaseConnection
+/**
+ * A simple [Fragment] subclass.
+ * Use the [SummaryFragment.newInstance] factory method to
+ * create an instance of this fragment.
+ */
+class SummaryFragment : Fragment() {
+    // TODO: Rename and change types of parameters
+    private lateinit var logo: Logo
+    private var sewingMachine: SewingMachine? = null
+
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-
-
-        return inflater.inflate(R.layout.fragment_logos_list, container, false)
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_summary, container, false)
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        databaseConnection = LogoDatabaseConnection(this.requireContext())
+        if (arguments != null){
+            logo = requireArguments().getParcelable(LOGO)!!
+        }
 
+        val logoImage = getImageFromUri(Uri.parse(logo.imgUrl))
+        imgLogoSummary.setImageBitmap(logoImage)
 
-        logosList = getSavedLogos()
-
-        rvLogoList.layoutManager = GridLayoutManager(context, 2)
-        rvLogoList.adapter = LogoListAdapter(logosList) { logo -> createListener(logo) }
-
-
-    }
-
-
-
-    private fun createListener(logo: Logo) {
-        Log.i(TAG, "Logo: ${logo.title}")
-        //TODO eliminar cuando termine las pruebas de parsear
-
-        val isCreationMode = (logo.id<0)
-        val bundle = bundleOf("creation" to isCreationMode, "logo" to logo)
-        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-        navController.navigate(R.id.nav_create_logo, bundle)
-
-    }
-
-
-    private fun getSavedLogos(): ArrayList<Logo> {
-        databaseConnection.open()
-        val list = databaseConnection.getAllData()
-        databaseConnection.close()
-
-        return list
     }
 
     //TODO eliminar cuando termine las pruebas de parsear
@@ -124,4 +97,23 @@ class LogosListFragment : Fragment() {
         )
     }
 
+    companion object {
+        /**
+         * Use this factory method to create a new instance of
+         * this fragment using the provided parameters.
+         *
+         * @param logo Parameter 1.
+         * @param sewingMachine Parameter 2.
+         * @return A new instance of fragment SummaryFragment.
+         */
+        // TODO: Rename and change types and number of parameters
+        @JvmStatic
+        fun newInstance(logo: Logo, sewingMachine: SewingMachine) =
+            SummaryFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable(LOGO, logo)
+                    putParcelable(SEWING_MACHINE, sewingMachine)
+                }
+            }
+    }
 }

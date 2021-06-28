@@ -1,11 +1,13 @@
 package es.uniovi.eii.stitchingbot.canvas.tools
 
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
-import es.uniovi.eii.stitchingbot.canvas.MyCanvasView
 
-class FreeDrawingTool() : Tool {
+class EraseTool:Tool {
+
+    //TODO Terminar de hacer esto
     var currentX: Float = 0F
     var currentY: Float = 0F
     lateinit var paint: Paint
@@ -19,6 +21,8 @@ class FreeDrawingTool() : Tool {
         this.currentX = currentX
         this.currentY = currentY
         this.paint = paint
+        this.paint.color = Color.WHITE
+        this.paint.strokeWidth=22f
 
     }
 
@@ -42,8 +46,6 @@ class FreeDrawingTool() : Tool {
     override fun touchUp(path: Path, extraCanvas:Canvas) {
         path.reset()
     }
-
-
 
 
 }

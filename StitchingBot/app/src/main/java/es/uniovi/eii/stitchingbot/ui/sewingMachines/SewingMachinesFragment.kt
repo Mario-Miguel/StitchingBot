@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.fragment_sewing_machines.*
 class SewingMachinesFragment : Fragment() {
 
     lateinit var machinesList: ArrayList<SewingMachine>
-    lateinit var databaseConnection: SewingMachinedatabaseConnection
+    private lateinit var databaseConnection: SewingMachinedatabaseConnection
 
 
 

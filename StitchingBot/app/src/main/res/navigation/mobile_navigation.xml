@@ -18,12 +18,6 @@
         tools:layout="@layout/fragment_create_logo" />
 
     <fragment
-        android:id="@+id/nav_load_file"
-        android:name="es.uniovi.eii.stitchingbot.ui.LoadFileFragment"
-        android:label="@string/menu_load_file"
-        tools:layout="@layout/fragment_load_file" />
-
-    <fragment
         android:id="@+id/nav_sewing_machines"
         android:name="es.uniovi.eii.stitchingbot.ui.sewingMachines.SewingMachinesFragment"
         android:label="@string/menu_sewing_machines"
@@ -47,6 +41,12 @@
         android:name="es.uniovi.eii.stitchingbot.ui.arduino.ArduinoConfigurationFragment"
         android:label="@string/menu_arduino_config"
         tools:layout="@layout/fragment_arduino_configuration" />
+
+    <fragment
+        android:id="@+id/nav_summary"
+        android:name="es.uniovi.eii.stitchingbot.ui.SummaryFragment"
+        android:label="@string/menu_summary"
+        tools:layout="@layout/fragment_summary" />
 
 
 </navigation>

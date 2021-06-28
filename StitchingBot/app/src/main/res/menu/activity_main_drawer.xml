@@ -15,10 +15,6 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/menu_create_logo" />
 
-        <item
-            android:id="@+id/nav_load_file"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/menu_load_file" />
 
         <item
             android:id="@+id/nav_sewing_machines"

@@ -1,5 +1,6 @@
 package es.uniovi.eii.stitchingbot
 
+import android.app.UiModeManager
 import android.bluetooth.BluetoothSocket
 import android.os.Bundle
 import android.os.Handler
@@ -13,6 +14,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import java.io.IOException
@@ -26,6 +28,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        UiModeManager.MODE_NIGHT_NO
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -40,7 +44,6 @@ class MainActivity : AppCompatActivity() {
             setOf(
                 R.id.nav_logo_list,
                 R.id.nav_create_logo,
-                R.id.nav_load_file,
                 R.id.nav_sewing_machines,
                 R.id.nav_arduino_connection
             ), drawerLayout

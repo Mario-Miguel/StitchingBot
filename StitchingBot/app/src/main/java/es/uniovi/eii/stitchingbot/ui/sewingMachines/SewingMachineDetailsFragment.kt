@@ -110,8 +110,15 @@ class SewingMachineDetailsFragment : Fragment() {
                 }
                 REQUEST_IMAGE_PICK -> if (resultCode == RESULT_OK && data != null) {
                     val selectedImage = data.data
-                    val currentPhotoFile= createImageFile()
-                    currentPhotoUri = Uri.fromFile(currentPhotoFile)
+                    var currentPhotoFile:File
+
+                    if(!sewingMachine.imgUrl.isNullOrBlank()) {
+                        currentPhotoFile = createImageFile()
+                        currentPhotoUri = Uri.fromFile(currentPhotoFile)
+                    }
+                    else{
+                        currentPhotoFile = File(currentPhotoUri.path)
+                    }
 
                     copyImage(getImageFromUri(selectedImage), currentPhotoFile)
 

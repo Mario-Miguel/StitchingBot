@@ -9,7 +9,7 @@ import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.model.Logo
 import kotlinx.android.synthetic.main.card_recycler_view_logo.view.*
 
-class LogoListAdapter(logosList: List<Logo>, val listener: (Logo) -> Unit) : RecyclerView.Adapter<LogoListAdapter.LogoViewHolder>() {
+class LogoListAdapter(logosList: List<Logo>, private val listener: (Logo) -> Unit) : RecyclerView.Adapter<LogoListAdapter.LogoViewHolder>() {
 
     var logos : List<Logo> = logosList
 
@@ -30,7 +30,7 @@ class LogoListAdapter(logosList: List<Logo>, val listener: (Logo) -> Unit) : Rec
 
         fun bind(logo: Logo, listener: (Logo) -> Unit) = with(itemView) {
             txtTitleLogo.text = logo.title
-            if(logo.imgUrl.isNotEmpty())
+            if(logo.imgUrl!!.isNotEmpty())
                 Picasso.get().load(logo.imgUrl).into(imgLogo)
             setOnClickListener { listener(logo) }
         }

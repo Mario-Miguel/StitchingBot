@@ -3,11 +3,8 @@ package es.uniovi.eii.stitchingbot.canvas.tools
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
-import android.util.Log
-import es.uniovi.eii.stitchingbot.translator.TAG
 
-class SquareTool() : Tool {
-
+class LineTool:Tool {
     private var currentX: Float = 0F
     private var currentY: Float = 0F
     lateinit var paint: Paint
@@ -31,12 +28,24 @@ class SquareTool() : Tool {
         motionTouchEventX: Float,
         motionTouchEventY: Float,
         path: Path,
-        extraCanvas: Canvas
+        canvas: Canvas
     ) {
 
         this.motionTouchEventX=motionTouchEventX
         this.motionTouchEventY=motionTouchEventY
 
+
+        path.quadTo(
+            currentX,
+            currentY,
+            (motionTouchEventX + currentX) / 2,
+            (motionTouchEventY + currentY) / 2
+        )
+        currentX = motionTouchEventX
+        currentY = motionTouchEventY
+
+        // Draw the path in the extra bitmap to save it.
+        canvas.drawPath(path, paint)
 
     }
 
@@ -50,11 +59,7 @@ class SquareTool() : Tool {
 
 
     private fun drawRectangle(canvas: Canvas, paint: Paint) {
-        val right: Float = if (currentX > motionTouchEventX) currentX else motionTouchEventX
-        val left: Float = if (currentX > motionTouchEventX) motionTouchEventX else currentX
-        val bottom: Float = if (currentY > motionTouchEventY) currentY else motionTouchEventY
-        val top: Float = if (currentY > motionTouchEventY) motionTouchEventY else currentY
-        canvas.drawRect(left, top, right, bottom, paint)
-    }
 
+        canvas.drawLine(currentX, currentY, motionTouchEventX, motionTouchEventY, paint)
+    }
 }

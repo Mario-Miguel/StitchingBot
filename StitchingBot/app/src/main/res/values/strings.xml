@@ -43,4 +43,6 @@
     <string name="menuPedalDetails">Pedal electrico</string>
     <string name="imgSewingMachineDetails">Imagen de la máquina de coser</string>
     <string name="btnSewingmachinesActionDefault">Agregar</string>
+    <string name="menu_summary">Resumen de la ejecucion</string>
+    <string name="action_delete">Eliminar</string>
 </resources>
