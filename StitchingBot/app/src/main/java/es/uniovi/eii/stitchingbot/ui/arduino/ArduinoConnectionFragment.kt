@@ -3,7 +3,6 @@ package es.uniovi.eii.stitchingbot.ui.arduino
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothSocket
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -21,6 +20,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -39,10 +39,12 @@ const val MESSAGE_READ = 2
 
 class ArduinoConnectionFragment : Fragment() {
 
-    lateinit var bluetoothAdapter: BluetoothAdapter
+    private var bluetoothAdapter: BluetoothAdapter? = null
     private lateinit var deviceAdapter: DevicesListAdapter
     private val REQUEST_ENABLE_BT: Int = 3
     private val REQUEST_PERMISSION_BLUETOOTH: Int = 5
+
+    private var comesFromSummary: Boolean = false
 
 
 //    var mmSocket: BluetoothSocket? = null
@@ -63,6 +65,10 @@ class ArduinoConnectionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if(arguments!= null){
+            comesFromSummary = requireArguments().getBoolean("summary")
+        }
+
         initBluetoothAdapter()
         //Register receiver
         val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
@@ -77,7 +83,7 @@ class ArduinoConnectionFragment : Fragment() {
         super.onDestroy()
 
         if (bluetoothAdapter != null) {
-            bluetoothAdapter.cancelDiscovery()
+            bluetoothAdapter!!.cancelDiscovery()
         }
         requireActivity().unregisterReceiver(receiver)
 
@@ -95,7 +101,7 @@ class ArduinoConnectionFragment : Fragment() {
             Log.i("BluetoothStitching", "No hay bluetooth disponible")
         }
 
-        if (!bluetoothAdapter.isEnabled) {
+        if (!bluetoothAdapter!!.isEnabled) {
             Log.i("BluetoothStitching", "hay bluetooth disponible")
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
@@ -155,13 +161,11 @@ class ArduinoConnectionFragment : Fragment() {
 
         createConnection(bluetoothDevice)
 
-        //startConfigurationFragment()
-
     }
 
 
     private fun createConnection(bluetoothDevice: BluetoothDevice) {
-        bluetoothAdapter.cancelDiscovery()
+        bluetoothAdapter!!.cancelDiscovery()
         try {
 
             //Try to create socket with uuid
@@ -183,8 +187,9 @@ class ArduinoConnectionFragment : Fragment() {
 
 
     private fun startConfigurationFragment() {
+        val bundle = bundleOf("summary" to comesFromSummary)
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-        navController.navigate(R.id.nav_arduino_configuration)
+        navController.navigate(R.id.nav_arduino_configuration, bundle)
 
 
     }
@@ -238,12 +243,12 @@ class ArduinoConnectionFragment : Fragment() {
 
     private fun startDiscovery() {
         deviceAdapter.clearElements()
-        if (bluetoothAdapter.isDiscovering) {
+        if (bluetoothAdapter!!.isDiscovering) {
             Log.i("BluetoothStitching", "Cancel discovery")
-            bluetoothAdapter.cancelDiscovery()
+            bluetoothAdapter!!.cancelDiscovery()
         }
         Log.i("BluetoothStitching", "Start discovery")
-        bluetoothAdapter.startDiscovery()
+        bluetoothAdapter!!.startDiscovery()
     }
 
 

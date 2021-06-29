@@ -45,4 +45,9 @@
     <string name="btnSewingmachinesActionDefault">Agregar</string>
     <string name="menu_summary">Resumen de la ejecucion</string>
     <string name="action_delete">Eliminar</string>
+    <string name="txt_sewing_machine_summary">Añadir máquina de coser</string>
+    <string name="txt_arduino_summary">Estado: desconectado</string>
+    <string name="btn_start_summary">Comenzar</string>
+    <string name="desc_img_arduino_summary">Estado de la conexión del arduino</string>
+    <string name="desc_logo_summary">Logotipo seleccionado</string>
 </resources>

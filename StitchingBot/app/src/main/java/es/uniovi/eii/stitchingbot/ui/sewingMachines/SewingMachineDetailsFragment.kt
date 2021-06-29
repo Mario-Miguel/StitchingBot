@@ -1,20 +1,15 @@
 package es.uniovi.eii.stitchingbot.ui.sewingMachines
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
@@ -26,20 +21,16 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
-import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.bluetooth.TAG
 import es.uniovi.eii.stitchingbot.database.SewingMachinedatabaseConnection
 import es.uniovi.eii.stitchingbot.model.SewingMachine
+import es.uniovi.eii.stitchingbot.util.ImageManager
 import kotlinx.android.synthetic.main.fragment_sewing_machine_details.*
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.HashMap
 
 
 private const val CREATION_MODE = "creation"
@@ -65,8 +56,10 @@ class SewingMachineDetailsFragment : Fragment() {
     private var isCreation: Boolean = false
 
     private var sewingMachine = SewingMachine()
-    private lateinit var currentPhotoPath: String
+
+    //private lateinit var currentPhotoPath: String
     private lateinit var currentPhotoUri: Uri
+    private lateinit var imageManager: ImageManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,11 +69,11 @@ class SewingMachineDetailsFragment : Fragment() {
         }
     }
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         return inflater.inflate(R.layout.fragment_sewing_machine_details, container, false)
     }
 
@@ -88,6 +81,7 @@ class SewingMachineDetailsFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        imageManager = ImageManager()
 
         if (arguments != null)
             isCreation = requireArguments().getBoolean(CREATION_MODE)
@@ -106,24 +100,39 @@ class SewingMachineDetailsFragment : Fragment() {
             when (requestCode) {
                 REQUEST_IMAGE_CAPTURE -> if (resultCode == RESULT_OK) {
                     sewingMachine.imgUrl = currentPhotoUri.toString()
-                    imgSewingMachineDetails.setImageBitmap(getImageFromUri(currentPhotoUri))
+                    imgSewingMachineDetails.setImageBitmap(
+                        imageManager.getImageFromUri(
+                            currentPhotoUri,
+                            requireActivity()
+                        )
+                    )
                 }
                 REQUEST_IMAGE_PICK -> if (resultCode == RESULT_OK && data != null) {
                     val selectedImage = data.data
-                    var currentPhotoFile:File
+                    val currentPhotoFile: File
 
-                    if(!sewingMachine.imgUrl.isNullOrBlank()) {
-                        currentPhotoFile = createImageFile()
+                    if (!sewingMachine.imgUrl.isNullOrBlank()) {
+                        currentPhotoFile = imageManager.createImageFile(requireActivity())
                         currentPhotoUri = Uri.fromFile(currentPhotoFile)
-                    }
-                    else{
-                        currentPhotoFile = File(currentPhotoUri.path)
+                    } else {
+                        currentPhotoUri = Uri.parse(sewingMachine.imgUrl)
+                        currentPhotoFile = File(currentPhotoUri.path!!)
                     }
 
-                    copyImage(getImageFromUri(selectedImage), currentPhotoFile)
+                    imageManager.copyImage(
+                        imageManager.getImageFromUri(
+                            selectedImage,
+                            requireActivity()
+                        ), currentPhotoFile
+                    )
 
                     sewingMachine.imgUrl = currentPhotoUri.toString()
-                    imgSewingMachineDetails.setImageBitmap(getImageFromUri(currentPhotoUri))
+                    imgSewingMachineDetails.setImageBitmap(
+                        imageManager.getImageFromUri(
+                            currentPhotoUri,
+                            requireActivity()
+                        )
+                    )
                 }
             }
         }
@@ -131,7 +140,7 @@ class SewingMachineDetailsFragment : Fragment() {
 
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun loadDefaultScreen(){
+    private fun loadDefaultScreen() {
         createSpinner()
         btnSewingMachineAction.setOnClickListener { confirmButtonAction() }
         imgSewingMachineDetails.setOnClickListener {
@@ -144,23 +153,28 @@ class SewingMachineDetailsFragment : Fragment() {
     }
 
 
-    private fun loadUpdateScreen(){
+    private fun loadUpdateScreen() {
         sewingMachine = requireArguments().getParcelable("machine")!!
         Log.i(TAG, "Sewing machine: ${sewingMachine.name}")
         btnSewingMachineAction.text = "Modificar"
         txtSewingMachineName.editText!!.setText(sewingMachine.name)
         spinnerSewingMachineDetails.setSelection(if (sewingMachine.hasPedal) 1 else 0)
-        if(sewingMachine.imgUrl?.isNotEmpty() == true) {
-            currentPhotoUri=Uri.parse(sewingMachine.imgUrl)
-            imgSewingMachineDetails.setImageBitmap(getImageFromUri(currentPhotoUri))
+        if (sewingMachine.imgUrl?.isNotEmpty() == true) {
+            currentPhotoUri = Uri.parse(sewingMachine.imgUrl)
+            imgSewingMachineDetails.setImageBitmap(
+                imageManager.getImageFromUri(
+                    currentPhotoUri,
+                    requireActivity()
+                )
+            )
         }
         showDeleteButton()
     }
 
 
-    private fun showDeleteButton(){
-        btnDeleteSewingMachine.visibility=View.VISIBLE
-        btnDeleteSewingMachine.isClickable=true
+    private fun showDeleteButton() {
+        btnDeleteSewingMachine.visibility = View.VISIBLE
+        btnDeleteSewingMachine.isClickable = true
         btnDeleteSewingMachine.setOnClickListener { deleteMachine() }
     }
 
@@ -194,8 +208,7 @@ class SewingMachineDetailsFragment : Fragment() {
                     TAG,
                     "Insertada maquina de coser: ${sewingMachine.name} - ${sewingMachine.hasPedal} - ${sewingMachine.imgUrl}"
                 )
-            }
-            else{
+            } else {
                 databaseConnection.open()
                 databaseConnection.update(sewingMachine)
                 databaseConnection.close()
@@ -244,7 +257,6 @@ class SewingMachineDetailsFragment : Fragment() {
                     ).show()
                 }
 
-//####################################################################################################
                 val perms: MutableMap<String, Int> = HashMap()
 
                 // Initialize the map with both permissions
@@ -307,23 +319,14 @@ class SewingMachineDetailsFragment : Fragment() {
     }
 
 
-    private fun deleteMachine(){
-        deleteImageFile()
+    private fun deleteMachine() {
+        imageManager.deleteImageFile(currentPhotoUri)
         val databaseConnection = SewingMachinedatabaseConnection(requireContext())
         databaseConnection.open()
         databaseConnection.delete(sewingMachine)
         databaseConnection.close()
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.popBackStack()
-    }
-
-    private fun deleteImageFile(){
-        //TODO hacer mensaje de confirmación
-        val file = File(currentPhotoUri.path)
-        if (file.exists()){
-            file.delete()
-        }
-
     }
 
 
@@ -350,84 +353,13 @@ class SewingMachineDetailsFragment : Fragment() {
     }
 
 
-    private fun copyImage(bitmap: Bitmap?, createdImageFile: File) {
-        val destination = FileOutputStream(createdImageFile)
-        if(bitmap!=null){
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, destination)
-            destination.flush()
-        }
-
-        destination.close()
-    }
-
-    private fun getImageFromUri(imageUri: Uri?): Bitmap? {
-        var image: Bitmap
-        if (imageUri != null) {
-            requireActivity().contentResolver.openFileDescriptor(imageUri, "r")
-                .use { pfd ->
-                    if (pfd != null) {
-                        val matrix = Matrix()
-                        matrix.postRotate(180F)
-                        image = BitmapFactory.decodeFileDescriptor(pfd.fileDescriptor)
-                        //Rotate bitmap
-                        val ei = requireActivity().contentResolver.openInputStream(imageUri)?.let {
-                            ExifInterface(
-                                it
-                            )
-                        }
-                        val orientation: Int = ei!!.getAttributeInt(
-                            ExifInterface.TAG_ORIENTATION,
-                            ExifInterface.ORIENTATION_UNDEFINED
-                        )
-
-                        return when (orientation) {
-                            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(image, 90F)
-                            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(image, 180F)
-                            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(image, 270F)
-                            ExifInterface.ORIENTATION_NORMAL -> image
-                            else -> image
-                        }
-                    }
-                }
-
-        }
-        return null
-    }
-
-
-    private fun rotateImage(source: Bitmap, angle: Float): Bitmap? {
-        val matrix = Matrix()
-        matrix.postRotate(angle)
-        return Bitmap.createBitmap(
-            source, 0, 0, source.width, source.height,
-            matrix, true
-        )
-    }
-
-
-    @SuppressLint("SimpleDateFormat")
-    private fun createImageFile(): File {
-        // Create an image file name
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val storageDir: File? =
-            requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "SEWMACH_${timeStamp}_", /* prefix */
-            ".jpg", /* suffix */
-            storageDir /* directory */
-        ).apply {
-            // Save a file: path for use with ACTION_VIEW intents
-            currentPhotoPath = absolutePath
-        }
-    }
-
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
             takePictureIntent.resolveActivity(requireActivity().packageManager)?.also {
                 // Create the File where the photo should go
                 val photoFile: File? = try {
-                    createImageFile()
+                    imageManager.createImageFile(requireActivity())
                 } catch (ex: IOException) {
                     // Error occurred while creating the File
                     Log.i(TAG, "Error creando archivo")
@@ -448,8 +380,6 @@ class SewingMachineDetailsFragment : Fragment() {
             }
         }
     }
-
-
 
 
     private fun showDialogOK(message: String, okListener: DialogInterface.OnClickListener) {

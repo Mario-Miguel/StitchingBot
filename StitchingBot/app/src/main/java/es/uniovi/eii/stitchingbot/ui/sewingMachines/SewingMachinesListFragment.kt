@@ -15,10 +15,12 @@ import es.uniovi.eii.stitchingbot.model.SewingMachine
 import kotlinx.android.synthetic.main.fragment_sewing_machines.*
 
 
-class SewingMachinesFragment : Fragment() {
+class SewingMachinesListFragment : Fragment() {
 
     lateinit var machinesList: ArrayList<SewingMachine>
     private lateinit var databaseConnection: SewingMachinedatabaseConnection
+
+    private var comesFromSummary: Boolean = false
 
 
 
@@ -40,16 +42,27 @@ class SewingMachinesFragment : Fragment() {
         //TODO añadir card para crear maquina
         machinesList.add(SewingMachine(-1,"__ADD", "", false))
 
+        if(arguments!= null){
+            comesFromSummary = requireArguments().getBoolean("summary")
+        }
 
         rvMachinesList.layoutManager = GridLayoutManager(context, 2)
         rvMachinesList.adapter = SewingMachinesListAdapter(machinesList) {machine -> createListener(machine)}
     }
 
     private fun createListener(machine: SewingMachine) {
-        val isCreationMode = (machine.id<0)
-        val bundle = bundleOf("creation" to isCreationMode, "machine" to machine)
-        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-        navController.navigate(R.id.nav_sewing_machine_details, bundle)
+        if(comesFromSummary){
+            val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+            navController.previousBackStackEntry?.savedStateHandle?.set("machine", machine)
+            navController.popBackStack()
+
+        }
+        else {
+            val isCreationMode = (machine.id < 0)
+            val bundle = bundleOf("creation" to isCreationMode, "machine" to machine)
+            val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+            navController.navigate(R.id.nav_sewing_machine_details, bundle)
+        }
 
     }
 

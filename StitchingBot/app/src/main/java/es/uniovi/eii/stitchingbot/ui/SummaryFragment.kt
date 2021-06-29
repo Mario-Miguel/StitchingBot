@@ -1,24 +1,30 @@
 package es.uniovi.eii.stitchingbot.ui
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.exifinterface.media.ExifInterface
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
+import es.uniovi.eii.stitchingbot.bluetooth.MyBluetoothService
 import es.uniovi.eii.stitchingbot.model.Logo
 import es.uniovi.eii.stitchingbot.model.SewingMachine
+import es.uniovi.eii.stitchingbot.translator.TAG
+import es.uniovi.eii.stitchingbot.util.ImageManager
 import kotlinx.android.synthetic.main.fragment_summary.*
+import java.io.OutputStream
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val LOGO = "logo"
 private const val SEWING_MACHINE = "machine"
+private const val ARDUINO = "arduino"
+private const val SUMMARY = "summary"
 
 /**
  * A simple [Fragment] subclass.
@@ -26,9 +32,13 @@ private const val SEWING_MACHINE = "machine"
  * create an instance of this fragment.
  */
 class SummaryFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private lateinit var logo: Logo
+    private var logo: Logo? = null
     private var sewingMachine: SewingMachine? = null
+
+    var bluetoothService : MyBluetoothService = MyBluetoothService
+    private var mmOutStream: OutputStream? = null
+
+    private val imageManager = ImageManager()
 
 
     override fun onCreateView(
@@ -43,59 +53,88 @@ class SummaryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (arguments != null){
-            logo = requireArguments().getParcelable(LOGO)!!
+        if (arguments != null) {
+            val auxLogo = requireArguments().getParcelable<Logo>(LOGO)
+            val auxSewingMachine = requireArguments().getParcelable<SewingMachine>(SEWING_MACHINE)
+            if (auxLogo != null)
+                logo = auxLogo
+            if (auxSewingMachine != null)
+                sewingMachine = auxSewingMachine
+
         }
 
-        val logoImage = getImageFromUri(Uri.parse(logo.imgUrl))
-        imgLogoSummary.setImageBitmap(logoImage)
+        if (logo != null) {
+            val logoImage =
+                imageManager.getImageFromUri(Uri.parse(logo!!.imgUrl), requireActivity())
+            imgLogoSummary.setImageBitmap(logoImage)
+        }
+
+        loadListeners()
+
+
+        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+        // Instead of String any types of data can be used
+        navController.currentBackStackEntry?.savedStateHandle?.getLiveData<SewingMachine>(SEWING_MACHINE)
+            ?.observe(viewLifecycleOwner) {
+                updateSewingMachineStatus(it)
+            }
+
+        navController.currentBackStackEntry?.savedStateHandle?.getLiveData<MyBluetoothService>(ARDUINO)
+            ?.observe(viewLifecycleOwner) {
+                updateArduinoStatus(it)
+            }
+
 
     }
 
-    //TODO eliminar cuando termine las pruebas de parsear
-    private fun getImageFromUri(imageUri: Uri?): Bitmap? {
-        var image: Bitmap
-        if (imageUri != null) {
-            requireActivity().contentResolver.openFileDescriptor(imageUri, "r")
-                .use { pfd ->
-                    if (pfd != null) {
-                        val matrix = Matrix()
-                        matrix.postRotate(180F)
-                        image = BitmapFactory.decodeFileDescriptor(pfd.fileDescriptor)
-                        //Rotate bitmap
-                        val ei = requireActivity().contentResolver.openInputStream(imageUri)?.let {
-                            ExifInterface(
-                                it
-                            )
-                        }
-                        val orientation: Int = ei!!.getAttributeInt(
-                            ExifInterface.TAG_ORIENTATION,
-                            ExifInterface.ORIENTATION_UNDEFINED
-                        )
 
-                        return when (orientation) {
-                            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(image, 90F)
-                            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(image, 180F)
-                            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(image, 270F)
-                            ExifInterface.ORIENTATION_NORMAL -> image
-                            else -> image
-                        }
-                    }
-                }
-
-        }
-        return null
+//##################################################################################################
+    private fun loadListeners() {
+        cardViewLogo.setOnClickListener { loadLogoFragment() }
+        cardViewSewingMachine.setOnClickListener { loadSewingMachineFragment() }
+        cardViewArduino.setOnClickListener { loadArduinoFragment() }
     }
 
 
-    private fun rotateImage(source: Bitmap, angle: Float): Bitmap? {
-        val matrix = Matrix()
-        matrix.postRotate(angle)
-        return Bitmap.createBitmap(
-            source, 0, 0, source.width, source.height,
-            matrix, true
+    private fun loadArduinoFragment() {
+        val bundle = bundleOf(SUMMARY to true)
+        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+        navController.navigate(R.id.nav_arduino_connection, bundle)
+    }
+
+
+    private fun loadLogoFragment() {
+        val bundle = bundleOf("creation" to false, LOGO to logo, SUMMARY to true)
+        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+        navController.navigate(R.id.nav_create_logo, bundle)
+    }
+
+
+    private fun loadSewingMachineFragment() {
+        val bundle = bundleOf(SUMMARY to true)
+        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+        navController.navigate(R.id.nav_sewing_machines, bundle)
+    }
+
+
+//##################################################################################################
+    private fun updateSewingMachineStatus(sewingMachine: SewingMachine) {
+        this.sewingMachine = sewingMachine
+        imgSewingMachineSummary.setImageBitmap(
+            imageManager.getImageFromUri(
+                Uri.parse(sewingMachine.imgUrl),
+                requireActivity()
+            )
         )
+        txtSewingMachineSummary.text= sewingMachine.name
     }
+
+    private fun updateArduinoStatus(bluetoothService: MyBluetoothService) {
+        this.bluetoothService = bluetoothService
+        txtArduinoSummary.text = "Estado: conectado"
+        imgRobotSummary.setImageDrawable(getDrawable(requireContext(),R.drawable.ic_baseline_check_24))
+    }
+
 
     companion object {
         /**

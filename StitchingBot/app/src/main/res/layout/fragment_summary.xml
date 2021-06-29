@@ -25,7 +25,8 @@
                 android:id="@+id/imgLogoSummary"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_baseline_add_24" />
+                android:src="@drawable/ic_baseline_add_24"
+                android:contentDescription="@string/desc_logo_summary" />
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
@@ -43,7 +44,15 @@
                 android:id="@+id/imgSewingMachineSummary"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_baseline_add_24" />
+                android:src="@drawable/ic_baseline_add_24"
+                android:contentDescription="@string/txt_sewing_machine_summary" />
+
+            <TextView
+                android:id="@+id/txtSewingMachineSummary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/txt_sewing_machine_summary" />
+
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
@@ -61,14 +70,21 @@
                 android:id="@+id/imgRobotSummary"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_baseline_add_24" />
+                android:src="@drawable/ic_baseline_clear_24"
+                android:contentDescription="@string/desc_img_arduino_summary" />
+
+            <TextView
+                android:id="@+id/txtArduinoSummary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/txt_arduino_summary" />
         </androidx.cardview.widget.CardView>
 
         <Button
             android:id="@+id/button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Comenzar"
+            android:text="@string/btn_start_summary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.539"

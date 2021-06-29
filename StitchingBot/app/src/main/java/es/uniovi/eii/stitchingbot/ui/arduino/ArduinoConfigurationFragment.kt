@@ -5,10 +5,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.bluetooth.ConnectedThread
 import es.uniovi.eii.stitchingbot.bluetooth.MyBluetoothService
 import kotlinx.android.synthetic.main.fragment_arduino_configuration.*
 import java.io.IOException
@@ -19,6 +19,7 @@ class ArduinoConfigurationFragment : Fragment() {
 
     var bluetoothService : MyBluetoothService= MyBluetoothService
     private var mmOutStream: OutputStream? = null
+    private var comesFromSummary: Boolean = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -30,8 +31,10 @@ class ArduinoConfigurationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if(arguments != null){
+            comesFromSummary = requireArguments().getBoolean("summary")
+        }
         initUI()
-        //startConnectedThread()
         startOutputStream()
 
     }
@@ -66,8 +69,15 @@ class ArduinoConfigurationFragment : Fragment() {
     }
 
     private fun startMainFragment(){
-        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-        navController.navigate(R.id.nav_logo_list)
+        if(!comesFromSummary) {
+            val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+            navController.navigate(R.id.nav_logo_list)
+        }
+        else{
+            val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+            navController.previousBackStackEntry?.savedStateHandle?.set("arduino", bluetoothService)
+            navController.popBackStack()
+        }
     }
 
     private fun disconnectDevice(){
@@ -76,14 +86,10 @@ class ArduinoConfigurationFragment : Fragment() {
         navController.navigate(R.id.nav_arduino_connection)
     }
 
-//    private fun startConnectedThread(){
-//        connectedThread = ConnectedThread(bluetoothService.getConnectionSocket()!!, bluetoothService.getHandler())
-//        connectedThread.run()
-//    }
 
     private fun startOutputStream(){
         try {
-            mmOutStream = bluetoothService.getConnectionSocket()?.outputStream ?: null
+            mmOutStream = bluetoothService.getConnectionSocket()?.outputStream
         } catch (e: IOException) {
         }
 
