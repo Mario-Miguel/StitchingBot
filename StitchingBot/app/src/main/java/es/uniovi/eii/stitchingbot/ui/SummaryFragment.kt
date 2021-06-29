@@ -2,7 +2,6 @@ package es.uniovi.eii.stitchingbot.ui
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,13 +13,11 @@ import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.bluetooth.MyBluetoothService
 import es.uniovi.eii.stitchingbot.model.Logo
 import es.uniovi.eii.stitchingbot.model.SewingMachine
-import es.uniovi.eii.stitchingbot.translator.TAG
+import es.uniovi.eii.stitchingbot.translator.Translator
 import es.uniovi.eii.stitchingbot.util.ImageManager
 import kotlinx.android.synthetic.main.fragment_summary.*
-import java.io.OutputStream
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
 private const val LOGO = "logo"
 private const val SEWING_MACHINE = "machine"
 private const val ARDUINO = "arduino"
@@ -35,8 +32,10 @@ class SummaryFragment : Fragment() {
     private var logo: Logo? = null
     private var sewingMachine: SewingMachine? = null
 
-    var bluetoothService : MyBluetoothService = MyBluetoothService
-    private var mmOutStream: OutputStream? = null
+    private var bluetoothService: MyBluetoothService = MyBluetoothService
+
+    private lateinit var translator: Translator
+    private var translationDone : Boolean = false
 
     private val imageManager = ImageManager()
 
@@ -74,21 +73,27 @@ class SummaryFragment : Fragment() {
 
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         // Instead of String any types of data can be used
-        navController.currentBackStackEntry?.savedStateHandle?.getLiveData<SewingMachine>(SEWING_MACHINE)
+        navController.currentBackStackEntry?.savedStateHandle?.getLiveData<String>(ARDUINO)
+            ?.observe(viewLifecycleOwner) {
+                updateArduinoStatus(it)
+            }
+        navController.currentBackStackEntry?.savedStateHandle?.getLiveData<SewingMachine>(
+            SEWING_MACHINE
+        )
             ?.observe(viewLifecycleOwner) {
                 updateSewingMachineStatus(it)
             }
 
-        navController.currentBackStackEntry?.savedStateHandle?.getLiveData<MyBluetoothService>(ARDUINO)
-            ?.observe(viewLifecycleOwner) {
-                updateArduinoStatus(it)
-            }
 
+        btnStartExecution.isEnabled =
+            logo != null && sewingMachine != null && bluetoothService.getConnectionSocket()?.isConnected == true && translationDone
+        btnStartTranslate.setOnClickListener { startTranslation() }
 
+        btnStartExecution.setOnClickListener { startExecution() }
     }
 
 
-//##################################################################################################
+    //##################################################################################################
     private fun loadListeners() {
         cardViewLogo.setOnClickListener { loadLogoFragment() }
         cardViewSewingMachine.setOnClickListener { loadSewingMachineFragment() }
@@ -99,7 +104,10 @@ class SummaryFragment : Fragment() {
     private fun loadArduinoFragment() {
         val bundle = bundleOf(SUMMARY to true)
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-        navController.navigate(R.id.nav_arduino_connection, bundle)
+        if (bluetoothService.getConnectionSocket()?.isConnected == true)
+            navController.navigate(R.id.nav_arduino_configuration, bundle)
+        else
+            navController.navigate(R.id.nav_arduino_connection, bundle)
     }
 
 
@@ -117,7 +125,7 @@ class SummaryFragment : Fragment() {
     }
 
 
-//##################################################################################################
+    //##################################################################################################
     private fun updateSewingMachineStatus(sewingMachine: SewingMachine) {
         this.sewingMachine = sewingMachine
         imgSewingMachineSummary.setImageBitmap(
@@ -126,13 +134,46 @@ class SummaryFragment : Fragment() {
                 requireActivity()
             )
         )
-        txtSewingMachineSummary.text= sewingMachine.name
+        txtSewingMachineSummary.text = sewingMachine.name
     }
 
-    private fun updateArduinoStatus(bluetoothService: MyBluetoothService) {
-        this.bluetoothService = bluetoothService
-        txtArduinoSummary.text = "Estado: conectado"
-        imgRobotSummary.setImageDrawable(getDrawable(requireContext(),R.drawable.ic_baseline_check_24))
+    private fun updateArduinoStatus(status: String) {
+        this.bluetoothService = MyBluetoothService
+        if (bluetoothService.getConnectionSocket()?.isConnected == true) {
+            txtArduinoSummary.text = "Estado: $status"
+            imgRobotSummary.setImageDrawable(
+                getDrawable(
+                    requireContext(),
+                    R.drawable.ic_baseline_check_24
+                )
+            )
+        } else {
+            txtArduinoSummary.text = "Estado: $status"
+            imgRobotSummary.setImageDrawable(
+                getDrawable(
+                    requireContext(),
+                    R.drawable.ic_baseline_clear_24
+                )
+            )
+        }
+
+    }
+
+//##################################################################################################
+
+    private fun startTranslation() {
+        translator = Translator(imageManager.getImageFromUri(Uri.parse(logo!!.imgUrl), requireActivity())!!)
+
+        translationDone = translator.run()
+
+        btnStartExecution.isEnabled =
+            logo != null && sewingMachine != null && bluetoothService.getConnectionSocket()?.isConnected == true && translationDone
+
+
+    }
+
+    private fun startExecution(){
+
     }
 
 

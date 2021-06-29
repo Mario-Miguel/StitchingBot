@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
@@ -17,13 +16,16 @@ import java.io.OutputStream
 
 class ArduinoConfigurationFragment : Fragment() {
 
-    var bluetoothService : MyBluetoothService= MyBluetoothService
+    var bluetoothService: MyBluetoothService = MyBluetoothService
     private var mmOutStream: OutputStream? = null
     private var comesFromSummary: Boolean = false
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this fragment
+
         return inflater.inflate(R.layout.fragment_arduino_configuration, container, false)
     }
 
@@ -31,7 +33,7 @@ class ArduinoConfigurationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if(arguments != null){
+        if (arguments != null) {
             comesFromSummary = requireArguments().getBoolean("summary")
         }
         initUI()
@@ -40,7 +42,7 @@ class ArduinoConfigurationFragment : Fragment() {
     }
 
 
-    private fun initUI(){
+    private fun initUI() {
         btnUpArrow.setOnClickListener { moveUp() }
         btnDownArrow.setOnClickListener { moveDown() }
         btnLeftArrow.setOnClickListener { moveLeft() }
@@ -52,42 +54,55 @@ class ArduinoConfigurationFragment : Fragment() {
     }
 
 
-    private fun moveUp(){
+    private fun moveUp() {
         write("U")
     }
 
-    private fun moveDown(){
+    private fun moveDown() {
         write("D")
     }
 
-    private fun moveRight(){
+    private fun moveRight() {
         write("R")
     }
 
-    private fun moveLeft(){
+    private fun moveLeft() {
         write("L")
     }
 
-    private fun startMainFragment(){
-        if(!comesFromSummary) {
+    private fun startMainFragment() {
+        if (!comesFromSummary) {
             val navController = requireActivity().findNavController(R.id.nav_host_fragment)
             navController.navigate(R.id.nav_logo_list)
-        }
-        else{
+        } else {
             val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-            navController.previousBackStackEntry?.savedStateHandle?.set("arduino", bluetoothService)
-            navController.popBackStack()
+            navController.getBackStackEntry(R.id.nav_summary).savedStateHandle.set(
+                "arduino",
+                "conectado"
+            )
+            navController.popBackStack(R.id.nav_summary, false)
         }
     }
 
-    private fun disconnectDevice(){
+    private fun disconnectDevice() {
         bluetoothService.closeConnectionSocket()
-        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-        navController.navigate(R.id.nav_arduino_connection)
+        if (!comesFromSummary) {
+            val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+            navController.navigate(R.id.nav_arduino_connection)
+        } else {
+
+            val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+            navController.getBackStackEntry(R.id.nav_summary).savedStateHandle.set(
+                "arduino",
+                "desconectado"
+            )
+            navController.popBackStack(R.id.nav_summary, false)
+
+        }
     }
 
 
-    private fun startOutputStream(){
+    private fun startOutputStream() {
         try {
             mmOutStream = bluetoothService.getConnectionSocket()?.outputStream
         } catch (e: IOException) {

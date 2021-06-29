@@ -29,7 +29,7 @@ private const val LOGO = "logo"
  */
 class CreateLogoFragment : Fragment() {
 
-    private var isCreation: Boolean = false
+    private var isCreation: Boolean = true
     lateinit var canvas: MyCanvasView
     private val imageManager = ImageManager()
 

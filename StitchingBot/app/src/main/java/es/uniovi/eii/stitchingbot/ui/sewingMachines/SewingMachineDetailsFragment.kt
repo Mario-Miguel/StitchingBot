@@ -111,7 +111,7 @@ class SewingMachineDetailsFragment : Fragment() {
                     val selectedImage = data.data
                     val currentPhotoFile: File
 
-                    if (!sewingMachine.imgUrl.isNullOrBlank()) {
+                    if (sewingMachine.imgUrl.isNullOrBlank()) {
                         currentPhotoFile = imageManager.createImageFile(requireActivity())
                         currentPhotoUri = Uri.fromFile(currentPhotoFile)
                     } else {

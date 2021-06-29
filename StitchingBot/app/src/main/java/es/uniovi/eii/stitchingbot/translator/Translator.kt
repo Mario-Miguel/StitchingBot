@@ -9,9 +9,9 @@ import es.uniovi.eii.stitchingbot.R
 
 const val TAG : String = "TranslateOrders"
 
-class Main (private val image: Bitmap){
+class Translator (private val image: Bitmap){
 
-    fun run(){
+    fun run(): Boolean{
         //Primero hacerlo con un solo color
         //Despues ya si eso meter más colores => hacerlo por capas
 
@@ -44,6 +44,7 @@ class Main (private val image: Bitmap){
         }
 
         Log.i(TAG, "End of processing")
+        return true
     }
 
 

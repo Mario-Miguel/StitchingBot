@@ -16,15 +16,10 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.adapter.LogoListAdapter
-import es.uniovi.eii.stitchingbot.adapter.SewingMachinesListAdapter
 import es.uniovi.eii.stitchingbot.database.LogoDatabaseConnection
-import es.uniovi.eii.stitchingbot.database.SewingMachinedatabaseConnection
 import es.uniovi.eii.stitchingbot.model.Logo
-import es.uniovi.eii.stitchingbot.model.SewingMachine
-import es.uniovi.eii.stitchingbot.translator.Main
 import es.uniovi.eii.stitchingbot.translator.TAG
 import kotlinx.android.synthetic.main.fragment_logos_list.*
-import kotlinx.android.synthetic.main.fragment_sewing_machines.*
 
 class LogosListFragment : Fragment() {
 
