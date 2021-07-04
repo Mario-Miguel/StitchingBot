@@ -93,15 +93,27 @@ class MyCanvasView : View {
         frame = Rect(inset, inset, width - inset, width - inset)
 
         if (logoImage != null)
-            extraCanvas.drawBitmap(logoImage!!, frame.left.toFloat(), frame.top.toFloat(), null)
+            extraCanvas.drawBitmap(logoImage!!, inset.toFloat(), inset.toFloat(), null)
     }
 
     override fun onDraw(canvas: Canvas) {
-        canvas.drawColor(backgroundColor)
+        //canvas.drawColor(backgroundColor)
+        canvas.drawARGB(0,0,0,0)
         // Draw the bitmap that has the saved path.
-        canvas.drawBitmap(extraBitmap, 0f, 0f, paint)
+        canvas.drawBitmap(extraBitmap, 0f, 0f, null)
+
         // Draw a frame around the canvas.
-        extraCanvas.drawRect(frame, paint)
+        val auxPaint = Paint().apply {
+            color = Color.DKGRAY
+            isAntiAlias = true
+            // Dithering affects how colors with higher-precision than the device are down-sampled.
+            isDither = true
+            style = Paint.Style.STROKE // default: FILL
+            strokeJoin = Paint.Join.ROUND // default: MITER
+            strokeCap = Paint.Cap.ROUND // default: BUTT
+            strokeWidth = STROKE_WIDTH
+        }
+        extraCanvas.drawRect(frame, auxPaint)
 
     }
 
@@ -168,8 +180,6 @@ class MyCanvasView : View {
 
     private fun touchUp() {
         // Reset the path so it doesn't get drawn again.
-        //path.reset()
-
         tool.touchUp(path, extraCanvas)
         invalidate()
     }
@@ -183,12 +193,13 @@ class MyCanvasView : View {
         )
 
         val auxCanvas = Canvas(cutBitmap)
-        val srcRect = Rect(frame.left + 5, frame.top + 5, frame.right - 5, frame.bottom - 5)
+        val srcRect = Rect(frame.left + 20, frame.top + 20, frame.right - 20, frame.bottom - 20)
         val destRect = Rect(0, 0, 1000, 1000)
 
         auxCanvas.drawBitmap(extraBitmap, srcRect, destRect, null)
 
         return cutBitmap
+
     }
 
     fun setImage(bitmap: Bitmap) {

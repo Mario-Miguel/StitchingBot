@@ -35,31 +35,16 @@ class LineTool:Tool {
         this.motionTouchEventY=motionTouchEventY
 
 
-        path.quadTo(
-            currentX,
-            currentY,
-            (motionTouchEventX + currentX) / 2,
-            (motionTouchEventY + currentY) / 2
-        )
-        currentX = motionTouchEventX
-        currentY = motionTouchEventY
-
-        // Draw the path in the extra bitmap to save it.
-        canvas.drawPath(path, paint)
-
     }
 
 
     override fun touchUp(path: Path, extraCanvas: Canvas) {
-        extraCanvas.drawPath(path, paint)
-        drawRectangle(extraCanvas, paint)
-        path.reset()
+        drawLine(extraCanvas, paint)
     }
 
 
 
-    private fun drawRectangle(canvas: Canvas, paint: Paint) {
-
+    private fun drawLine(canvas: Canvas, paint: Paint) {
         canvas.drawLine(currentX, currentY, motionTouchEventX, motionTouchEventY, paint)
     }
 }

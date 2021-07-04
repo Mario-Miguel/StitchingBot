@@ -51,7 +51,7 @@ class SewingMachinesListFragment : Fragment() {
     }
 
     private fun createListener(machine: SewingMachine) {
-        if(comesFromSummary){
+        if(comesFromSummary && machine.id>=0){
             val navController = requireActivity().findNavController(R.id.nav_host_fragment)
             navController.previousBackStackEntry?.savedStateHandle?.set("machine", machine)
             navController.popBackStack()

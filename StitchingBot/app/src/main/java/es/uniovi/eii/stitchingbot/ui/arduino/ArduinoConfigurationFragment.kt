@@ -17,7 +17,7 @@ import java.io.OutputStream
 class ArduinoConfigurationFragment : Fragment() {
 
     var bluetoothService: MyBluetoothService = MyBluetoothService
-    private var mmOutStream: OutputStream? = null
+    //private var mmOutStream: OutputStream? = null
     private var comesFromSummary: Boolean = false
 
     override fun onCreateView(
@@ -37,7 +37,7 @@ class ArduinoConfigurationFragment : Fragment() {
             comesFromSummary = requireArguments().getBoolean("summary")
         }
         initUI()
-        startOutputStream()
+        //startOutputStream()
 
     }
 
@@ -55,19 +55,19 @@ class ArduinoConfigurationFragment : Fragment() {
 
 
     private fun moveUp() {
-        write("U")
+        bluetoothService.write("U")
     }
 
     private fun moveDown() {
-        write("D")
+        bluetoothService.write("D")
     }
 
     private fun moveRight() {
-        write("R")
+        bluetoothService.write("R")
     }
 
     private fun moveLeft() {
-        write("L")
+        bluetoothService.write("L")
     }
 
     private fun startMainFragment() {
@@ -101,24 +101,16 @@ class ArduinoConfigurationFragment : Fragment() {
         }
     }
 
+//
+//    private fun startOutputStream() {
+//        try {
+//            mmOutStream = bluetoothService.getConnectionSocket()?.outputStream
+//        } catch (e: IOException) {
+//        }
+//
+//    }
 
-    private fun startOutputStream() {
-        try {
-            mmOutStream = bluetoothService.getConnectionSocket()?.outputStream
-        } catch (e: IOException) {
-        }
 
-    }
-
-    fun write(input: String) {
-        val bytes = input.toByteArray() //converts entered String into bytes
-        Log.i("BluetoothStitching", "Mensaje enviado")
-        try {
-            mmOutStream!!.write(bytes)
-        } catch (e: IOException) {
-            Log.e("Send Error", "Unable to send message", e)
-        }
-    }
 
 
 }

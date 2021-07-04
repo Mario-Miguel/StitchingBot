@@ -39,6 +39,8 @@ class SummaryFragment : Fragment() {
 
     private val imageManager = ImageManager()
 
+    private lateinit var translation: MutableList<Pair<Int,Int>>
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -164,7 +166,9 @@ class SummaryFragment : Fragment() {
     private fun startTranslation() {
         translator = Translator(imageManager.getImageFromUri(Uri.parse(logo!!.imgUrl), requireActivity())!!)
 
-        translationDone = translator.run()
+//        translationDone = translator.run()
+        translation = translator.run()
+        translationDone = true
 
         btnStartExecution.isEnabled =
             logo != null && sewingMachine != null && bluetoothService.getConnectionSocket()?.isConnected == true && translationDone
@@ -173,6 +177,7 @@ class SummaryFragment : Fragment() {
     }
 
     private fun startExecution(){
+        bluetoothService.startExecution(translation)
 
     }
 
