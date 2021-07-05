@@ -58,15 +58,25 @@ object MyBluetoothService {
         }
     }
 
-    fun startExecution(translation: MutableList<Pair<Int, Int>>) {
+    fun startExecution(translation: MutableList<Triple<Int, Int, Boolean>>) {
 
         startedProcess = true
         val ordersToSend = mutableListOf<String>()
         val auxString = StringBuilder()
         var counter = 0
 
-//        for (coord in translation) {
-//            auxString.append("${coord.first},${coord.second};")
+        for (coord in translation) {
+            auxString.append("${coord.first},${coord.second},${if (coord.third) 1 else 0};")
+            counter++
+            if (counter == 50) {
+                ordersToSend.add(auxString.toString())
+                auxString.clear()
+                counter = 0
+            }
+        }
+
+//        for (i in 1..701) {
+//            auxString.append("${i},0;")
 //            counter++
 //            if (counter == 100) {
 //                ordersToSend.add(auxString.toString())
@@ -75,26 +85,16 @@ object MyBluetoothService {
 //            }
 //        }
 
-        for (i in 1..701) {
-            auxString.append("${i},0;")
-            counter++
-            if (counter == 100) {
-                ordersToSend.add(auxString.toString())
-                auxString.clear()
-                counter = 0
-            }
-        }
-
 
         //thread(start=true, isDaemon = true){
         val buffer = ByteArray(1024) // buffer store for the stream
         var bytes = 0 // bytes returned from read()
-        var hasMessage=false
+        var hasMessage = false
         Log.i("BluetoothStitching", "Connected thread run")
 
         counter = 0
-        mmOutStream.write(ordersToSend[counter].toByteArray())
-        counter++
+        mmOutStream.write("S".toByteArray())
+
 
         // Keep listening to the InputStream until an exception occurs
         while (counter < ordersToSend.size) {
@@ -103,9 +103,9 @@ object MyBluetoothService {
                 Read from the InputStream from Arduino until termination character is reached.
                 Then send the whole String message to GUI Handler.
                  */
-                    buffer[bytes] = mmInStream.read().toByte()
-                if(buffer[bytes] != 0.toByte())
-                    hasMessage=true
+                buffer[bytes] = mmInStream.read().toByte()
+                if (buffer[bytes] != 0.toByte())
+                    hasMessage = true
 
                 var readMessage: String
                 if (buffer[bytes] == '\n'.toByte()) {
@@ -118,9 +118,9 @@ object MyBluetoothService {
                         counter++
                     }
                     bytes = 0
-                    hasMessage=false
+                    hasMessage = false
                     buffer.fill(0)
-                } else if(hasMessage){
+                } else if (hasMessage) {
                     bytes++
                 }
             } catch (e: IOException) {

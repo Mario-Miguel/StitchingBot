@@ -39,7 +39,7 @@ class SummaryFragment : Fragment() {
 
     private val imageManager = ImageManager()
 
-    private lateinit var translation: MutableList<Pair<Int,Int>>
+    private lateinit var translation: MutableList<Triple<Int, Int, Boolean>>
 
 
     override fun onCreateView(

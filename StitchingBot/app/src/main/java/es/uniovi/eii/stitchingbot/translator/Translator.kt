@@ -6,9 +6,11 @@ import android.util.Log
 
 const val TAG: String = "TranslateOrders"
 const val POINT: Int = 1
-const val HEIGHT: Int = 750
-const val WIDTH: Int = 750
-const val FACTOR_AJUSTE: Int = 5
+const val HEIGHT: Int = 375
+const val WIDTH: Int = 375
+const val FACTOR_AJUSTE: Int = 6
+
+//1875
 
 class Translator(private val image: Bitmap) {
 
@@ -53,7 +55,7 @@ class Translator(private val image: Bitmap) {
                 it.second * FACTOR_AJUSTE,
                 it.third
             )
-        }.toMutableList()
+        }.filterIndexed { i, _ -> i % 2 == 0 }.toMutableList()
 
 
         Log.i(TAG, "End of processing")
@@ -62,7 +64,6 @@ class Translator(private val image: Bitmap) {
     }
 
     private fun completeArray(coordsV2: MutableList<Triple<Int, Int, Boolean>>): MutableList<Triple<Int, Int, Boolean>> {
-        val completedArray = mutableListOf<Triple<Int, Int, Boolean>>()
 
         for (i in 1 until coordsV2.size) {
             //Si las coordenadas de x NO son contiguas
@@ -70,7 +71,7 @@ class Translator(private val image: Bitmap) {
                 coordsV2[i] = Triple(coordsV2[i].first, coordsV2[i].second, true)
             }
         }
-        return completedArray
+        return coordsV2
 
     }
 
