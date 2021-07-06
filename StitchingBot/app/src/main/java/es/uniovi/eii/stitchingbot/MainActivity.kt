@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
+import es.uniovi.eii.stitchingbot.bluetooth.MyBluetoothService
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
@@ -27,9 +28,10 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
         super.onCreate(savedInstanceState)
 
-        UiModeManager.MODE_NIGHT_NO
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -43,11 +45,14 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_logo_list,
-                R.id.nav_create_logo,
                 R.id.nav_sewing_machines,
-                R.id.nav_arduino_connection
+                R.id.nav_arduino_connection,
+                R.id.nav_summary
             ), drawerLayout
         )
+        if(MyBluetoothService.isInExecution){
+            navView.menu.getItem(navView.menu.size()).isVisible=true
+        }
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)

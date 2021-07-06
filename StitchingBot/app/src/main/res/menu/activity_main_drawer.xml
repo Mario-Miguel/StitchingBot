@@ -11,12 +11,6 @@
             android:title="@string/menu_logos_list" />
 
         <item
-            android:id="@+id/nav_create_logo"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/menu_create_logo" />
-
-
-        <item
             android:id="@+id/nav_sewing_machines"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/menu_sewing_machines" />
@@ -25,6 +19,12 @@
             android:id="@+id/nav_arduino_connection"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/menu_arduino_connection" />
+
+        <item
+            android:id="@+id/nav_summary"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/menu_summary"
+            android:visible="false" />
 
     </group>
 </menu>

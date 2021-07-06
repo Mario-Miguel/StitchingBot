@@ -6,10 +6,9 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
-    <string name="menu_logos_list">logos List</string>
-    <string name="menu_create_logo">Create logo</string>
+    <string name="menu_logos_list">Logotipos</string>
     <string name="menu_load_file">Load file</string>
-    <string name="menu_sewing_machines">Sewing machines</string>
+    <string name="menu_sewing_machines">Máquinas de coser</string>
     <string name="menu_arduino_config">Arduino configuration</string>
     <string name="img_logo">Logo\'s image</string>
     <string name="logo_name">Logo\'s name</string>
@@ -35,7 +34,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_button_description">Search button</string>
     <string name="txt_devices_list_header">Dispositivos encontrados</string>
-    <string name="menu_arduino_connection">Arduino configuration</string>
+    <string name="menu_arduino_connection">Configuración del robot</string>
     <string name="img_machine">Imagen de la máquina de coser</string>
     <string name="machine_name">Nombre de la máquina</string>
     <string name="menu_sewing_machine_details">Detalles de la máquina de coser</string>
@@ -51,4 +50,5 @@
     <string name="desc_img_arduino_summary">Estado de la conexión del arduino</string>
     <string name="desc_logo_summary">Logotipo seleccionado</string>
     <string name="btn_start_translate">Traducir</string>
+    <string name="menu_create_logo">Crear logotipo</string>
 </resources>

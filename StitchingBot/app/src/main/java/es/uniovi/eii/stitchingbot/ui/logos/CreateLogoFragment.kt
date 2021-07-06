@@ -54,7 +54,8 @@ class CreateLogoFragment : Fragment() {
         if (arguments != null) {
             isCreation = requireArguments().getBoolean(CREATION_MODE)
             logo = requireArguments().getParcelable(LOGO)!!
-            showLogoImage()
+            if(logo.id>=0)
+                showLogoImage()
         }
     }
 

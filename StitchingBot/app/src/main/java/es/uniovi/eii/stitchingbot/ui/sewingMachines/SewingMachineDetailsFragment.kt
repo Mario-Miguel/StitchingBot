@@ -12,9 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -28,6 +26,7 @@ import es.uniovi.eii.stitchingbot.bluetooth.TAG
 import es.uniovi.eii.stitchingbot.database.SewingMachinedatabaseConnection
 import es.uniovi.eii.stitchingbot.model.SewingMachine
 import es.uniovi.eii.stitchingbot.util.ImageManager
+import es.uniovi.eii.stitchingbot.util.ShowDialog
 import kotlinx.android.synthetic.main.fragment_sewing_machine_details.*
 import java.io.File
 import java.io.IOException
@@ -74,6 +73,7 @@ class SewingMachineDetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.fragment_sewing_machine_details, container, false)
     }
 
@@ -91,6 +91,21 @@ class SewingMachineDetailsFragment : Fragment() {
         if (!isCreation) {
             loadUpdateScreen()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        if(!isCreation){
+            menu.clear()
+            inflater.inflate(R.menu.delete_button, menu)
+        }
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(item.itemId == R.id.action_delete){
+            deleteMachine()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 
@@ -168,15 +183,8 @@ class SewingMachineDetailsFragment : Fragment() {
                 )
             )
         }
-        showDeleteButton()
     }
 
-
-    private fun showDeleteButton() {
-        btnDeleteSewingMachine.visibility = View.VISIBLE
-        btnDeleteSewingMachine.isClickable = true
-        btnDeleteSewingMachine.setOnClickListener { deleteMachine() }
-    }
 
 
     private fun createSpinner() {
@@ -291,7 +299,7 @@ class SewingMachineDetailsFragment : Fragment() {
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE
                             )
                         ) {
-                            showDialogOK(
+                            ShowDialog.showDialogOK(requireContext(),
                                 "Camera and Storage Read Permission required for this app"
                             ) { _, which ->
                                 when (which) {
@@ -382,14 +390,6 @@ class SewingMachineDetailsFragment : Fragment() {
     }
 
 
-    private fun showDialogOK(message: String, okListener: DialogInterface.OnClickListener) {
-        AlertDialog.Builder(requireContext())
-            .setMessage(message)
-            .setPositiveButton("OK", okListener)
-            .setNegativeButton("Cancel", okListener)
-            .create()
-            .show()
-    }
 
 
     companion object {

@@ -6,9 +6,7 @@ import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.os.bundleOf
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
@@ -32,8 +30,7 @@ class LogosListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-
-
+        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.fragment_logos_list, container, false)
     }
 
@@ -47,18 +44,30 @@ class LogosListFragment : Fragment() {
         logosList = getSavedLogos()
 
         rvLogoList.layoutManager = GridLayoutManager(context, 2)
-        rvLogoList.adapter = LogoListAdapter(logosList) { logo -> createListener(logo) }
+        rvLogoList.adapter = LogoListAdapter(logosList) { logo -> navigateToCreation(logo) }
 
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
+        inflater.inflate(R.menu.add_button, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_add) {
+            navigateToCreation(Logo(id=-1))
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
 
-    private fun createListener(logo: Logo) {
+    private fun navigateToCreation(logo: Logo) {
         Log.i(TAG, "Logo: ${logo.title}")
         //TODO eliminar cuando termine las pruebas de parsear
 
-        val isCreationMode = (logo.id<0)
+        val isCreationMode = (logo.id < 0)
         val bundle = bundleOf("creation" to isCreationMode, "logo" to logo)
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.navigate(R.id.nav_create_logo, bundle)

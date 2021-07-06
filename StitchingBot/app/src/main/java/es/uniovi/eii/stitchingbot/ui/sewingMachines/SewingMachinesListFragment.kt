@@ -1,9 +1,7 @@
 package es.uniovi.eii.stitchingbot.ui.sewingMachines
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
@@ -23,34 +21,47 @@ class SewingMachinesListFragment : Fragment() {
     private var comesFromSummary: Boolean = false
 
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
+        setHasOptionsMenu(true)
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_sewing_machines, container, false)
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         databaseConnection = SewingMachinedatabaseConnection(this.requireContext())
 
-        //TODO crear lista de maquinas de coser
         machinesList = getSavedSewingMachines()
-        //TODO añadir card para crear maquina
-        machinesList.add(SewingMachine(-1,"__ADD", "", false))
 
         if(arguments!= null){
             comesFromSummary = requireArguments().getBoolean("summary")
         }
 
         rvMachinesList.layoutManager = GridLayoutManager(context, 2)
-        rvMachinesList.adapter = SewingMachinesListAdapter(machinesList) {machine -> createListener(machine)}
+        rvMachinesList.adapter = SewingMachinesListAdapter(machinesList) {machine -> navigateToCreation(machine)}
     }
 
-    private fun createListener(machine: SewingMachine) {
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
+        inflater.inflate(R.menu.add_button, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_add) {
+            navigateToCreation(SewingMachine(id=-1))
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+
+    private fun navigateToCreation(machine: SewingMachine) {
         if(comesFromSummary && machine.id>=0){
             val navController = requireActivity().findNavController(R.id.nav_host_fragment)
             navController.previousBackStackEntry?.savedStateHandle?.set("machine", machine)

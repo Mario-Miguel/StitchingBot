@@ -35,7 +35,7 @@ class SummaryFragment : Fragment() {
     private var bluetoothService: MyBluetoothService = MyBluetoothService
 
     private lateinit var translator: Translator
-    private var translationDone : Boolean = false
+    private var translationDone: Boolean = false
 
     private val imageManager = ImageManager()
 
@@ -86,9 +86,16 @@ class SummaryFragment : Fragment() {
                 updateSewingMachineStatus(it)
             }
 
+        if (bluetoothService.isInExecution) {
+            progressBar.visibility = View.VISIBLE
+        }
 
         btnStartExecution.isEnabled =
-            logo != null && sewingMachine != null && bluetoothService.getConnectionSocket()?.isConnected == true && translationDone
+                    logo != null
+                    && sewingMachine != null
+                    && bluetoothService.getConnectionSocket()?.isConnected == true
+                    && translationDone
+
         btnStartTranslate.setOnClickListener { startTranslation() }
 
         btnStartExecution.setOnClickListener { startExecution() }
@@ -164,7 +171,8 @@ class SummaryFragment : Fragment() {
 //##################################################################################################
 
     private fun startTranslation() {
-        translator = Translator(imageManager.getImageFromUri(Uri.parse(logo!!.imgUrl), requireActivity())!!)
+        translator =
+            Translator(imageManager.getImageFromUri(Uri.parse(logo!!.imgUrl), requireActivity())!!)
 
 //        translationDone = translator.run()
         translation = translator.run()
@@ -176,8 +184,15 @@ class SummaryFragment : Fragment() {
 
     }
 
-    private fun startExecution(){
-        bluetoothService.startExecution(translation)
+    private fun startExecution() {
+        progressBar.visibility = View.VISIBLE
+
+
+        bluetoothService.startExecution(
+            translation,
+            progressBar,
+            requireActivity()
+        )
 
     }
 

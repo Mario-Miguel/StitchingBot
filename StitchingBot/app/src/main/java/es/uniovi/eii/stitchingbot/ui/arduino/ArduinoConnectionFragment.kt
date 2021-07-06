@@ -16,6 +16,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -29,6 +30,7 @@ import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.adapter.DevicesListAdapter
 import es.uniovi.eii.stitchingbot.bluetooth.MyBluetoothService
 import es.uniovi.eii.stitchingbot.bluetooth.TAG
+import es.uniovi.eii.stitchingbot.util.ShowDialog
 import kotlinx.android.synthetic.main.fragment_arduino_connection.*
 import java.io.IOException
 import java.util.*
@@ -47,8 +49,8 @@ class ArduinoConnectionFragment : Fragment() {
     private var comesFromSummary: Boolean = false
 
 
-//    var mmSocket: BluetoothSocket? = null
-    var myBluetoothService : MyBluetoothService= MyBluetoothService
+    //    var mmSocket: BluetoothSocket? = null
+    var myBluetoothService: MyBluetoothService = MyBluetoothService
 
 
     override fun onCreateView(
@@ -65,7 +67,7 @@ class ArduinoConnectionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if(arguments!= null){
+        if (arguments != null) {
             comesFromSummary = requireArguments().getBoolean("summary")
         }
 
@@ -157,9 +159,34 @@ class ArduinoConnectionFragment : Fragment() {
     }
 
     private fun bondDevice(bluetoothDevice: BluetoothDevice) {
-        createHandler()
+        //TODO crear la progressbar
+        Thread {
+            // display the indefinite progressbar
+            this@ArduinoConnectionFragment.requireActivity().runOnUiThread {
+                progressBar.visibility = View.VISIBLE
+                requireActivity().window.setFlags(
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                )
 
-        createConnection(bluetoothDevice)
+            }
+
+            // performing some dummy time taking operation
+            createHandler()
+            createConnection(bluetoothDevice)
+
+            // when the task is completed, make progressBar gone
+            this@ArduinoConnectionFragment.requireActivity().runOnUiThread {
+                progressBar.visibility = View.GONE
+                requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            }
+        }.start()
+
+
+//        createHandler()
+//
+//        createConnection(bluetoothDevice)
+
 
     }
 
@@ -169,7 +196,11 @@ class ArduinoConnectionFragment : Fragment() {
         try {
 
             //Try to create socket with uuid
-            myBluetoothService.setConnectionSocket(bluetoothDevice.createInsecureRfcommSocketToServiceRecord(MY_UUID))
+            myBluetoothService.setConnectionSocket(
+                bluetoothDevice.createInsecureRfcommSocketToServiceRecord(
+                    MY_UUID
+                )
+            )
 
             // Connect to the remote device through the socket. This call blocks
             // until it succeeds or throws an exception.
@@ -189,8 +220,8 @@ class ArduinoConnectionFragment : Fragment() {
     private fun startConfigurationFragment() {
         val bundle = bundleOf("summary" to comesFromSummary)
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+        navController.popBackStack()
         navController.navigate(R.id.nav_arduino_configuration, bundle)
-
 
     }
 
@@ -277,7 +308,7 @@ class ArduinoConnectionFragment : Fragment() {
 
 
     private fun createHandler() {
-        val handler= object : Handler(Looper.getMainLooper()) {
+        val handler = object : Handler(Looper.getMainLooper()) {
             override fun handleMessage(msg: Message) {
                 when (msg.what) {
                     CONNECTING_STATUS -> when (msg.arg1) {
@@ -291,6 +322,7 @@ class ArduinoConnectionFragment : Fragment() {
                         }
                         -1 -> {
                             Log.i("BluetoothStitching", "No se ha podido conectar")
+                            ShowDialog.showDialogOK(requireContext(), "No se ha podido conectar") { _, _ ->}
                         }
                     }
                 }
