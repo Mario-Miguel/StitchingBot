@@ -1,44 +1,80 @@
 package es.uniovi.eii.stitchingbot.bluetooth
 
+import android.app.Activity
 import android.bluetooth.BluetoothSocket
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
-import es.uniovi.eii.stitchingbot.ui.arduino.MESSAGE_READ
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 
 
-
-
 /* =============================== Thread for Data Transfer =========================================== */
-class ConnectedThread(private val mmSocket: BluetoothSocket, private val handler: Handler) : Thread() {
+class ConnectedThread(
+    private val mmInStream: InputStream,
+    private val mmOutStream: OutputStream,
+    activity: Activity
+) : Thread() {
 
-    private val mmInStream: InputStream?
-    private val mmOutStream: OutputStream?
+    private var mActivity:Activity = activity
+    private var mHandler: Handler = Handler(activity.mainLooper)
+
+    private lateinit var translation: MutableList<Triple<Int, Int, Boolean>>
+
 
     override fun run() {
 
+        val ordersToSend = mutableListOf<String>()
+        val auxString = StringBuilder()
+        var counter = 0
+
+        for (coord in translation) {
+            auxString.append("${coord.first},${coord.second},${if (coord.third) 1 else 0};")
+            counter++
+            if (counter == 50) {
+                ordersToSend.add(auxString.toString())
+                auxString.clear()
+                counter = 0
+            }
+        }
+
+
         val buffer = ByteArray(1024) // buffer store for the stream
         var bytes = 0 // bytes returned from read()
+        var hasMessage = false
         Log.i("BluetoothStitching", "Connected thread run")
+
+        counter = 0
+        mmOutStream.write("S".toByteArray())
+
+
         // Keep listening to the InputStream until an exception occurs
-        while (true) {
+        while (counter < ordersToSend.size) {
             try {
                 /*
                 Read from the InputStream from Arduino until termination character is reached.
                 Then send the whole String message to GUI Handler.
                  */
-                if (mmInStream != null) {
-                    buffer[bytes] = mmInStream.read() as Byte
-                }
+                buffer[bytes] = mmInStream.read().toByte()
+                if (buffer[bytes] != 0.toByte())
+                    hasMessage = true
+
                 var readMessage: String
                 if (buffer[bytes] == '\n'.toByte()) {
-                    readMessage = String(buffer, 0, bytes)
+                    readMessage = String(buffer, 0, bytes).trim()
                     Log.e("Arduino Message", readMessage)
-                    handler.obtainMessage(MESSAGE_READ, readMessage).sendToTarget()
+
+                    //AVANZO 2cm
+                    if (readMessage == "M") {
+                        mmOutStream.write(ordersToSend[counter].toByteArray())
+                        counter++
+                        //progressBar.progress = counter * 50
+                    }
                     bytes = 0
-                } else {
+                    hasMessage = false
+                    buffer.fill(0)
+                } else if (hasMessage) {
                     bytes++
                 }
             } catch (e: IOException) {
@@ -46,39 +82,39 @@ class ConnectedThread(private val mmSocket: BluetoothSocket, private val handler
                 break
             }
         }
+        MyBluetoothService.isInExecution = false
+        Log.i(TAG, "Sa acabao")
+
     }
 
     /* Call this from the main activity to send data to the remote device */
+//    fun write(input: String) {
+//        val bytes = input.toByteArray() //converts entered String into bytes
+//        Log.i("BluetoothStitching", "Mensaje enviado")
+//        try {
+//            mmOutStream!!.write(bytes)
+//        } catch (e: IOException) {
+//            Log.e("Send Error", "Unable to send message", e)
+//        }
+//    }
+
     fun write(input: String) {
         val bytes = input.toByteArray() //converts entered String into bytes
         Log.i("BluetoothStitching", "Mensaje enviado")
         try {
-            mmOutStream!!.write(bytes)
+            mmOutStream.write(bytes)
         } catch (e: IOException) {
             Log.e("Send Error", "Unable to send message", e)
         }
     }
 
     /* Call this from the main activity to shutdown the connection */
-    fun cancel() {
-        try {
-            mmSocket.close()
-        } catch (e: IOException) {
-        }
-    }
+//    fun cancel() {
+//        try {
+//            mmSocket.close()
+//        } catch (e: IOException) {
+//        }
+//    }
 
-    init {
-        var tmpIn: InputStream? = null
-        var tmpOut: OutputStream? = null
 
-        // Get the input and output streams, using temp objects because
-        // member streams are final
-        try {
-            tmpIn = mmSocket.inputStream
-            tmpOut = mmSocket.outputStream
-        } catch (e: IOException) {
-        }
-        mmInStream = tmpIn
-        mmOutStream = tmpOut
-    }
 }

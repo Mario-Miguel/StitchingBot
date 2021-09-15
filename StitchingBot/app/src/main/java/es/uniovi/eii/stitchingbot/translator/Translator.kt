@@ -27,7 +27,7 @@ class Translator(private val image: Bitmap) {
 
 
         //Coordenada X, coordenada Y, ¿tiene que levantar el pedal para la siguiente?
-        val coordsV2 = mutableListOf<Triple<Int, Int, Boolean>>()
+        val coords = mutableListOf<Triple<Int, Int, Boolean>>()
 
         pointsMatrix = Array(scaledBitmap.height) {
             IntArray(scaledBitmap.width)
@@ -40,7 +40,7 @@ class Translator(private val image: Bitmap) {
 
                 if (pixel == Color.BLACK) {
                     //coords.add(Pair(x, y))
-                    coordsV2.add(Triple(x, y, false))
+                    coords.add(Triple(x, y, false))
                     pointsMatrix[y][x] = POINT
                 }
 
@@ -48,8 +48,8 @@ class Translator(private val image: Bitmap) {
         }
 
 
-        var orderedArrayV2 = completeArray(coordsV2)
-        orderedArrayV2 = orderedArrayV2.map {
+        var orderedArray = completeArray(coords)
+        orderedArray = orderedArray.map {
             Triple(
                 it.first * FACTOR_AJUSTE,
                 it.second * FACTOR_AJUSTE,
@@ -60,7 +60,7 @@ class Translator(private val image: Bitmap) {
 
         Log.i(TAG, "End of processing")
 
-        return orderedArrayV2
+        return orderedArray
     }
 
     private fun completeArray(coordsV2: MutableList<Triple<Int, Int, Boolean>>): MutableList<Triple<Int, Int, Boolean>> {

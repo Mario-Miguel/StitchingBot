@@ -72,6 +72,7 @@ object MyBluetoothService {
         isInExecution=true
         val navView = activity.findViewById(R.id.nav_view) as NavigationView
         navView.menu.getItem(navView.menu.size()-1).isVisible=true
+
         Thread {
             startedProcess = true
             val ordersToSend = mutableListOf<String>()
@@ -118,7 +119,7 @@ object MyBluetoothService {
                         if (readMessage == "M") {
                             mmOutStream.write(ordersToSend[counter].toByteArray())
                             counter++
-                            progressBar.progress = counter*50
+                            progressBar.progress = ((counter.toDouble()/ordersToSend.size.toDouble())*100).toInt()
                         }
                         bytes = 0
                         hasMessage = false
@@ -137,7 +138,7 @@ object MyBluetoothService {
             val navController = activity.findNavController(R.id.nav_host_fragment)
             navController.navigate(R.id.nav_summary, null)
 
-        }
+        }.start()
 
 
     }

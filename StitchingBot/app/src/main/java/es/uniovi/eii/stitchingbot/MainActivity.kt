@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             ), drawerLayout
         )
         if(MyBluetoothService.isInExecution){
-            navView.menu.getItem(navView.menu.size()).isVisible=true
+            navView.menu.getItem(navView.menu.size()-1).isVisible=true
         }
 
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -76,7 +76,6 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
-
 
 
 
