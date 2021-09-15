@@ -15,18 +15,22 @@
 #define DIRY_2  8
 #define STEPY_2 9
 
+#define DIR_PULLEY 12
+#define STEP_PULLEY 11
+
 #define motorInterfaceType 1
 
 //AccelStepper definition
 AccelStepper stepperX = AccelStepper(motorInterfaceType, STEPX, DIRX);
 AccelStepper stepperY1 = AccelStepper(motorInterfaceType, STEPY_1, DIRY_1);
 AccelStepper stepperY2 = AccelStepper(motorInterfaceType, STEPY_2, DIRY_2);
+AccelStepper stepperPulley = AccelStepper(motorInterfaceType, STEP_PULLEY, DIR_PULLEY);
 
 //#####################################################################################
 
 //Finales de carrera
 #define FIN_CARRX 25
-#define FIN_CARRY 23
+#define FIN_CARRY 23 
 
 //#####################################################################################
 
@@ -70,9 +74,10 @@ void setup() {
 
 
   //Stepper motors
-  stepperX.setMaxSpeed(5000);
-  stepperY1.setMaxSpeed(5000);
-  stepperY2.setMaxSpeed(5000);
+  stepperX.setMaxSpeed(500);
+  stepperY1.setMaxSpeed(500);
+  stepperY2.setMaxSpeed(500);
+  stepperPulley.setMaxSpeed(1000);
 
 }
 
@@ -80,6 +85,9 @@ void loop() {
 
   bluetoothRead();
 
+//  if(!digitalRead(FIN_CARRY)){
+//    runPulleyMotor();
+//  }
 }
 
 //#####################################################################################
@@ -130,15 +138,37 @@ void bluetoothRead() {
 //#####################################################################################
 
 void startAutohome() {
-  stepperX.setSpeed(-500);
-  stepperY1.setSpeed(500);
-  stepperY2.setSpeed(500);
+  stepperX.setSpeed(-250);
+  stepperY1.setSpeed(-250);
+  stepperY2.setSpeed(-250);
 
   while (!endOfPathX() || !endOfPathY()) {
     if (!endOfPathX())
       stepperX.runSpeed();
 
     if (!endOfPathY()) {
+      stepperY1.runSpeed();
+      stepperY2.runSpeed();
+    }
+  }
+
+  stepperX.setCurrentPosition(0);
+  stepperY1.setCurrentPosition(0);
+  stepperY2.setCurrentPosition(0);
+
+  stepperX.moveTo(1500);
+  stepperY1.moveTo(50);
+  stepperY2.moveTo(50);
+
+  stepperX.setSpeed(250);
+  stepperY1.setSpeed(250);
+  stepperY2.setSpeed(250); 
+
+  while (stepperX.distanceToGo() != 0 || stepperY1.distanceToGo() != 0) {
+    if (stepperX.distanceToGo() != 0)
+      stepperX.runSpeed();
+
+    if (stepperY1.distanceToGo() != 0) {
       stepperY1.runSpeed();
       stepperY2.runSpeed();
     }
@@ -202,9 +232,10 @@ void executeActions() {
   else {
     //Si tiene que cambiar, parar el pedal, despues mover en los ejes que sean
     setPedalState(!hasToChange[actionCounter]);
+    
 
     //Hacer que se mueva a la coordenada indicada
-    Serial.println(">Se mueve a la coordenada x: " + String(xCoords[actionCounter]) + " - y: " + String(yCoords[actionCounter]) + " - Action counter: " + String(actionCounter));
+    Serial.println(">Se mueve a la coordenada x: " + String(xCoords[actionCounter]) + " - y: " + String(yCoords[actionCounter]) + " - Current pos: " + String(stepperX.currentPosition()));
     moveMotorsLib(xCoords[actionCounter], yCoords[actionCounter]);
     actionCounter++;
   }
@@ -222,7 +253,7 @@ void setPedalState(boolean state) {
     //TODO Hacer que se pulse el pedal
     actualPedalState = true;
   }
-  delay(1000);
+  delay(10);
 }
 
 //#####################################################################################
@@ -236,16 +267,16 @@ void resetArrays() {
 //#####################################################################################
 
 void moveMotorsLib(int xCoord, int yCoord) {
-  int xMovement = xCoord - stepperX.currentPosition();
+  int xMovement = xCoord - (-1*stepperX.currentPosition());
   int yMovement = yCoord - stepperY1.currentPosition();
   int directionX = 0;
   int directionY = 0;
 
   if (xMovement < 0) {
-    directionX = -1;
+    directionX = 1;
   }
   else if(xMovement>0) {
-    directionX = 1;
+    directionX = -1;
   }
   if (yMovement < 0) {
     directionY = -1;
@@ -254,7 +285,7 @@ void moveMotorsLib(int xCoord, int yCoord) {
     directionY = 1;
   }
 
-  stepperX.moveTo(xCoord);
+  stepperX.moveTo(-xCoord);
   stepperY1.moveTo(yCoord);
   stepperY2.moveTo(yCoord);
 
@@ -262,8 +293,16 @@ void moveMotorsLib(int xCoord, int yCoord) {
   stepperY1.setSpeed(250*directionY);
   stepperY2.setSpeed(250*directionY);  
 
+  stepperPulley.setCurrentPosition(0);
+  if(actualPedalState)
+    stepperPulley.moveTo(465);
+  else
+    stepperPulley.moveTo(0);
+  stepperPulley.setSpeed(500);
 
-  while ((!endOfPathX() && stepperX.distanceToGo() != 0) || (!endOfPathY() && stepperY1.distanceToGo() != 0)) {
+
+  while ((!endOfPathX() && stepperX.distanceToGo() != 0) || (!endOfPathY() && stepperY1.distanceToGo() != 0)) {   
+    
     if (!endOfPathX() && stepperX.distanceToGo() != 0)
       stepperX.runSpeed();
 
@@ -271,7 +310,20 @@ void moveMotorsLib(int xCoord, int yCoord) {
       stepperY1.runSpeed();
       stepperY2.runSpeed();
     }
+
   }
+
+  delay(200);
+
+  while(stepperPulley.distanceToGo() != 0){
+    if(stepperPulley.distanceToGo() != 0){
+      
+      stepperPulley.runSpeed();
+    }
+  }
+  
+  delay(100);
+  
 
 }
 
@@ -283,5 +335,18 @@ bool endOfPathY() {
 bool endOfPathX() {
   return !digitalRead(FIN_CARRX);
 }
+
+//#####################################################################################
+
+//void runPulleyMotor(){
+//  if(actualPedalState){
+//    stepperPulley.setSpeed(1000);
+//    stepperPulley.runSpeed();
+//  }
+//  else{
+//    stepperPulley.setSpeed(0);
+//    stepperPulley.runSpeed();
+//  }
+//}
 
 //#####################################################################################

@@ -53,19 +53,38 @@ module huecoMotor(x, y, z){
             cylinder(h=60, r=radio_eje_motor, center=true, $fn=360);
     }
     
+    //Agujeros para los tornillos del motor
+    translate([x+15, y, z+15]){
+        rotate([90,0,0])
+            cylinder(h=60, r=4, center=true, $fn=360);
+    }
+    translate([x+15, y, z-15]){
+        rotate([90,0,0])
+            cylinder(h=60, r=4, center=true, $fn=360);
+    }
+    translate([x-15, y, z+15]){
+        rotate([90,0,0])
+            cylinder(h=60, r=4, center=true, $fn=360);
+    }
+    translate([x-15, y, z-15]){
+        rotate([90,0,0])
+            cylinder(h=60, r=4, center=true, $fn=360);
+    }
+    
     //Sujección del motor
     //En el medio ->translate([29.5,40,0])
     //Desplazado -> translate([35,40,0])
     translate([49.5,40,0]){
         color("Blue")sujeccionMotor();
     }
+    
+    
 }
 
 module sujeccionMotor(){
-    huecoTornillo(7.5,12,0);
+//    huecoTornillo(7.5,12,0);
     huecoTornillo(7.5, 35, 0);
-    huecoTornillo(33.5, 12, 0);
-    huecoTornillo(33.5, 35, 0);
+    
 }
 
 
@@ -81,7 +100,7 @@ module sujeccionTuerca(){
         
         //Hueco para meter la tuerca
         translate([5, 20, 13.4])
-            cube([5, 22, 27], center=true);
+            cube([5, 22, 30], center=true);
         
         //Hueco para la extension de la tuerca
         translate([7.5, 15, 0])
@@ -164,6 +183,6 @@ module soporteMotorSuperiorV2(conTapa){
 }
 
 //Mostrar la pieza
-//soporteMotorSuperiorV2(false);
+soporteMotorSuperiorV2(false);
 //tapa();
 

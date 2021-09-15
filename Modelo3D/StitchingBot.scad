@@ -5,6 +5,8 @@ use<SoporteVarilla.scad>
 use<SoporteVarillaSuperior.scad>
 use<SoporteVarillaSuperiorV2.scad>
 use<VarillaRoscada.scad>
+//use<SoporteTela.scad>
+use<SoporteTelaV2.scad>
 
 
 
@@ -45,3 +47,9 @@ rotate([0, 0, 270])
     varillaRoscada(-230, 240, 87.5);
 rotate([0, 0, 270])
     varillaRoscada(-270, 240, 87.5);
+
+
+
+//Soporte para la tela
+translate([200,260,73])
+    sujeccionTela();
