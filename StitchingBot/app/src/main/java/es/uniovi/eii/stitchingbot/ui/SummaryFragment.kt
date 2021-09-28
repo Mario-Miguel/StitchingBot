@@ -175,7 +175,7 @@ class SummaryFragment : Fragment() {
             Translator(imageManager.getImageFromUri(Uri.parse(logo!!.imgUrl), requireActivity())!!)
 
 //        translationDone = translator.run()
-        translation = translator.run()
+        translation = translator.run().map { Triple(it.first, it.second, false) }.toMutableList()
         translationDone = true
 
         btnStartExecution.isEnabled =

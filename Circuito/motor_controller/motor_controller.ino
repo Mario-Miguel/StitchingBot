@@ -295,13 +295,13 @@ void moveMotorsLib(int xCoord, int yCoord) {
 
   stepperPulley.setCurrentPosition(0);
   if(actualPedalState)
-    stepperPulley.moveTo(465);
+    stepperPulley.moveTo(467);
   else
     stepperPulley.moveTo(0);
   stepperPulley.setSpeed(500);
 
 
-  while ((!endOfPathX() && stepperX.distanceToGo() != 0) || (!endOfPathY() && stepperY1.distanceToGo() != 0)) {   
+  while ((!endOfPathX() && stepperX.distanceToGo() != 0) || (!endOfPathY() && stepperY1.distanceToGo() != 0) || (stepperPulley.distanceToGo() != 0)) {   
     
     if (!endOfPathX() && stepperX.distanceToGo() != 0)
       stepperX.runSpeed();
@@ -310,17 +310,22 @@ void moveMotorsLib(int xCoord, int yCoord) {
       stepperY1.runSpeed();
       stepperY2.runSpeed();
     }
-
-  }
-
-  delay(200);
-
-  while(stepperPulley.distanceToGo() != 0){
+    
     if(stepperPulley.distanceToGo() != 0){
       
       stepperPulley.runSpeed();
     }
+
   }
+
+//  delay(200);
+//
+//  while(stepperPulley.distanceToGo() != 0){
+//    if(stepperPulley.distanceToGo() != 0){
+//      
+//      stepperPulley.runSpeed();
+//    }
+//  }
   
   delay(100);
   
