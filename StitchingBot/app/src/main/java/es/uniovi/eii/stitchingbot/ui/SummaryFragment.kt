@@ -1,10 +1,13 @@
 package es.uniovi.eii.stitchingbot.ui
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -13,9 +16,14 @@ import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.bluetooth.MyBluetoothService
 import es.uniovi.eii.stitchingbot.model.Logo
 import es.uniovi.eii.stitchingbot.model.SewingMachine
+import es.uniovi.eii.stitchingbot.translator.TAG
 import es.uniovi.eii.stitchingbot.translator.Translator
 import es.uniovi.eii.stitchingbot.util.ImageManager
+import kotlinx.android.synthetic.main.fragment_arduino_connection.*
 import kotlinx.android.synthetic.main.fragment_summary.*
+import kotlinx.android.synthetic.main.fragment_summary.progressBar
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 private const val LOGO = "logo"
@@ -34,12 +42,12 @@ class SummaryFragment : Fragment() {
 
     private var bluetoothService: MyBluetoothService = MyBluetoothService
 
-    private lateinit var translator: Translator
-    private var translationDone: Boolean = false
+    private var translator: Translator = Translator
+
 
     private val imageManager = ImageManager()
 
-    private lateinit var translation: MutableList<Triple<Int, Int, Boolean>>
+    private lateinit var thread: Thread
 
 
     override fun onCreateView(
@@ -48,6 +56,14 @@ class SummaryFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_summary, container, false)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        this@SummaryFragment.requireActivity().runOnUiThread {
+            progressBar.visibility = View.GONE
+            requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        }
     }
 
 
@@ -90,11 +106,14 @@ class SummaryFragment : Fragment() {
             progressBar.visibility = View.VISIBLE
         }
 
+        createProcessingThread()
+
+
         btnStartExecution.isEnabled =
-                    logo != null
+            logo != null
                     && sewingMachine != null
                     && bluetoothService.getConnectionSocket()?.isConnected == true
-                    && translationDone
+                    && translator.translationDone
 
         btnStartTranslate.setOnClickListener { startTranslation() }
 
@@ -170,26 +189,49 @@ class SummaryFragment : Fragment() {
 
 //##################################################################################################
 
+    private fun createProcessingThread() {
+        thread = Thread {
+
+
+            // display the indefinite progressbar
+            this@SummaryFragment.requireActivity().runOnUiThread {
+                progressBar.visibility = View.VISIBLE
+                requireActivity().window.setFlags(
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                )
+
+            }
+
+            translator.image=imageManager.getImageFromUri(
+                Uri.parse(logo!!.imgUrl),
+                requireActivity()
+            )!!
+            translator.run()
+
+            if (this@SummaryFragment.isVisible) {
+                btnStartExecution.isEnabled =
+                    logo != null && sewingMachine != null && bluetoothService.getConnectionSocket()?.isConnected == true && translator.translationDone
+
+                // when the task is completed, make progressBar gone
+                this@SummaryFragment.requireActivity().runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                }
+            }
+        }
+    }
+
     private fun startTranslation() {
-        translator =
-            Translator(imageManager.getImageFromUri(Uri.parse(logo!!.imgUrl), requireActivity())!!)
-
-//        translationDone = translator.run()
-        translation = translator.run().map { Triple(it.first, it.second, false) }.toMutableList()
-        translationDone = true
-
-        btnStartExecution.isEnabled =
-            logo != null && sewingMachine != null && bluetoothService.getConnectionSocket()?.isConnected == true && translationDone
-
+        thread.start()
 
     }
 
     private fun startExecution() {
         progressBar.visibility = View.VISIBLE
 
-
         bluetoothService.startExecution(
-            translation,
+            translator.translation,
             progressBar,
             requireActivity()
         )

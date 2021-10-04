@@ -3,6 +3,9 @@ package es.uniovi.eii.stitchingbot.translator
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.Log
+import kotlinx.coroutines.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlin.math.*
 
 const val TAG: String = "TranslateOrders"
@@ -13,12 +16,14 @@ const val FACTOR_AJUSTE: Int = 6
 
 //1875
 
-class Translator(private val image: Bitmap) {
+object Translator {
 
+    var image: Bitmap = Bitmap.createBitmap(HEIGHT, WIDTH, Bitmap.Config.ARGB_8888)
+    var translation : MutableList<Triple<Int, Int, Boolean>> = mutableListOf()
+    var translationDone: Boolean = false
     lateinit var weightMatrix: Array<IntArray>
-    lateinit var hasPassedMatrix: Array<IntArray>
 
-    fun run(): MutableList<Pair<Int, Int>> {
+    fun run() {
 
         Log.i(TAG, "${image.width} - ${image.height}")
         //La relacion es de 50 pixeles <-> 1mm
@@ -34,12 +39,15 @@ class Translator(private val image: Bitmap) {
             IntArray(scaledBitmap.width)
         }
 
-        //Matriz que va a tener los nodos por los que puedo pasar
-        hasPassedMatrix = Array(scaledBitmap.height) {
-            IntArray(scaledBitmap.width)
-        }
+        coords = processData(scaledBitmap, coords)
+        Log.i(TAG, "End of processing")
+
+        translation = coords.map { Triple(it.first, it.second, false) }.toMutableList()
+        translationDone=true
+    }
 
 
+    private fun processData(scaledBitmap: Bitmap, coords:MutableList<Pair<Int,Int>>): MutableList<Pair<Int,Int>>{
         //Se añaden los puntos en las respectivas matrices
         for (y in 0 until scaledBitmap.height) {
             for (x in 0 until scaledBitmap.width) {
@@ -48,31 +56,23 @@ class Translator(private val image: Bitmap) {
                 weightMatrix[y][x] = Int.MAX_VALUE
 
                 if (pixel == Color.BLACK) {
-                    //coords.add(Triple(x, y, false))
                     coords.add(Pair(x, y))
 
-                    //weightMatrix[y][x] = hypot((x-coords[0].first).toDouble(), (y-coords[0].second).toDouble()).toInt()
                     weightMatrix[y][x] = POINT
-                    hasPassedMatrix[y][x] = POINT
 
                 }
 
             }
         }
 
-        //Ahora tengo en la matriz de los pesos todos las distancias desde el punto inicial a los puntos restantes y en los que no hay punto, el valor máximo de enteros
-
-        coords = createCoordArray(coords).map {
+        val orderedCoords = createCoordArray(coords).map {
             Pair(
                 (it.first * FACTOR_AJUSTE)+16,
                 (it.second * FACTOR_AJUSTE)+16
             )
         }.filterIndexed { i, _ -> i % 2 == 0 }.toMutableList()
 
-
-        Log.i(TAG, "End of processing")
-
-        return coords
+        return orderedCoords
     }
 
 
@@ -87,15 +87,15 @@ class Translator(private val image: Bitmap) {
 
         while (counter<coords.size) {
             if(horizontal){
-                if(weightMatrix[actualCoord.second][actualCoord.first+1]==POINT){
-                    orderedCoordenates.add(Pair(actualCoord.first+1, actualCoord.second))
+                if(checkPoint(actualCoord.second, actualCoord.first+1)){
                     weightMatrix[actualCoord.second][actualCoord.first+1]=Int.MAX_VALUE
                     actualCoord = Pair(actualCoord.first+1, actualCoord.second)
+                    orderedCoordenates.add(Pair(actualCoord.first, actualCoord.second))
                 }
-                else if(weightMatrix[actualCoord.second][actualCoord.first-1]==POINT){
-                    orderedCoordenates.add(Pair(actualCoord.first-1, actualCoord.second))
+                else if(checkPoint(actualCoord.second, actualCoord.first-1)){
                     weightMatrix[actualCoord.second][actualCoord.first-1]=Int.MAX_VALUE
                     actualCoord = Pair(actualCoord.first-1, actualCoord.second)
+                    orderedCoordenates.add(Pair(actualCoord.first, actualCoord.second))
                 }
                 else{
                     horizontal = false
@@ -104,12 +104,12 @@ class Translator(private val image: Bitmap) {
             }
 
             if (vertical){
-                if(weightMatrix[actualCoord.second+1][actualCoord.first]==POINT){
-                    weightMatrix[actualCoord.second][actualCoord.first+1]=Int.MAX_VALUE
+                if(checkPoint(actualCoord.second+1, actualCoord.first)){
+                    weightMatrix[actualCoord.second+1][actualCoord.first]=Int.MAX_VALUE
                     actualCoord = Pair(actualCoord.first, actualCoord.second+1)
                     orderedCoordenates.add(Pair(actualCoord.first, actualCoord.second))
                 }
-                else if(weightMatrix[actualCoord.second-1][actualCoord.first]==POINT){
+                else if(checkPoint(actualCoord.second-1, actualCoord.first)){
                     weightMatrix[actualCoord.second-1][actualCoord.first]=Int.MAX_VALUE
                     actualCoord = Pair(actualCoord.first, actualCoord.second-1)
                     orderedCoordenates.add(Pair(actualCoord.first, actualCoord.second))
@@ -118,16 +118,18 @@ class Translator(private val image: Bitmap) {
                     actualCoord = findNearestCoord(actualCoord, coords)
                     weightMatrix[actualCoord.second][actualCoord.first]=Int.MAX_VALUE
                     orderedCoordenates.add(Pair(actualCoord.first, actualCoord.second))
-                    counter--
+
                 }
                 horizontal = true
                 vertical=false
             }
-            Log.i(TAG, "Añadido $actualCoord")
             counter++
         }
-
         return orderedCoordenates
+    }
+
+    private fun checkPoint(x: Int, y:Int): Boolean{
+        return !(y+1>=weightMatrix.size || y-1<0 || x+1>=weightMatrix[0].size || x-1<0 ||weightMatrix[y][x]!=POINT)
     }
 
     private fun findNearestCoord(initialCoord: Pair<Int, Int>, coords:MutableList<Pair<Int, Int>>):Pair<Int, Int>{
@@ -143,8 +145,8 @@ class Translator(private val image: Bitmap) {
                 }
             }
         }
-
         return coordToReturn
     }
+
 
 }
