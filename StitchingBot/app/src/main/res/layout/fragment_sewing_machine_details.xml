@@ -15,18 +15,19 @@
             android:id="@+id/imgSewingMachineDetails"
             android:layout_width="300dp"
             android:layout_height="200dp"
+            android:contentDescription="@string/imgSewingMachineDetails"
             android:src="@drawable/ic_baseline_add_a_photo_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.15"
-            android:contentDescription="@string/imgSewingMachineDetails" />
+            app:layout_constraintVertical_bias="0.15" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/txtSewingMachineName"
-            android:layout_width="200dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:hint="@string/txtSewingMachineName"
             app:endIconMode="clear_text"
@@ -45,30 +46,41 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:layout_width="200dp"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/txtMotorSteps"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="140dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
-            android:text="Pedal eléctrico"
-            app:layout_constraintBottom_toTopOf="@+id/spinnerSewingMachineDetails"
-            app:layout_constraintStart_toStartOf="@+id/spinnerSewingMachineDetails"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.995" />
+            android:layout_marginTop="45dp"
+            android:hint="@string/label_motor_steps"
+            app:endIconMode="clear_text"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="@+id/txtSewingMachineName"
+            app:layout_constraintTop_toBottomOf="@+id/txtSewingMachineName"
+            app:layout_constraintVertical_bias="5">
 
-        <Spinner
-            android:id="@+id/spinnerSewingMachineDetails"
-            android:layout_width="200dp"
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:singleLine="true" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/btnTrySteps"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.50"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.715" />
+            android:layout_marginStart="10dp"
+            android:text="@string/btn_try_steps"
+            app:layout_constraintBottom_toBottomOf="@+id/txtMotorSteps"
+            app:layout_constraintStart_toEndOf="@+id/txtMotorSteps"
+            app:layout_constraintTop_toTopOf="@+id/txtMotorSteps" />
 
         <Button
             android:id="@+id/btnSewingMachineAction"
-            android:layout_width="289dp"
+            android:layout_width="300dp"
             android:layout_height="56dp"
             android:layout_marginBottom="16dp"
             android:text="@string/btnSewingmachinesActionDefault"
@@ -81,6 +93,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
+            android:contentDescription="@string/delete_button"
             android:src="@drawable/ic_baseline_delete_24"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -89,7 +102,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.023" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

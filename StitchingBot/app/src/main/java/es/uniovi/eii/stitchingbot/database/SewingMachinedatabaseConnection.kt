@@ -49,7 +49,7 @@ class SewingMachinedatabaseConnection(context: Context) : DatabaseConnection<Sew
                 cursor.getInt(0),
                 cursor.getString(1),
                 cursor.getString(2),
-                cursor.getInt(3) > 0
+                cursor.getInt(3)
             )
 
             machines.add(machine)

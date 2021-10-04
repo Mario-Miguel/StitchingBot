@@ -21,10 +21,10 @@ class DatabaseHelper(context: Context) :
         const val ID = "id"
         const val COLUMN_NAME = "name"
         const val COLUMN_IMG = "imgUrl"
-        const val COLUMN_PEDAL = "hasPedal"
+        const val COLUMN_MOTOR_SPEED = "motorSpeed"
 
         fun creation(): String {
-            return "CREATE TABLE  $TABLE_SEWING_MACHINES ($ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_NAME TEXT NOT NULL, $COLUMN_IMG TEXT, $COLUMN_PEDAL INTEGER NOT NULL)"
+            return "CREATE TABLE  $TABLE_SEWING_MACHINES ($ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_NAME TEXT NOT NULL, $COLUMN_IMG TEXT, $COLUMN_MOTOR_SPEED INTEGER NOT NULL)"
         }
     }
 
@@ -56,14 +56,14 @@ class DatabaseHelper(context: Context) :
         val values = ContentValues()
         values.put(SewingMachineTable.COLUMN_NAME, sewingMachine.name)
         values.put(SewingMachineTable.COLUMN_IMG, sewingMachine.imgUrl)
-        values.put(SewingMachineTable.COLUMN_PEDAL, sewingMachine.hasPedal)
+        values.put(SewingMachineTable.COLUMN_MOTOR_SPEED, sewingMachine.motorSteps)
         return values
     }
 
 
 
     fun getAllSewingMachinesColumns(): Array<String>{
-        return arrayOf(SewingMachineTable.ID, SewingMachineTable.COLUMN_NAME, SewingMachineTable.COLUMN_IMG, SewingMachineTable.COLUMN_PEDAL)
+        return arrayOf(SewingMachineTable.ID, SewingMachineTable.COLUMN_NAME, SewingMachineTable.COLUMN_IMG, SewingMachineTable.COLUMN_MOTOR_SPEED)
     }
 
 

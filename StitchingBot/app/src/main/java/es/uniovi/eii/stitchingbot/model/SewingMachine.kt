@@ -7,13 +7,12 @@ data class SewingMachine(
     val id: Int=0,
     var name: String? ="",
     var imgUrl: String? ="",
-    var hasPedal: Boolean=false) : Parcelable{
+    var motorSteps: Int=467) : Parcelable{
 
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readString(),
         parcel.readString(),
-        parcel.readByte() != 0.toByte()
     ) {
     }
 
@@ -21,7 +20,7 @@ data class SewingMachine(
         parcel.writeInt(id)
         parcel.writeString(name)
         parcel.writeString(imgUrl)
-        parcel.writeByte(if (hasPedal) 1 else 0)
+
     }
 
     override fun describeContents(): Int {

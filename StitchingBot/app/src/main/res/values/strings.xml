@@ -51,4 +51,7 @@
     <string name="desc_logo_summary">Logotipo seleccionado</string>
     <string name="btn_start_translate">Traducir</string>
     <string name="menu_create_logo">Crear logotipo</string>
+    <string name="delete_button">DeleteButton</string>
+    <string name="label_motor_steps">Pasos</string>
+    <string name="btn_try_steps">Probar pasos</string>
 </resources>
