@@ -1,9 +1,7 @@
-package es.uniovi.eii.stitchingbot.bluetooth
+package es.uniovi.eii.stitchingbot.util.bluetooth
 
 import android.app.Activity
-import android.bluetooth.BluetoothSocket
 import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import java.io.IOException
 import java.io.InputStream
@@ -82,7 +80,7 @@ class ConnectedThread(
                 break
             }
         }
-        MyBluetoothService.isInExecution = false
+        BluetoothService.isInExecution = false
         Log.i(TAG, "Sa acabao")
 
     }

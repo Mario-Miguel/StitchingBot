@@ -1,10 +1,10 @@
-package es.uniovi.eii.stitchingbot.canvas.tools
+package es.uniovi.eii.stitchingbot.ui.canvas.tools
 
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
 
-class LineTool:Tool {
+class LineTool: Tool {
     private var currentX: Float = 0F
     private var currentY: Float = 0F
     lateinit var paint: Paint

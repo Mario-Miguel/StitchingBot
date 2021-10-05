@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package es.uniovi.eii.stitchingbot.canvas
+package es.uniovi.eii.stitchingbot.ui.canvas
 
 import android.content.Context
 import android.graphics.*
@@ -24,8 +24,8 @@ import android.view.View
 import android.view.ViewConfiguration
 import androidx.core.content.res.ResourcesCompat
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.canvas.tools.FreeDrawingTool
-import es.uniovi.eii.stitchingbot.canvas.tools.Tool
+import es.uniovi.eii.stitchingbot.ui.canvas.tools.FreeDrawingTool
+import es.uniovi.eii.stitchingbot.ui.canvas.tools.Tool
 import kotlin.math.abs
 
 

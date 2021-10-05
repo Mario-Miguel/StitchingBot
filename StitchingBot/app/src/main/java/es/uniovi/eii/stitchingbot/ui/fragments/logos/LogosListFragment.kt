@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.ui.logos
+package es.uniovi.eii.stitchingbot.ui.fragments.logos
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -13,10 +13,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.adapter.LogoListAdapter
+import es.uniovi.eii.stitchingbot.ui.adapter.LogoListAdapter
 import es.uniovi.eii.stitchingbot.database.LogoDatabaseConnection
 import es.uniovi.eii.stitchingbot.model.Logo
-import es.uniovi.eii.stitchingbot.translator.TAG
+import es.uniovi.eii.stitchingbot.util.translator.TAG
 import kotlinx.android.synthetic.main.fragment_logos_list.*
 
 class LogosListFragment : Fragment() {

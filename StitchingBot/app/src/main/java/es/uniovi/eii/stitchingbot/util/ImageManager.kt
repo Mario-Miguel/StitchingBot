@@ -7,13 +7,15 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
+import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ImageManager() {
+object ImageManager {
 
     fun getImageFromUri(imageUri: Uri?, activity: Activity): Bitmap? {
         var image: Bitmap
@@ -61,7 +63,7 @@ class ImageManager() {
 
     fun deleteImageFile(uri: Uri) {
         //TODO hacer mensaje de confirmación
-        val file = File(uri.path)
+        val file = File(uri.path!!)
         if (file.exists()) {
             file.delete()
         }
@@ -89,9 +91,18 @@ class ImageManager() {
             ".jpg", /* suffix */
             storageDir /* directory */
         )
-//            .apply {
-//            // Save a file: path for use with ACTION_VIEW intents
-//            currentPhotoPath = absolutePath
-//        }
+    }
+
+    fun createPhotoFile(activity: Activity): File?{
+        // Create the File where the photo should go
+        val photoFile: File? = try {
+            createImageFile(activity)
+        } catch (ex: IOException) {
+            // Error occurred while creating the File
+            Log.i("ImageManager", "Error creando archivo")
+            null
+        }
+
+        return photoFile
     }
 }

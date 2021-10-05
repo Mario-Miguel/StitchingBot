@@ -1,9 +1,7 @@
-package es.uniovi.eii.stitchingbot.ui
+package es.uniovi.eii.stitchingbot.ui.fragments
 
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,17 +11,15 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.bluetooth.MyBluetoothService
 import es.uniovi.eii.stitchingbot.model.Logo
 import es.uniovi.eii.stitchingbot.model.SewingMachine
-import es.uniovi.eii.stitchingbot.translator.TAG
-import es.uniovi.eii.stitchingbot.translator.Translator
+import es.uniovi.eii.stitchingbot.util.ArduinoCommands
+import es.uniovi.eii.stitchingbot.util.translator.Translator
 import es.uniovi.eii.stitchingbot.util.ImageManager
+import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
 import kotlinx.android.synthetic.main.fragment_arduino_connection.*
 import kotlinx.android.synthetic.main.fragment_summary.*
 import kotlinx.android.synthetic.main.fragment_summary.progressBar
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 
 private const val LOGO = "logo"
@@ -40,14 +36,10 @@ class SummaryFragment : Fragment() {
     private var logo: Logo? = null
     private var sewingMachine: SewingMachine? = null
 
-    private var bluetoothService: MyBluetoothService = MyBluetoothService
+    private var bluetoothService: BluetoothService = BluetoothService
 
     private var translator: Translator = Translator
-
-
-    private val imageManager = ImageManager()
-
-    private lateinit var thread: Thread
+    private val imageManager = ImageManager
 
 
     override fun onCreateView(
@@ -105,8 +97,6 @@ class SummaryFragment : Fragment() {
         if (bluetoothService.isInExecution) {
             progressBar.visibility = View.VISIBLE
         }
-
-        createProcessingThread()
 
 
         btnStartExecution.isEnabled =
@@ -166,7 +156,7 @@ class SummaryFragment : Fragment() {
     }
 
     private fun updateArduinoStatus(status: String) {
-        this.bluetoothService = MyBluetoothService
+        this.bluetoothService = BluetoothService
         if (bluetoothService.getConnectionSocket()?.isConnected == true) {
             txtArduinoSummary.text = "Estado: $status"
             imgRobotSummary.setImageDrawable(
@@ -189,10 +179,8 @@ class SummaryFragment : Fragment() {
 
 //##################################################################################################
 
-    private fun createProcessingThread() {
-        thread = Thread {
-
-
+    private fun startTranslation() {
+        Thread {
             // display the indefinite progressbar
             this@SummaryFragment.requireActivity().runOnUiThread {
                 progressBar.visibility = View.VISIBLE
@@ -203,39 +191,31 @@ class SummaryFragment : Fragment() {
 
             }
 
-            translator.image=imageManager.getImageFromUri(
+            translator.image = imageManager.getImageFromUri(
                 Uri.parse(logo!!.imgUrl),
                 requireActivity()
             )!!
             translator.run()
 
-            if (this@SummaryFragment.isVisible) {
-                btnStartExecution.isEnabled =
-                    logo != null && sewingMachine != null && bluetoothService.getConnectionSocket()?.isConnected == true && translator.translationDone
+            this@SummaryFragment.requireActivity().runOnUiThread {
+                if (this@SummaryFragment.isVisible) {
+                    btnStartExecution.isEnabled =
+                        logo != null && sewingMachine != null && bluetoothService.isConnected() && translator.translationDone
 
-                // when the task is completed, make progressBar gone
-                this@SummaryFragment.requireActivity().runOnUiThread {
                     progressBar.visibility = View.GONE
                     requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                 }
             }
-        }
-    }
-
-    private fun startTranslation() {
-        thread.start()
-
+        }.start()
     }
 
     private fun startExecution() {
         progressBar.visibility = View.VISIBLE
-
-        bluetoothService.startExecution(
+        ArduinoCommands.doExecution(
             translator.translation,
             progressBar,
             requireActivity()
         )
-
     }
 
 
@@ -248,7 +228,6 @@ class SummaryFragment : Fragment() {
          * @param sewingMachine Parameter 2.
          * @return A new instance of fragment SummaryFragment.
          */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(logo: Logo, sewingMachine: SewingMachine) =
             SummaryFragment().apply {

@@ -1,86 +1,40 @@
-package es.uniovi.eii.stitchingbot.bluetooth
+package es.uniovi.eii.stitchingbot.util
 
 import android.app.Activity
-import android.bluetooth.BluetoothSocket
-import android.os.Handler
 import android.util.Log
 import android.widget.ProgressBar
 import androidx.navigation.findNavController
 import com.google.android.material.navigation.NavigationView
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.util.ShowDialog
+import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
 import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
 
+object ArduinoCommands {
 
-const val TAG = "BluetoothStitching"
+    private val bluetoothService = BluetoothService
 
-object MyBluetoothService {
-
-    var isInExecution = false
-
-    private var connectionSocket: BluetoothSocket? = null
-    private lateinit var mmInStream: InputStream
-    private lateinit var mmOutStream: OutputStream
-
-    private lateinit var handler: Handler
-    private var startedProcess = false
-
-    fun setConnectionSocket(socket: BluetoothSocket) {
-        this.connectionSocket = socket
-        mmInStream = connectionSocket!!.inputStream
-        mmOutStream = connectionSocket!!.outputStream
+    fun doMotorStepsTest(motorSteps: Int){
+        val stringToSend = "C;$motorSteps"
+        bluetoothService.write(stringToSend)
     }
 
-    fun getConnectionSocket(): BluetoothSocket? {
-        return this.connectionSocket
-    }
-
-    fun setHandler(handler: Handler) {
-        this.handler = handler
-    }
-
-    fun getHandler(): Handler {
-        return this.handler
-    }
-
-    fun closeConnectionSocket() {
-        try {
-            if (connectionSocket != null)
-                connectionSocket!!.close()
-        } catch (e: IOException) {
-            Log.e(TAG, "Could not close the client socket", e)
-        }
-    }
-
-    fun write(input: String) {
-        val bytes = input.toByteArray() //converts entered String into bytes
-        Log.i("BluetoothStitching", "Mensaje enviado")
-        try {
-            mmOutStream.write(bytes)
-        } catch (e: IOException) {
-            Log.e("Send Error", "Unable to send message", e)
-        }
-    }
-
-    fun startExecution(
-        translation: MutableList<Triple<Int, Int, Boolean>>,
+    fun doExecution(
+        translation: MutableList<Pair<Int, Int>>,
         progressBar: ProgressBar,
         activity: Activity
     ) {
-        isInExecution=true
+        BluetoothService.isInExecution =true
         val navView = activity.findViewById(R.id.nav_view) as NavigationView
         navView.menu.getItem(navView.menu.size()-1).isVisible=true
 
         Thread {
-            startedProcess = true
+            BluetoothService.startedProcess = true
             val ordersToSend = mutableListOf<String>()
             val auxString = StringBuilder()
             var counter = 0
 
             for (coord in translation) {
-                auxString.append("${coord.first},${coord.second},${if (coord.third) 1 else 0};")
+                auxString.append("${coord.first},${coord.second};")
                 counter++
                 if (counter == 50) {
                     ordersToSend.add(auxString.toString())
@@ -96,7 +50,7 @@ object MyBluetoothService {
             Log.i("BluetoothStitching", "Connected thread run")
 
             counter = 0
-            mmOutStream.write("S".toByteArray())
+            BluetoothService.write("S")
 
 
             // Keep listening to the InputStream until an exception occurs
@@ -106,7 +60,7 @@ object MyBluetoothService {
                     Read from the InputStream from Arduino until termination character is reached.
                     Then send the whole String message to GUI Handler.
                      */
-                    buffer[bytes] = mmInStream.read().toByte()
+                    buffer[bytes] = BluetoothService.read()
                     if (buffer[bytes] != 0.toByte())
                         hasMessage = true
 
@@ -117,7 +71,7 @@ object MyBluetoothService {
 
                         //AVANZO 2cm
                         if (readMessage == "M") {
-                            mmOutStream.write(ordersToSend[counter].toByteArray())
+                            BluetoothService.write(ordersToSend[counter])
                             counter++
                             progressBar.progress = ((counter.toDouble()/ordersToSend.size.toDouble())*100).toInt()
                         }
@@ -132,18 +86,10 @@ object MyBluetoothService {
                     break
                 }
             }
-            isInExecution=false
-            Log.i(TAG, "Sa acabao")
+            BluetoothService.isInExecution =false
             ShowDialog.showDialogOK(activity.applicationContext, "Ejecución terminada") { _, _ -> }
             val navController = activity.findNavController(R.id.nav_host_fragment)
             navController.navigate(R.id.nav_summary, null)
-
         }.start()
-
-
     }
-
 }
-
-//Detectar el objeto completo -> Mirar a ver loq ue esta rodeado por ceroas y despues coserlo de izquierda a derecha y de arriba a abajo
-//Si no hacer un grafo uniendo los nodos, lo que habia pensao que no me salio

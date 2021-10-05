@@ -1,9 +1,8 @@
-package es.uniovi.eii.stitchingbot.canvas.tools
+package es.uniovi.eii.stitchingbot.ui.canvas.tools
 
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
-import es.uniovi.eii.stitchingbot.canvas.MyCanvasView
 
 class FreeDrawingTool() : Tool {
     var currentX: Float = 0F

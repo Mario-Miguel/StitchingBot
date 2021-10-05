@@ -1,11 +1,11 @@
-package es.uniovi.eii.stitchingbot.canvas.tools
+package es.uniovi.eii.stitchingbot.ui.canvas.tools
 
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 
-class EraseTool:Tool {
+class EraseTool: Tool {
 
     //TODO Terminar de hacer esto
     var currentX: Float = 0F

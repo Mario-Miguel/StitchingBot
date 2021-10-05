@@ -1,42 +1,32 @@
-package es.uniovi.eii.stitchingbot.ui.sewingMachines
+package es.uniovi.eii.stitchingbot.ui.fragments.sewingMachines
 
 import android.Manifest
-import android.app.Activity.RESULT_CANCELED
-import android.app.Activity.RESULT_OK
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
-import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.bluetooth.TAG
-import es.uniovi.eii.stitchingbot.database.SewingMachinedatabaseConnection
-import es.uniovi.eii.stitchingbot.model.SewingMachine
+import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
+import es.uniovi.eii.stitchingbot.controller.SewingMachineController
+import es.uniovi.eii.stitchingbot.util.ArduinoCommands
 import es.uniovi.eii.stitchingbot.util.ImageManager
 import es.uniovi.eii.stitchingbot.util.ShowDialog
 import kotlinx.android.synthetic.main.fragment_sewing_machine_details.*
-import java.io.File
-import java.io.IOException
 
 
 private const val CREATION_MODE = "creation"
-private const val SEWING_MACHINE = "machine"
+private const val TAG = "SewingMachine"
 
 @RequiresApi(Build.VERSION_CODES.Q)
 private val PERMISSIONS = arrayOf(
@@ -45,16 +35,10 @@ private val PERMISSIONS = arrayOf(
 )
 
 
-/**
- * A simple [Fragment] subclass.
- * Use the [SewingMachineDetailsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class SewingMachineDetailsFragment : Fragment() {
     private var isCreation: Boolean = false
-    private var sewingMachine = SewingMachine()
+    private var sewingMachineController = SewingMachineController()
 
-    private lateinit var currentPhotoUri: Uri
     private lateinit var imageManager: ImageManager
 
     private val getImageFromGallery = registerForActivityResult(
@@ -72,9 +56,9 @@ class SewingMachineDetailsFragment : Fragment() {
             permissions.entries.forEach {
                 if (!it.value) {
                     granted = false
-                    if(it.key == "android.permission.CAMERA")
+                    if (it.key == "android.permission.CAMERA")
                         nonGrantedPermissions.add("Camera")
-                    else{
+                    else {
                         nonGrantedPermissions.add("Almacenamiento")
                     }
                 }
@@ -106,19 +90,10 @@ class SewingMachineDetailsFragment : Fragment() {
     }
 
 
-    private fun showNotGrantedPermissionsMessage(nonGrantedPermissions: MutableList<String>) {
-        val permissionsString = nonGrantedPermissions.reduce { acc, str -> "$acc - $str" }
-
-        ShowDialog.showDialogOK(
-            requireContext(),
-            "Se necesitan los permisos: $permissionsString"
-        ) { _, _ -> }
-    }
-
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        imageManager = ImageManager()
+        imageManager = ImageManager
 
         if (arguments != null)
             isCreation = requireArguments().getBoolean(CREATION_MODE)
@@ -147,37 +122,20 @@ class SewingMachineDetailsFragment : Fragment() {
 
 
     private fun imagePick(selectedImage: Uri) {
-        val currentPhotoFile: File
+        val uri = sewingMachineController.updateSewingMachineUrl(selectedImage, requireActivity())
 
-        if (sewingMachine.imgUrl.isNullOrBlank()) {
-            currentPhotoFile = imageManager.createImageFile(requireActivity())
-            currentPhotoUri = Uri.fromFile(currentPhotoFile)
-        } else {
-            currentPhotoUri = Uri.parse(sewingMachine.imgUrl)
-            currentPhotoFile = File(currentPhotoUri.path!!)
-        }
-
-        imageManager.copyImage(
-            imageManager.getImageFromUri(
-                selectedImage,
-                requireActivity()
-            ), currentPhotoFile
-        )
-
-        sewingMachine.imgUrl = currentPhotoUri.toString()
         imgSewingMachineDetails.setImageBitmap(
             imageManager.getImageFromUri(
-                currentPhotoUri,
+                uri,
                 requireActivity()
             )
         )
     }
 
     private fun imageTake() {
-        sewingMachine.imgUrl = currentPhotoUri.toString()
         imgSewingMachineDetails.setImageBitmap(
             imageManager.getImageFromUri(
-                currentPhotoUri,
+                sewingMachineController.getCurrentPhotoUri(),
                 requireActivity()
             )
         )
@@ -190,20 +148,23 @@ class SewingMachineDetailsFragment : Fragment() {
         imgSewingMachineDetails.setOnClickListener {
             getPermissions.launch(PERMISSIONS)
         }
-        txtMotorSteps.editText!!.setText(sewingMachine.motorSteps.toString())
+        txtMotorSteps.editText!!.setText(sewingMachineController.getSewingMachine().motorSteps.toString())
+        btnTrySteps.setOnClickListener { tryStepsButtonAction() }
     }
 
     private fun loadUpdateScreen() {
-        sewingMachine = requireArguments().getParcelable("machine")!!
-        Log.i(TAG, "Sewing machine: ${sewingMachine.name}")
+        sewingMachineController.setSewingMachine(requireArguments().getParcelable("machine")!!)
+
+        Log.i(TAG, "Sewing machine: ${sewingMachineController.getSewingMachine().name}")
         btnSewingMachineAction.text = "Modificar"
-        txtSewingMachineName.editText!!.setText(sewingMachine.name)
-        txtMotorSteps.editText!!.setText(sewingMachine.motorSteps.toString())
-        if (sewingMachine.imgUrl?.isNotEmpty() == true) {
-            currentPhotoUri = Uri.parse(sewingMachine.imgUrl)
+        txtSewingMachineName.editText!!.setText(sewingMachineController.getSewingMachine().name)
+        txtMotorSteps.editText!!.setText(sewingMachineController.getSewingMachine().motorSteps.toString())
+
+        if (sewingMachineController.getSewingMachine().imgUrl?.isNotEmpty() == true) {
+
             imgSewingMachineDetails.setImageBitmap(
                 imageManager.getImageFromUri(
-                    currentPhotoUri,
+                    sewingMachineController.getCurrentPhotoUri(),
                     requireActivity()
                 )
             )
@@ -212,33 +173,27 @@ class SewingMachineDetailsFragment : Fragment() {
 
     private fun confirmButtonAction() {
         if (checkFields()) {
-            sewingMachine.name = txtSewingMachineName.editText!!.text.toString()
-            sewingMachine.motorSteps = txtMotorSteps.editText!!.text.toString().toInt()
+            val name = txtSewingMachineName.editText!!.text.toString()
+            val motorSteps = txtMotorSteps.editText!!.text.toString().toInt()
+            sewingMachineController.updateSewingMachineParams(name, motorSteps)
 
-            val databaseConnection = SewingMachinedatabaseConnection(requireContext())
             if (arguments?.getBoolean(CREATION_MODE) == true) {
-                databaseConnection.open()
-                databaseConnection.insert(sewingMachine)
-                databaseConnection.close()
+                sewingMachineController.addSewingMachine(requireContext())
                 Toast.makeText(requireContext(), "Máquina creada", Toast.LENGTH_LONG).show()
                 Log.i(
                     TAG,
-                    "Insertada maquina de coser: ${sewingMachine.name} - ${sewingMachine.motorSteps} - ${sewingMachine.imgUrl}"
+                    "Insertada maquina de coser"
                 )
             } else {
-                databaseConnection.open()
-                databaseConnection.update(sewingMachine)
-                databaseConnection.close()
-
+                sewingMachineController.updateSewingMachine(requireContext())
                 Toast.makeText(requireContext(), "Máquina modificada", Toast.LENGTH_LONG).show()
                 Log.i(
                     TAG,
-                    "Update maquina de coser: ${sewingMachine.name} - ${sewingMachine.motorSteps} - ${sewingMachine.imgUrl}"
+                    "Update maquina de coser"
                 )
             }
 
-            val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-            navController.popBackStack()
+            goBack()
         } else {
             Toast.makeText(requireContext(), "Rellene todos los campos", Toast.LENGTH_LONG).show()
         }
@@ -249,30 +204,31 @@ class SewingMachineDetailsFragment : Fragment() {
             .isNotBlank()
     }
 
+    private fun tryStepsButtonAction() {
+        val arduinoCommands = ArduinoCommands
+        val motorSteps = txtMotorSteps.editText!!.text.toString().toInt()
 
-    private fun hasPermissions(context: Context, permissions: Array<String>): Boolean =
-        permissions.all {
-            Log.i(
-                TAG,
-                "$it - ${
-                    ActivityCompat.checkSelfPermission(
-                        context,
-                        it
-                    ) == PackageManager.PERMISSION_GRANTED
-                }"
-            )
-            ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+        if (BluetoothService.isConnected()) {
+            arduinoCommands.doMotorStepsTest(motorSteps)
+        } else {
+            ShowDialog.showDialogOK(
+                requireContext(),
+                "El dispositivo no está conectado. \n ¿Desea conectarlo?",
+            ) { _, _ -> goToArduinoConnectionFragment() }
         }
+    }
+
+    private fun goToArduinoConnectionFragment() {
+        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+        navController.navigate(R.id.nav_arduino_connection)
+    }
 
 
     private fun deleteMachine() {
-        imageManager.deleteImageFile(currentPhotoUri)
-        val databaseConnection = SewingMachinedatabaseConnection(requireContext())
-        databaseConnection.open()
-        databaseConnection.delete(sewingMachine)
-        databaseConnection.close()
-        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-        navController.popBackStack()
+        imageManager.deleteImageFile(sewingMachineController.getCurrentPhotoUri())
+        sewingMachineController.deleteSewingMachine(requireContext())
+
+        goBack()
     }
 
 
@@ -301,45 +257,51 @@ class SewingMachineDetailsFragment : Fragment() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
             takePictureIntent.resolveActivity(requireActivity().packageManager)?.also {
-                // Create the File where the photo should go
-                val photoFile: File? = try {
-                    imageManager.createImageFile(requireActivity())
-                } catch (ex: IOException) {
-                    // Error occurred while creating the File
-                    Log.i(TAG, "Error creando archivo")
-                    null
-                }
+
                 // Continue only if the File was successfully created
-                photoFile?.also {
+                imageManager.createPhotoFile(requireActivity())?.also {
                     Log.i(TAG, it.absolutePath)
                     val photoURI: Uri = FileProvider.getUriForFile(
                         requireContext(),
                         "es.uniovi.eii.stitchingbot",
                         it
                     )
-                    currentPhotoUri = photoURI
+                    sewingMachineController.setCurrentPhotoUri(photoURI)
                     getImageFromCamera.launch(photoURI)
                 }
             }
         }
     }
 
+    private fun goBack() {
+        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+        navController.popBackStack()
+    }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param isCreation Parameter 1.
-         * @return A new instance of fragment SewingMachineDetailsFragment.
-         */
+    private fun showNotGrantedPermissionsMessage(nonGrantedPermissions: MutableList<String>) {
+        val permissionsString = nonGrantedPermissions.reduce { acc, str -> "$acc - $str" }
+
+        ShowDialog.showDialogOK(
+            requireContext(),
+            "Se necesitan los permisos: $permissionsString"
+        ) { _, _ -> }
+    }
+
+    /*companion object {
+        */
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     *
+     * @return A new instance of fragment SewingMachineDetailsFragment.
+     *//*
         @JvmStatic
-        fun newInstance(isCreation: Boolean, sewingMachine: SewingMachine) =
+        fun newInstance(isCreation: Boolean) =
             SewingMachineDetailsFragment().apply {
                 arguments = Bundle().apply {
                     putBoolean(CREATION_MODE, isCreation)
-                    putParcelable(SEWING_MACHINE, sewingMachine)
                 }
             }
-    }
+    }*/
 }

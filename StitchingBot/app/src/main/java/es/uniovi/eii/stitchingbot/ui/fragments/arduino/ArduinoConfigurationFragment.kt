@@ -1,23 +1,19 @@
-package es.uniovi.eii.stitchingbot.ui.arduino
+package es.uniovi.eii.stitchingbot.ui.fragments.arduino
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.bluetooth.MyBluetoothService
+import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
 import kotlinx.android.synthetic.main.fragment_arduino_configuration.*
-import java.io.IOException
-import java.io.OutputStream
 
 
 class ArduinoConfigurationFragment : Fragment() {
 
-    var bluetoothService: MyBluetoothService = MyBluetoothService
-    //private var mmOutStream: OutputStream? = null
+    var bluetoothService: BluetoothService = BluetoothService
     private var comesFromSummary: Boolean = false
 
     override fun onCreateView(
@@ -25,7 +21,6 @@ class ArduinoConfigurationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-
         return inflater.inflate(R.layout.fragment_arduino_configuration, container, false)
     }
 
@@ -37,8 +32,6 @@ class ArduinoConfigurationFragment : Fragment() {
             comesFromSummary = requireArguments().getBoolean("summary")
         }
         initUI()
-        //startOutputStream()
-
     }
 
 
@@ -73,7 +66,8 @@ class ArduinoConfigurationFragment : Fragment() {
     private fun startMainFragment() {
         if (!comesFromSummary) {
             val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-            navController.navigate(R.id.nav_logo_list)
+            /*navController.navigate(R.id.nav_logo_list)*/
+            navController.popBackStack()
         } else {
             val navController = requireActivity().findNavController(R.id.nav_host_fragment)
             navController.getBackStackEntry(R.id.nav_summary).savedStateHandle.set(
@@ -100,17 +94,6 @@ class ArduinoConfigurationFragment : Fragment() {
 
         }
     }
-
-//
-//    private fun startOutputStream() {
-//        try {
-//            mmOutStream = bluetoothService.getConnectionSocket()?.outputStream
-//        } catch (e: IOException) {
-//        }
-//
-//    }
-
-
 
 
 }

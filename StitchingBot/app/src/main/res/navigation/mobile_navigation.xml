@@ -7,44 +7,44 @@
 
     <fragment
         android:id="@+id/nav_logo_list"
-        android:name="es.uniovi.eii.stitchingbot.ui.logos.LogosListFragment"
+        android:name="es.uniovi.eii.stitchingbot.ui.fragments.logos.LogosListFragment"
         android:label="@string/menu_logos_list"
         tools:layout="@layout/fragment_logos_list" />
 
     <fragment
         android:id="@+id/nav_create_logo"
-        android:name="es.uniovi.eii.stitchingbot.ui.logos.CreateLogoFragment"
+        android:name="es.uniovi.eii.stitchingbot.ui.fragments.logos.CreateLogoFragment"
         android:label="@string/menu_create_logo"
         tools:layout="@layout/fragment_create_logo" />
 
     <fragment
         android:id="@+id/nav_sewing_machines"
-        android:name="es.uniovi.eii.stitchingbot.ui.sewingMachines.SewingMachinesListFragment"
+        android:name="es.uniovi.eii.stitchingbot.ui.fragments.sewingMachines.SewingMachinesListFragment"
         android:label="@string/menu_sewing_machines"
         tools:layout="@layout/fragment_sewing_machines" />
 
     <fragment
         android:id="@+id/nav_sewing_machine_details"
-        android:name="es.uniovi.eii.stitchingbot.ui.sewingMachines.SewingMachineDetailsFragment"
+        android:name="es.uniovi.eii.stitchingbot.ui.fragments.sewingMachines.SewingMachineDetailsFragment"
         android:label="@string/menu_sewing_machine_details"
         tools:layout="@layout/fragment_sewing_machine_details" />
 
 
     <fragment
         android:id="@+id/nav_arduino_connection"
-        android:name="es.uniovi.eii.stitchingbot.ui.arduino.ArduinoConnectionFragment"
+        android:name="es.uniovi.eii.stitchingbot.ui.fragments.arduino.ArduinoConnectionFragment"
         android:label="@string/menu_arduino_connection"
         tools:layout="@layout/fragment_arduino_connection" />
 
     <fragment
         android:id="@+id/nav_arduino_configuration"
-        android:name="es.uniovi.eii.stitchingbot.ui.arduino.ArduinoConfigurationFragment"
+        android:name="es.uniovi.eii.stitchingbot.ui.fragments.arduino.ArduinoConfigurationFragment"
         android:label="@string/menu_arduino_config"
         tools:layout="@layout/fragment_arduino_configuration" />
 
     <fragment
         android:id="@+id/nav_summary"
-        android:name="es.uniovi.eii.stitchingbot.ui.SummaryFragment"
+        android:name="es.uniovi.eii.stitchingbot.ui.fragments.SummaryFragment"
         android:label="@string/menu_summary"
         tools:layout="@layout/fragment_summary" />
 

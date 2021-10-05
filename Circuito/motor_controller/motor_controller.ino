@@ -25,12 +25,13 @@ AccelStepper stepperX = AccelStepper(motorInterfaceType, STEPX, DIRX);
 AccelStepper stepperY1 = AccelStepper(motorInterfaceType, STEPY_1, DIRY_1);
 AccelStepper stepperY2 = AccelStepper(motorInterfaceType, STEPY_2, DIRY_2);
 AccelStepper stepperPulley = AccelStepper(motorInterfaceType, STEP_PULLEY, DIR_PULLEY);
+int stepperPulleySteps = 467;
 
 //#####################################################################################
 
 //Finales de carrera
 #define FIN_CARRX 25
-#define FIN_CARRY 23 
+#define FIN_CARRY 23
 
 //#####################################################################################
 
@@ -43,19 +44,21 @@ SoftwareSerial BTSerial(rx, tx); // RX | TX of Arduino
 
 //#####################################################################################
 const String ASK_FOR_ACTIONS = "M";
+const String START_EXECUTION = "S";
+const char CONFIGURE_PULLEY = 'C';
+
 #define MAX_ARRAY_SIZE 50
 String actionsRead[MAX_ARRAY_SIZE];
 int timeActionsRead[MAX_ARRAY_SIZE];
 int xCoords[MAX_ARRAY_SIZE];
 int yCoords[MAX_ARRAY_SIZE];
-int hasToChange[MAX_ARRAY_SIZE];
+//int hasToChange[MAX_ARRAY_SIZE];
 
 int actionCounter = 0;
 unsigned long startActionTime = 0;
 boolean entradaLeida = false;
-boolean startedFromJava = false;
 boolean areActionsRemaining = false;
-boolean actualPedalState = true;
+//boolean actualPedalState = true;
 
 String receivedString = "";
 
@@ -85,9 +88,9 @@ void loop() {
 
   bluetoothRead();
 
-//  if(!digitalRead(FIN_CARRY)){
-//    runPulleyMotor();
-//  }
+  //  if(!digitalRead(FIN_CARRY)){
+  //    runPulleyMotor();
+  //  }
 }
 
 //#####################################################################################
@@ -96,14 +99,18 @@ void bluetoothRead() {
   if (Serial1.available() > 0) {
     receivedString = Serial1.readString();
     delay(100);
-    
-    if (receivedString == "S") {
+
+    if (receivedString.charAt(0) == CONFIGURE_PULLEY ) {
+      int steps = receivedString.substring(2).toInt();
+      configurePulleyMotor(steps);
+    }
+    else if (receivedString == START_EXECUTION) {
       startAutohome();
       Serial1.println(ASK_FOR_ACTIONS);
       actionCounter = 0;
       resetArrays();
-      entradaLeida=false;
-      receivedString="";
+      entradaLeida = false;
+      receivedString = "";
       delay(100);
     }
     else {
@@ -111,7 +118,7 @@ void bluetoothRead() {
       areActionsRemaining = true;
       delay(100);
     }
-    
+
   }
 
   //---------------------------------------
@@ -119,7 +126,6 @@ void bluetoothRead() {
   if (areActionsRemaining) {
 
     if (actionCounter == MAX_ARRAY_SIZE) {
-      //      Serial.println(">" + ASK_FOR_ACTIONS);
       Serial.println(">Pide más acciones");
       Serial1.println(ASK_FOR_ACTIONS);
       resetArrays();
@@ -129,7 +135,6 @@ void bluetoothRead() {
     }
 
     if (entradaLeida) {
-      //Serial.println(">Ejecuta una acción");
       executeActions();
     }
   }
@@ -162,7 +167,7 @@ void startAutohome() {
 
   stepperX.setSpeed(250);
   stepperY1.setSpeed(250);
-  stepperY2.setSpeed(250); 
+  stepperY2.setSpeed(250);
 
   while (stepperX.distanceToGo() != 0 || stepperY1.distanceToGo() != 0) {
     if (stepperX.distanceToGo() != 0)
@@ -194,7 +199,7 @@ void createActions(String actionsString) {
 
       xCoords[i] = getValue(entradaPartida, ',', 0).toInt();
       yCoords[i] = getValue(entradaPartida, ',', 1).toInt();
-      hasToChange[i] = getValue(entradaPartida, ',', 2).toInt();
+      //hasToChange[i] = getValue(entradaPartida, ',', 2).toInt();
 
     }
     i = i + 1;
@@ -225,14 +230,14 @@ String getValue(String datos, char separator, int index)
 void executeActions() {
 
   if (xCoords[actionCounter] == 0 && yCoords[actionCounter] == 0) {
-    Serial.println(">Se acabaron las acciones wey");
+    Serial.println(">Se acabaron las acciones");
     Serial1.println(ASK_FOR_ACTIONS);
     actionCounter = 0;
   }
   else {
     //Si tiene que cambiar, parar el pedal, despues mover en los ejes que sean
-    setPedalState(!hasToChange[actionCounter]);
-    
+    //setPedalState(!hasToChange[actionCounter]);
+
 
     //Hacer que se mueva a la coordenada indicada
     Serial.println(">Se mueve a la coordenada x: " + String(xCoords[actionCounter]) + " - y: " + String(yCoords[actionCounter]) + " - Current pos: " + String(stepperX.currentPosition()));
@@ -243,31 +248,31 @@ void executeActions() {
 
 //#####################################################################################
 
-void setPedalState(boolean state) {
-
-  if (!state) {
-    //TODO mirar a ver como controlar el pedal. En este caso hay que dejar de pisarlo
-    actualPedalState = false;
-  }
-  else if (!actualPedalState) {
-    //TODO Hacer que se pulse el pedal
-    actualPedalState = true;
-  }
-  delay(10);
-}
+//void setPedalState(boolean state) {
+//
+//  if (!state) {
+//    //TODO mirar a ver como controlar el pedal. En este caso hay que dejar de pisarlo
+//    actualPedalState = false;
+//  }
+//  else if (!actualPedalState) {
+//    //TODO Hacer que se pulse el pedal
+//    actualPedalState = true;
+//  }
+//  delay(10);
+//}
 
 //#####################################################################################
 
 void resetArrays() {
   memset(xCoords, 0, sizeof(xCoords));
   memset(yCoords, 0, sizeof(yCoords));
-  memset(hasToChange, 0, sizeof(hasToChange));
+  //memset(hasToChange, 0, sizeof(hasToChange));
 }
 
 //#####################################################################################
 
 void moveMotorsLib(int xCoord, int yCoord) {
-  int xMovement = xCoord - (-1*stepperX.currentPosition());
+  int xMovement = xCoord - (-1 * stepperX.currentPosition());
   int yMovement = yCoord - stepperY1.currentPosition();
   int directionX = 0;
   int directionY = 0;
@@ -275,13 +280,13 @@ void moveMotorsLib(int xCoord, int yCoord) {
   if (xMovement < 0) {
     directionX = 1;
   }
-  else if(xMovement>0) {
+  else if (xMovement > 0) {
     directionX = -1;
   }
   if (yMovement < 0) {
     directionY = -1;
   }
-  else if(yMovement>0) {
+  else if (yMovement > 0) {
     directionY = 1;
   }
 
@@ -289,20 +294,17 @@ void moveMotorsLib(int xCoord, int yCoord) {
   stepperY1.moveTo(yCoord);
   stepperY2.moveTo(yCoord);
 
-  stepperX.setSpeed(250*directionX);
-  stepperY1.setSpeed(250*directionY);
-  stepperY2.setSpeed(250*directionY);  
+  stepperX.setSpeed(250 * directionX);
+  stepperY1.setSpeed(250 * directionY);
+  stepperY2.setSpeed(250 * directionY);
 
   stepperPulley.setCurrentPosition(0);
-  if(actualPedalState)
-    stepperPulley.moveTo(467);
-  else
-    stepperPulley.moveTo(0);
+  stepperPulley.moveTo(stepperPulleySteps);
   stepperPulley.setSpeed(500);
 
 
-  while ((!endOfPathX() && stepperX.distanceToGo() != 0) || (!endOfPathY() && stepperY1.distanceToGo() != 0) || (stepperPulley.distanceToGo() != 0)) {   
-    
+  while ((!endOfPathX() && stepperX.distanceToGo() != 0) || (!endOfPathY() && stepperY1.distanceToGo() != 0) || (stepperPulley.distanceToGo() != 0)) {
+
     if (!endOfPathX() && stepperX.distanceToGo() != 0)
       stepperX.runSpeed();
 
@@ -310,25 +312,17 @@ void moveMotorsLib(int xCoord, int yCoord) {
       stepperY1.runSpeed();
       stepperY2.runSpeed();
     }
-    
-    if(stepperPulley.distanceToGo() != 0){
-      
+
+    if (stepperPulley.distanceToGo() != 0) {
+
       stepperPulley.runSpeed();
     }
 
   }
 
-//  delay(200);
-//
-//  while(stepperPulley.distanceToGo() != 0){
-//    if(stepperPulley.distanceToGo() != 0){
-//      
-//      stepperPulley.runSpeed();
-//    }
-//  }
-  
+
   delay(100);
-  
+
 
 }
 
@@ -343,15 +337,22 @@ bool endOfPathX() {
 
 //#####################################################################################
 
-//void runPulleyMotor(){
-//  if(actualPedalState){
-//    stepperPulley.setSpeed(1000);
-//    stepperPulley.runSpeed();
-//  }
-//  else{
-//    stepperPulley.setSpeed(0);
-//    stepperPulley.runSpeed();
-//  }
-//}
+void configurePulleyMotor(int steps) {
+  stepperPulleySteps = steps;
+  runPulleyMotor();
+
+}
+
+void runPulleyMotor() {
+  stepperPulley.setCurrentPosition(0);
+  stepperPulley.moveTo(stepperPulleySteps);
+  stepperPulley.setSpeed(500);
+
+  while ((stepperPulley.distanceToGo() != 0)) {
+    stepperPulley.runSpeed();
+  }
+
+
+}
 
 //#####################################################################################

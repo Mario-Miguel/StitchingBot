@@ -1,22 +1,11 @@
-package es.uniovi.eii.stitchingbot.adapter
+package es.uniovi.eii.stitchingbot.ui.adapter
 
-import android.app.Activity
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
-import android.graphics.drawable.VectorDrawable
-import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.toBitmap
-import androidx.exifinterface.media.ExifInterface
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.bluetooth.TAG
 import es.uniovi.eii.stitchingbot.model.SewingMachine
 import kotlinx.android.synthetic.main.card_recycler_view_sewing_machine.view.*
 
@@ -35,21 +24,9 @@ class SewingMachinesListAdapter(
 
     override fun onBindViewHolder(holder: SewingMachinesViewHolder, position: Int) {
         holder.bind(machines[position], listener)
-
     }
 
     override fun getItemCount() = machines.size
-
-    fun addElement(sewingMachine: SewingMachine) {
-        machines.add(sewingMachine)
-        notifyItemInserted(itemCount)
-    }
-
-    fun clearElements() {
-        val lastSize = itemCount
-        machines.clear()
-        notifyItemRangeRemoved(0, lastSize)
-    }
 
 
     class SewingMachinesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -57,11 +34,7 @@ class SewingMachinesListAdapter(
         fun bind(machine: SewingMachine, listener: (SewingMachine) -> Unit) = with(itemView) {
             txtSewingMachineName.text = machine.name
 
-            if (machine.id == -1) {
-                Log.i(TAG, "Imagen con el +")
-                txtSewingMachineName.text = "Añadir máquina de coser"
-                imgMachine.setImageResource(R.drawable.ic_baseline_add_24)
-            } else if (machine.imgUrl!!.isNotEmpty()) {
+            if (machine.imgUrl!!.isNotEmpty()) {
                 Picasso.get().load(machine.imgUrl).into(imgMachine)
             }
 
@@ -69,9 +42,7 @@ class SewingMachinesListAdapter(
         }
 
 
-
     }
-
 
 
 }

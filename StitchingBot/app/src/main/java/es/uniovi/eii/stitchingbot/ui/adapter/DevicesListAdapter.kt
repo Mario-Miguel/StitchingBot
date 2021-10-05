@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.adapter
+package es.uniovi.eii.stitchingbot.ui.adapter
 
 import android.bluetooth.BluetoothDevice
 import android.view.LayoutInflater

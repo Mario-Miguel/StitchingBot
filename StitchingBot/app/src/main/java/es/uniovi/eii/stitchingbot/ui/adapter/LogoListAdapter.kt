@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.adapter
+package es.uniovi.eii.stitchingbot.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.View

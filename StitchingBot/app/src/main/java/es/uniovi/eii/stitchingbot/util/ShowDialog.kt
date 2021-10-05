@@ -10,7 +10,7 @@ object ShowDialog {
         AlertDialog.Builder(context)
             .setMessage(message)
             .setPositiveButton("OK", okListener)
-            .setNegativeButton("Cancel", okListener)
+            .setNegativeButton("Cancel") { _, _ -> }
             .create()
             .show()
     }

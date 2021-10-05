@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.ui.logos
+package es.uniovi.eii.stitchingbot.ui.fragments.logos
 
 import android.net.Uri
 import android.os.Bundle
@@ -9,12 +9,12 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.bluetooth.TAG
-import es.uniovi.eii.stitchingbot.canvas.MyCanvasView
-import es.uniovi.eii.stitchingbot.canvas.tools.*
+import es.uniovi.eii.stitchingbot.util.bluetooth.TAG
+import es.uniovi.eii.stitchingbot.ui.canvas.MyCanvasView
 import es.uniovi.eii.stitchingbot.database.LogoDatabaseConnection
 import es.uniovi.eii.stitchingbot.model.Logo
-import es.uniovi.eii.stitchingbot.ui.sewingMachines.SewingMachineDetailsFragment
+import es.uniovi.eii.stitchingbot.ui.canvas.tools.*
+import es.uniovi.eii.stitchingbot.ui.fragments.sewingMachines.SewingMachineDetailsFragment
 import es.uniovi.eii.stitchingbot.util.ImageManager
 import kotlinx.android.synthetic.main.fragment_create_logo.*
 import java.io.File
@@ -31,7 +31,7 @@ class CreateLogoFragment : Fragment() {
 
     private var isCreation: Boolean = true
     lateinit var canvas: MyCanvasView
-    private val imageManager = ImageManager()
+    private val imageManager = ImageManager
 
     private lateinit var logo: Logo
     private lateinit var currentPhotoUri: Uri

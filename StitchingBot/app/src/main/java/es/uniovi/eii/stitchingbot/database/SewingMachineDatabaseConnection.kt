@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import es.uniovi.eii.stitchingbot.model.SewingMachine
 
-class SewingMachinedatabaseConnection(context: Context) : DatabaseConnection<SewingMachine>(context){
+class SewingMachineDatabaseConnection(context: Context) : DatabaseConnection<SewingMachine>(context){
 
 
     override fun insert(element: SewingMachine) {

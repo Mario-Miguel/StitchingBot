@@ -1,10 +1,6 @@
 package es.uniovi.eii.stitchingbot
 
-import android.app.UiModeManager
-import android.bluetooth.BluetoothSocket
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
 import android.view.Menu
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -17,8 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
-import es.uniovi.eii.stitchingbot.bluetooth.MyBluetoothService
-import java.io.IOException
+import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
 
 class MainActivity : AppCompatActivity() {
 
@@ -50,8 +45,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_summary
             ), drawerLayout
         )
-        if(MyBluetoothService.isInExecution){
-            navView.menu.getItem(navView.menu.size()-1).isVisible=true
+
+        if (BluetoothService.isInExecution) {
+            navView.menu.getItem(navView.menu.size() - 1).isVisible = true
         }
 
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -76,11 +72,6 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
-
-
-
-
-
 
 
 }

@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.canvas.tools
+package es.uniovi.eii.stitchingbot.ui.canvas.tools
 
 import android.graphics.Canvas
 import android.graphics.Paint

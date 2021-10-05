@@ -1,11 +1,8 @@
-package es.uniovi.eii.stitchingbot.translator
+package es.uniovi.eii.stitchingbot.util.translator
 
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.Log
-import kotlinx.coroutines.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlin.math.*
 
 const val TAG: String = "TranslateOrders"
@@ -19,7 +16,7 @@ const val FACTOR_AJUSTE: Int = 6
 object Translator {
 
     var image: Bitmap = Bitmap.createBitmap(HEIGHT, WIDTH, Bitmap.Config.ARGB_8888)
-    var translation : MutableList<Triple<Int, Int, Boolean>> = mutableListOf()
+    var translation : MutableList<Pair<Int, Int>> = mutableListOf()
     var translationDone: Boolean = false
     lateinit var weightMatrix: Array<IntArray>
 
@@ -42,8 +39,8 @@ object Translator {
         coords = processData(scaledBitmap, coords)
         Log.i(TAG, "End of processing")
 
-        translation = coords.map { Triple(it.first, it.second, false) }.toMutableList()
-        translationDone=true
+        translation = coords
+        translationDone =true
     }
 
 
@@ -77,7 +74,7 @@ object Translator {
 
 
     private fun createCoordArray(coords:MutableList<Pair<Int, Int>>): MutableList<Pair<Int, Int>> {
-        var orderedCoordenates = mutableListOf<Pair<Int, Int>>()
+        val orderedCoordenates = mutableListOf<Pair<Int, Int>>()
         var actualCoord = coords[0]
         orderedCoordenates.add(actualCoord)
         var horizontal = true
@@ -129,7 +126,7 @@ object Translator {
     }
 
     private fun checkPoint(x: Int, y:Int): Boolean{
-        return !(y+1>=weightMatrix.size || y-1<0 || x+1>=weightMatrix[0].size || x-1<0 ||weightMatrix[y][x]!=POINT)
+        return !(y+1>= weightMatrix.size || y-1<0 || x+1>= weightMatrix[0].size || x-1<0 || weightMatrix[y][x]!= POINT)
     }
 
     private fun findNearestCoord(initialCoord: Pair<Int, Int>, coords:MutableList<Pair<Int, Int>>):Pair<Int, Int>{
@@ -137,7 +134,7 @@ object Translator {
         var coordToReturn = initialCoord
 
         for(i in coords.indices){
-            if(weightMatrix[coords[i].second][coords[i].first]==POINT){
+            if(weightMatrix[coords[i].second][coords[i].first]== POINT){
                 val distance = hypot((initialCoord.first - coords[i].first).toDouble(), (initialCoord.second-coords[i].second).toDouble()).toInt()
                 if (distance < minDistance){
                     minDistance=distance

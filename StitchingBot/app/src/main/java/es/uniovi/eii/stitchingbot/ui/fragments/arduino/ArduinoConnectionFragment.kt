@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.ui.arduino
+package es.uniovi.eii.stitchingbot.ui.fragments.arduino
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
@@ -27,9 +27,9 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.adapter.DevicesListAdapter
-import es.uniovi.eii.stitchingbot.bluetooth.MyBluetoothService
-import es.uniovi.eii.stitchingbot.bluetooth.TAG
+import es.uniovi.eii.stitchingbot.ui.adapter.DevicesListAdapter
+import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
+import es.uniovi.eii.stitchingbot.util.bluetooth.TAG
 import es.uniovi.eii.stitchingbot.util.ShowDialog
 import kotlinx.android.synthetic.main.fragment_arduino_connection.*
 import java.io.IOException
@@ -37,7 +37,6 @@ import java.util.*
 
 val MY_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
 const val CONNECTING_STATUS = 1
-const val MESSAGE_READ = 2
 
 class ArduinoConnectionFragment : Fragment() {
 
@@ -49,15 +48,13 @@ class ArduinoConnectionFragment : Fragment() {
     private var comesFromSummary: Boolean = false
 
 
-    //    var mmSocket: BluetoothSocket? = null
-    var myBluetoothService: MyBluetoothService = MyBluetoothService
+    var myBluetoothService: BluetoothService = BluetoothService
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_arduino_connection, container, false)
@@ -69,6 +66,10 @@ class ArduinoConnectionFragment : Fragment() {
 
         if (arguments != null) {
             comesFromSummary = requireArguments().getBoolean("summary")
+        }
+
+        if(BluetoothService.isConnected()){
+            startConfigurationFragment()
         }
 
         initBluetoothAdapter()
@@ -181,12 +182,6 @@ class ArduinoConnectionFragment : Fragment() {
                 requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             }
         }.start()
-
-
-//        createHandler()
-//
-//        createConnection(bluetoothDevice)
-
 
     }
 

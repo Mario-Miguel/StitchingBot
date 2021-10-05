@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.ui.sewingMachines
+package es.uniovi.eii.stitchingbot.ui.fragments.sewingMachines
 
 import android.os.Bundle
 import android.view.*
@@ -7,18 +7,17 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.adapter.SewingMachinesListAdapter
-import es.uniovi.eii.stitchingbot.database.SewingMachinedatabaseConnection
+import es.uniovi.eii.stitchingbot.controller.SewingMachineController
 import es.uniovi.eii.stitchingbot.model.SewingMachine
+import es.uniovi.eii.stitchingbot.ui.adapter.SewingMachinesListAdapter
 import kotlinx.android.synthetic.main.fragment_sewing_machines.*
 
 
 class SewingMachinesListFragment : Fragment() {
 
-    lateinit var machinesList: ArrayList<SewingMachine>
-    private lateinit var databaseConnection: SewingMachinedatabaseConnection
 
     private var comesFromSummary: Boolean = false
+    private var sewingMachineController = SewingMachineController()
 
 
     override fun onCreateView(
@@ -33,16 +32,13 @@ class SewingMachinesListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        databaseConnection = SewingMachinedatabaseConnection(this.requireContext())
-
-        machinesList = getSavedSewingMachines()
 
         if(arguments!= null){
             comesFromSummary = requireArguments().getBoolean("summary")
         }
 
         rvMachinesList.layoutManager = GridLayoutManager(context, 2)
-        rvMachinesList.adapter = SewingMachinesListAdapter(machinesList) {machine -> navigateToCreation(machine)}
+        rvMachinesList.adapter = SewingMachinesListAdapter(sewingMachineController.getAllSewingMachines(requireContext())) {machine -> navigateToCreation(machine)}
     }
 
 
@@ -66,7 +62,6 @@ class SewingMachinesListFragment : Fragment() {
             val navController = requireActivity().findNavController(R.id.nav_host_fragment)
             navController.previousBackStackEntry?.savedStateHandle?.set("machine", machine)
             navController.popBackStack()
-
         }
         else {
             val isCreationMode = (machine.id < 0)
@@ -77,14 +72,6 @@ class SewingMachinesListFragment : Fragment() {
 
     }
 
-
-    private fun getSavedSewingMachines(): ArrayList<SewingMachine>{
-        databaseConnection.open()
-        val list = databaseConnection.getAllData()
-        databaseConnection.close()
-
-        return list
-    }
 
 
 }
