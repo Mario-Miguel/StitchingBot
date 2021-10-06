@@ -11,7 +11,7 @@ class SewingMachineController {
 
 
     fun setSewingMachine(name: String? = sewingMachine.name, imgUrl : String? = sewingMachine.imgUrl, motorSteps: Int=sewingMachine.motorSteps){
-        val auxSewingMachine = SewingMachine(name=name,imgUrl =imgUrl, motorSteps=motorSteps)
+        val auxSewingMachine = SewingMachine(sewingMachine.id, name,imgUrl, motorSteps)
         this.sewingMachine = auxSewingMachine
     }
 

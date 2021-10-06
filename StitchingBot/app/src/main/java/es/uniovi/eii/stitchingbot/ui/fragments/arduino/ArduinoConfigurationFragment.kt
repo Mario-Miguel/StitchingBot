@@ -41,9 +41,8 @@ class ArduinoConfigurationFragment : Fragment() {
         btnLeftArrow.setOnClickListener { moveLeft() }
         btnRightArrow.setOnClickListener { moveRight() }
 
-        btnAxisDone.setOnClickListener { startMainFragment() }
-        btnDisconnect.setOnClickListener { disconnectDevice() }
-
+        btnAxisDone.setOnClickListener { onClickDone() }
+        btnDisconnect.setOnClickListener { onClickDisconnect() }
     }
 
 
@@ -55,44 +54,40 @@ class ArduinoConfigurationFragment : Fragment() {
         bluetoothService.write("D")
     }
 
-    private fun moveRight() {
-        bluetoothService.write("R")
-    }
-
     private fun moveLeft() {
         bluetoothService.write("L")
     }
 
-    private fun startMainFragment() {
+    private fun moveRight() {
+        bluetoothService.write("R")
+    }
+
+    private fun onClickDone() {
         if (!comesFromSummary) {
             val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-            /*navController.navigate(R.id.nav_logo_list)*/
             navController.popBackStack()
         } else {
-            val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-            navController.getBackStackEntry(R.id.nav_summary).savedStateHandle.set(
-                "arduino",
-                "conectado"
-            )
-            navController.popBackStack(R.id.nav_summary, false)
+            goBackToSummary("conectado")
         }
     }
 
-    private fun disconnectDevice() {
+    private fun onClickDisconnect() {
         bluetoothService.closeConnectionSocket()
         if (!comesFromSummary) {
             val navController = requireActivity().findNavController(R.id.nav_host_fragment)
             navController.navigate(R.id.nav_arduino_connection)
         } else {
-
-            val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-            navController.getBackStackEntry(R.id.nav_summary).savedStateHandle.set(
-                "arduino",
-                "desconectado"
-            )
-            navController.popBackStack(R.id.nav_summary, false)
-
+            goBackToSummary("desconectado")
         }
+    }
+
+    private fun goBackToSummary(status: String){
+        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+        navController.getBackStackEntry(R.id.nav_summary).savedStateHandle.set(
+            "arduino",
+            status
+        )
+        navController.popBackStack(R.id.nav_summary, false)
     }
 
 

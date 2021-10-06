@@ -17,17 +17,17 @@ import java.util.*
 
 class ImageManager {
 
-    private lateinit var  currentPhotoUri: Uri
+    private lateinit var currentPhotoUri: Uri
 
-    fun setPhotoUri(uri: Uri){
+    fun setPhotoUri(uri: Uri) {
         currentPhotoUri = uri
     }
 
-    fun setPhotoUri(url: String){
+    fun setPhotoUri(url: String) {
         currentPhotoUri = Uri.parse(url)
     }
 
-    fun getPhotoUri(): Uri{
+    fun getPhotoUri(): Uri {
         return currentPhotoUri
     }
 
@@ -75,6 +75,13 @@ class ImageManager {
         )
     }
 
+    fun deleteImageIfSaved(){
+        if(this::currentPhotoUri.isInitialized){
+            deleteImageFile()
+        }
+    }
+
+
     fun deleteImageFile() {
         //TODO hacer mensaje de confirmación
         val file = File(currentPhotoUri.path!!)
@@ -83,7 +90,7 @@ class ImageManager {
         }
     }
 
-    fun saveImage(bitmap: Bitmap?, activity: Activity){
+    fun saveImage(bitmap: Bitmap?, activity: Activity) {
         val file = createImageFile(activity)
         saveImageToFile(bitmap, file)
         currentPhotoUri = Uri.fromFile(file)
@@ -94,7 +101,16 @@ class ImageManager {
         saveImageToFile(bitmap, file)
     }
 
-    private fun saveImageToFile(bitmap:Bitmap?, file: File){
+    fun copyImageFromGallery(selectedImage: Uri, file: File, activity: Activity){
+        val bitmap = getImageFromUri(
+            selectedImage,
+            activity
+        )
+        saveImageToFile(bitmap, file)
+    }
+
+
+    private fun saveImageToFile(bitmap: Bitmap?, file: File) {
         val destination = FileOutputStream(file)
         if (bitmap != null) {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, destination)
@@ -117,7 +133,7 @@ class ImageManager {
         )
     }
 
-    fun createPhotoFile(activity: Activity): File?{
+    fun createPhotoFile(activity: Activity): File? {
         // Create the File where the photo should go
         val photoFile: File? = try {
             createImageFile(activity)
@@ -130,30 +146,5 @@ class ImageManager {
         return photoFile
     }
 
-    fun updatePhotoUrl(selectedImage: Uri, activity: Activity, imgUrl: String?): Uri{
-        val currentPhotoFile: File
-
-        if (imgUrl.isNullOrBlank()) {
-            currentPhotoFile = createImageFile(activity)
-            currentPhotoUri = Uri.fromFile(currentPhotoFile)
-            saveImage(
-                getImageFromUri(
-                    selectedImage,
-                    activity
-                ), activity
-            )
-        } else {
-            currentPhotoUri = Uri.parse(imgUrl)
-            copyImage(
-                getImageFromUri(
-                    selectedImage,
-                    activity
-                )
-            )
-        }
-
-
-        return currentPhotoUri
-    }
 
 }

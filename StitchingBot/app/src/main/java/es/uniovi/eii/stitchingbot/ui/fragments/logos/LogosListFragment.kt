@@ -1,7 +1,6 @@
 package es.uniovi.eii.stitchingbot.ui.fragments.logos
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -11,7 +10,6 @@ import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.controller.LogoController
 import es.uniovi.eii.stitchingbot.model.Logo
 import es.uniovi.eii.stitchingbot.ui.adapter.LogoListAdapter
-import es.uniovi.eii.stitchingbot.util.translator.TAG
 import kotlinx.android.synthetic.main.fragment_logos_list.*
 
 class LogosListFragment : Fragment() {
@@ -30,12 +28,10 @@ class LogosListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val logoController = LogoController()
-        val logosList = logoController.getSavedLogos(requireContext())
 
         rvLogoList.layoutManager = GridLayoutManager(context, 2)
         rvLogoList.adapter =
-            LogoListAdapter(logosList) { logo ->
+            LogoListAdapter(LogoController().getSavedLogos(requireContext())) { logo ->
                 navigateToCreation(logo)
             }
     }

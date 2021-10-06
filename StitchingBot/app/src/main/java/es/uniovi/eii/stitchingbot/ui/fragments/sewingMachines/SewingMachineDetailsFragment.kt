@@ -121,8 +121,20 @@ class SewingMachineDetailsFragment : Fragment() {
 
 
     private fun imagePick(selectedImage: Uri) {
-        val uri = imageManager.updatePhotoUrl(selectedImage, requireActivity(), sewingMachineController.getSewingMachine().imgUrl)
-        sewingMachineController.setSewingMachine(imgUrl = uri.toString())
+        imageManager.createPhotoFile(requireActivity())?.also {
+            Log.i(TAG, it.absolutePath)
+            val photoURI: Uri = FileProvider.getUriForFile(
+                requireContext(),
+                "es.uniovi.eii.stitchingbot",
+                it
+            )
+
+            imageManager.deleteImageIfSaved()
+            imageManager.setPhotoUri(photoURI)
+            imageManager.copyImageFromGallery(selectedImage, it, requireActivity())
+
+
+        }
 
         imgSewingMachineDetails.setImageBitmap(
             imageManager.getImageFromUri(
@@ -263,6 +275,7 @@ class SewingMachineDetailsFragment : Fragment() {
                         "es.uniovi.eii.stitchingbot",
                         it
                     )
+                    imageManager.deleteImageIfSaved()
                     imageManager.setPhotoUri(photoURI)
                     getImageFromCamera.launch(photoURI)
                 }

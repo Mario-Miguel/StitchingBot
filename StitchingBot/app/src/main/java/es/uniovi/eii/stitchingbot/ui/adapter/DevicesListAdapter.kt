@@ -10,9 +10,7 @@ import kotlinx.android.synthetic.main.device_list_item.view.*
 
 class DevicesListAdapter(private val listener : OnItemClickListener) : RecyclerView.Adapter<DevicesListAdapter.ViewHolder>() {
 
-
     private val devices = ArrayList<BluetoothDevice>()
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)= ViewHolder (LayoutInflater.from(parent.context).inflate(R.layout.device_list_item, parent, false))
 

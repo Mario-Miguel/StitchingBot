@@ -8,8 +8,8 @@ class LogoController {
 
     private var logo = Logo()
 
-    fun setLogo(title: String = "", url: String = ""){
-        val auxLogo = Logo(title = title, imgUrl = url)
+    fun setLogo(title: String? = logo.title, url: String? = logo.imgUrl){
+        val auxLogo = Logo(logo.id, title, url, logo.category)
         this.logo = auxLogo
     }
 
