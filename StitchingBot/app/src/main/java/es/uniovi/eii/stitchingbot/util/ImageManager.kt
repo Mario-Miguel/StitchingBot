@@ -15,19 +15,33 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-object ImageManager {
+class ImageManager {
 
-    fun getImageFromUri(imageUri: Uri?, activity: Activity): Bitmap? {
+    private lateinit var  currentPhotoUri: Uri
+
+    fun setPhotoUri(uri: Uri){
+        currentPhotoUri = uri
+    }
+
+    fun setPhotoUri(url: String){
+        currentPhotoUri = Uri.parse(url)
+    }
+
+    fun getPhotoUri(): Uri{
+        return currentPhotoUri
+    }
+
+    fun getImageFromUri(selectedUri: Uri = currentPhotoUri, activity: Activity): Bitmap? {
         var image: Bitmap
-        if (imageUri != null) {
-            activity.contentResolver.openFileDescriptor(imageUri, "r")
+        if (selectedUri != null) {
+            activity.contentResolver.openFileDescriptor(selectedUri, "r")
                 .use { pfd ->
                     if (pfd != null) {
                         val matrix = Matrix()
                         matrix.postRotate(180F)
                         image = BitmapFactory.decodeFileDescriptor(pfd.fileDescriptor)
                         //Rotate bitmap
-                        val ei = activity.contentResolver.openInputStream(imageUri)?.let {
+                        val ei = activity.contentResolver.openInputStream(selectedUri)?.let {
                             ExifInterface(
                                 it
                             )
@@ -61,17 +75,27 @@ object ImageManager {
         )
     }
 
-    fun deleteImageFile(uri: Uri) {
+    fun deleteImageFile() {
         //TODO hacer mensaje de confirmación
-        val file = File(uri.path!!)
+        val file = File(currentPhotoUri.path!!)
         if (file.exists()) {
             file.delete()
         }
     }
 
+    fun saveImage(bitmap: Bitmap?, activity: Activity){
+        val file = createImageFile(activity)
+        saveImageToFile(bitmap, file)
+        currentPhotoUri = Uri.fromFile(file)
+    }
 
-    fun copyImage(bitmap: Bitmap?, createdImageFile: File) {
-        val destination = FileOutputStream(createdImageFile)
+    fun copyImage(bitmap: Bitmap?) {
+        val file = File(currentPhotoUri.path!!)
+        saveImageToFile(bitmap, file)
+    }
+
+    private fun saveImageToFile(bitmap:Bitmap?, file: File){
+        val destination = FileOutputStream(file)
         if (bitmap != null) {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, destination)
             destination.flush()
@@ -105,4 +129,31 @@ object ImageManager {
 
         return photoFile
     }
+
+    fun updatePhotoUrl(selectedImage: Uri, activity: Activity, imgUrl: String?): Uri{
+        val currentPhotoFile: File
+
+        if (imgUrl.isNullOrBlank()) {
+            currentPhotoFile = createImageFile(activity)
+            currentPhotoUri = Uri.fromFile(currentPhotoFile)
+            saveImage(
+                getImageFromUri(
+                    selectedImage,
+                    activity
+                ), activity
+            )
+        } else {
+            currentPhotoUri = Uri.parse(imgUrl)
+            copyImage(
+                getImageFromUri(
+                    selectedImage,
+                    activity
+                )
+            )
+        }
+
+
+        return currentPhotoUri
+    }
+
 }

@@ -1,5 +1,6 @@
 package es.uniovi.eii.stitchingbot.ui.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,20 +29,15 @@ class SewingMachinesListAdapter(
 
     override fun getItemCount() = machines.size
 
-
     class SewingMachinesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bind(machine: SewingMachine, listener: (SewingMachine) -> Unit) = with(itemView) {
             txtSewingMachineName.text = machine.name
-
             if (machine.imgUrl!!.isNotEmpty()) {
                 Picasso.get().load(machine.imgUrl).into(imgMachine)
             }
-
             setOnClickListener { listener(machine) }
         }
-
-
     }
 
 

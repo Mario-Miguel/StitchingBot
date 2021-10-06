@@ -1,62 +1,26 @@
 package es.uniovi.eii.stitchingbot.controller
 
-import android.app.Activity
 import android.content.Context
-import android.net.Uri
+import android.util.Log
 import es.uniovi.eii.stitchingbot.database.SewingMachineDatabaseConnection
 import es.uniovi.eii.stitchingbot.model.SewingMachine
-import es.uniovi.eii.stitchingbot.util.ImageManager
-import java.io.File
 
 class SewingMachineController {
 
     private var sewingMachine = SewingMachine()
-    private var imageManager = ImageManager
-    private lateinit var currentPhotoUri: Uri
 
-    fun updateSewingMachineParams(name:String, motorSteps: Int){
-        sewingMachine.name=name
-        sewingMachine.motorSteps=motorSteps
+
+    fun setSewingMachine(name: String? = sewingMachine.name, imgUrl : String? = sewingMachine.imgUrl, motorSteps: Int=sewingMachine.motorSteps){
+        val auxSewingMachine = SewingMachine(name=name,imgUrl =imgUrl, motorSteps=motorSteps)
+        this.sewingMachine = auxSewingMachine
     }
 
-    fun setSewingMachine(sewingMachine:SewingMachine){
-        this.sewingMachine = sewingMachine
-        currentPhotoUri = Uri.parse(sewingMachine.imgUrl)
+    fun setSewingMachine(sewingMachine: SewingMachine){
+        this.sewingMachine=sewingMachine
     }
 
     fun getSewingMachine(): SewingMachine{
         return sewingMachine
-    }
-
-    fun setCurrentPhotoUri(uri:Uri){
-        currentPhotoUri=uri
-        sewingMachine.imgUrl=uri.toString()
-    }
-
-    fun getCurrentPhotoUri():Uri{
-        return currentPhotoUri
-    }
-
-    fun updateSewingMachineUrl(selectedImage: Uri, activity: Activity): Uri{
-        val currentPhotoFile: File
-
-        if (sewingMachine.imgUrl.isNullOrBlank()) {
-            currentPhotoFile = imageManager.createImageFile(activity)
-            currentPhotoUri = Uri.fromFile(currentPhotoFile)
-        } else {
-            currentPhotoUri = Uri.parse(sewingMachine.imgUrl)
-            currentPhotoFile = File(currentPhotoUri.path!!)
-        }
-
-        imageManager.copyImage(
-            imageManager.getImageFromUri(
-                selectedImage,
-                activity
-            ), currentPhotoFile
-        )
-
-        sewingMachine.imgUrl = currentPhotoUri.toString()
-        return currentPhotoUri
     }
 
     fun addSewingMachine(context:Context){
@@ -67,6 +31,7 @@ class SewingMachineController {
     }
 
     fun updateSewingMachine(context:Context){
+        Log.d("SMDETAILS2", "SewingMachine to update: $sewingMachine")
         val databaseConnection = SewingMachineDatabaseConnection(context)
         databaseConnection.open()
         databaseConnection.update(sewingMachine)

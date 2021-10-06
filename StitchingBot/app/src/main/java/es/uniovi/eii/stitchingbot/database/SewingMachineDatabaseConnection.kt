@@ -2,6 +2,7 @@ package es.uniovi.eii.stitchingbot.database
 
 import android.content.ContentValues
 import android.content.Context
+import android.util.Log
 import es.uniovi.eii.stitchingbot.model.SewingMachine
 
 class SewingMachineDatabaseConnection(context: Context) : DatabaseConnection<SewingMachine>(context){

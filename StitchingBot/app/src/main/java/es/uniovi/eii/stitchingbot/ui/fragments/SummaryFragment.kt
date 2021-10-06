@@ -39,7 +39,7 @@ class SummaryFragment : Fragment() {
     private var bluetoothService: BluetoothService = BluetoothService
 
     private var translator: Translator = Translator
-    private val imageManager = ImageManager
+    private val imageManager = ImageManager()
 
 
     override fun onCreateView(
@@ -74,7 +74,7 @@ class SummaryFragment : Fragment() {
 
         if (logo != null) {
             val logoImage =
-                imageManager.getImageFromUri(Uri.parse(logo!!.imgUrl), requireActivity())
+                imageManager.getImageFromUri(selectedUri = Uri.parse(logo!!.imgUrl), activity = requireActivity())
             imgLogoSummary.setImageBitmap(logoImage)
         }
 

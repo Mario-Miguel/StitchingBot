@@ -38,8 +38,8 @@ private val PERMISSIONS = arrayOf(
 class SewingMachineDetailsFragment : Fragment() {
     private var isCreation: Boolean = false
     private var sewingMachineController = SewingMachineController()
+    private val imageManager = ImageManager()
 
-    private lateinit var imageManager: ImageManager
 
     private val getImageFromGallery = registerForActivityResult(
         ActivityResultContracts.GetContent()
@@ -93,7 +93,6 @@ class SewingMachineDetailsFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        imageManager = ImageManager
 
         if (arguments != null)
             isCreation = requireArguments().getBoolean(CREATION_MODE)
@@ -122,12 +121,12 @@ class SewingMachineDetailsFragment : Fragment() {
 
 
     private fun imagePick(selectedImage: Uri) {
-        val uri = sewingMachineController.updateSewingMachineUrl(selectedImage, requireActivity())
+        val uri = imageManager.updatePhotoUrl(selectedImage, requireActivity(), sewingMachineController.getSewingMachine().imgUrl)
+        sewingMachineController.setSewingMachine(imgUrl = uri.toString())
 
         imgSewingMachineDetails.setImageBitmap(
             imageManager.getImageFromUri(
-                uri,
-                requireActivity()
+                activity=requireActivity()
             )
         )
     }
@@ -135,8 +134,7 @@ class SewingMachineDetailsFragment : Fragment() {
     private fun imageTake() {
         imgSewingMachineDetails.setImageBitmap(
             imageManager.getImageFromUri(
-                sewingMachineController.getCurrentPhotoUri(),
-                requireActivity()
+                activity=requireActivity()
             )
         )
     }
@@ -155,17 +153,15 @@ class SewingMachineDetailsFragment : Fragment() {
     private fun loadUpdateScreen() {
         sewingMachineController.setSewingMachine(requireArguments().getParcelable("machine")!!)
 
-        Log.i(TAG, "Sewing machine: ${sewingMachineController.getSewingMachine().name}")
         btnSewingMachineAction.text = "Modificar"
         txtSewingMachineName.editText!!.setText(sewingMachineController.getSewingMachine().name)
         txtMotorSteps.editText!!.setText(sewingMachineController.getSewingMachine().motorSteps.toString())
 
-        if (sewingMachineController.getSewingMachine().imgUrl?.isNotEmpty() == true) {
-
+        if (!sewingMachineController.getSewingMachine().imgUrl.isNullOrEmpty()) {
+            imageManager.setPhotoUri(sewingMachineController.getSewingMachine().imgUrl!!)
             imgSewingMachineDetails.setImageBitmap(
                 imageManager.getImageFromUri(
-                    sewingMachineController.getCurrentPhotoUri(),
-                    requireActivity()
+                    activity=requireActivity(),
                 )
             )
         }
@@ -175,9 +171,10 @@ class SewingMachineDetailsFragment : Fragment() {
         if (checkFields()) {
             val name = txtSewingMachineName.editText!!.text.toString()
             val motorSteps = txtMotorSteps.editText!!.text.toString().toInt()
-            sewingMachineController.updateSewingMachineParams(name, motorSteps)
+            sewingMachineController.setSewingMachine(name=name,imgUrl=imageManager.getPhotoUri().toString(), motorSteps=motorSteps)
 
-            if (arguments?.getBoolean(CREATION_MODE) == true) {
+            Log.i("SMDETAILS", "img url: ${sewingMachineController.getSewingMachine()}")
+            if (isCreation) {
                 sewingMachineController.addSewingMachine(requireContext())
                 Toast.makeText(requireContext(), "Máquina creada", Toast.LENGTH_LONG).show()
                 Log.i(
@@ -225,7 +222,7 @@ class SewingMachineDetailsFragment : Fragment() {
 
 
     private fun deleteMachine() {
-        imageManager.deleteImageFile(sewingMachineController.getCurrentPhotoUri())
+        imageManager.deleteImageFile()
         sewingMachineController.deleteSewingMachine(requireContext())
 
         goBack()
@@ -266,7 +263,7 @@ class SewingMachineDetailsFragment : Fragment() {
                         "es.uniovi.eii.stitchingbot",
                         it
                     )
-                    sewingMachineController.setCurrentPhotoUri(photoURI)
+                    imageManager.setPhotoUri(photoURI)
                     getImageFromCamera.launch(photoURI)
                 }
             }
@@ -287,21 +284,4 @@ class SewingMachineDetailsFragment : Fragment() {
         ) { _, _ -> }
     }
 
-    /*companion object {
-        */
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     *
-     * @return A new instance of fragment SewingMachineDetailsFragment.
-     *//*
-        @JvmStatic
-        fun newInstance(isCreation: Boolean) =
-            SewingMachineDetailsFragment().apply {
-                arguments = Bundle().apply {
-                    putBoolean(CREATION_MODE, isCreation)
-                }
-            }
-    }*/
 }

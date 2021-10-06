@@ -13,6 +13,7 @@ data class SewingMachine(
         parcel.readInt(),
         parcel.readString(),
         parcel.readString(),
+        parcel.readInt()
     ) {
     }
 
@@ -20,7 +21,7 @@ data class SewingMachine(
         parcel.writeInt(id)
         parcel.writeString(name)
         parcel.writeString(imgUrl)
-
+        parcel.writeInt(motorSteps)
     }
 
     override fun describeContents(): Int {

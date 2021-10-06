@@ -2,22 +2,17 @@ package es.uniovi.eii.stitchingbot.ui.fragments.logos
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.util.bluetooth.TAG
+import es.uniovi.eii.stitchingbot.controller.LogoController
 import es.uniovi.eii.stitchingbot.ui.canvas.MyCanvasView
-import es.uniovi.eii.stitchingbot.database.LogoDatabaseConnection
-import es.uniovi.eii.stitchingbot.model.Logo
 import es.uniovi.eii.stitchingbot.ui.canvas.tools.*
-import es.uniovi.eii.stitchingbot.ui.fragments.sewingMachines.SewingMachineDetailsFragment
 import es.uniovi.eii.stitchingbot.util.ImageManager
 import kotlinx.android.synthetic.main.fragment_create_logo.*
-import java.io.File
 
 
 private const val CREATION_MODE = "creation"
@@ -30,11 +25,11 @@ private const val LOGO = "logo"
 class CreateLogoFragment : Fragment() {
 
     private var isCreation: Boolean = true
-    lateinit var canvas: MyCanvasView
-    private val imageManager = ImageManager
+    private lateinit var canvas: MyCanvasView
+    private val imageManager = ImageManager()
+    private val logoController = LogoController()
 
-    private lateinit var logo: Logo
-    private lateinit var currentPhotoUri: Uri
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,8 +48,8 @@ class CreateLogoFragment : Fragment() {
 
         if (arguments != null) {
             isCreation = requireArguments().getBoolean(CREATION_MODE)
-            logo = requireArguments().getParcelable(LOGO)!!
-            if(logo.id>=0)
+            logoController.setLogo(requireArguments().getParcelable(LOGO)!!)
+            if(logoController.getLogo().id>=0)
                 showLogoImage()
         }
     }
@@ -101,90 +96,52 @@ class CreateLogoFragment : Fragment() {
 
 
     private fun showLogoImage(){
-        currentPhotoUri = Uri.parse(logo.imgUrl)
-        val image = imageManager.getImageFromUri(currentPhotoUri, requireActivity())!!
+        imageManager.setPhotoUri(Uri.parse(logoController.getLogo().imgUrl))
+        val image = imageManager.getImageFromUri(activity=requireActivity())!!
         canvas.setImage(image)
     }
 
 
     private fun modifyLogo(){
         val bitmap = canvas.getBitmapToSave()
-        currentPhotoUri = Uri.parse(logo.imgUrl)
-        val file = File(currentPhotoUri.path!!)
+        imageManager.setPhotoUri(Uri.parse(logoController.getLogo().imgUrl))
 
-        imageManager.copyImage(bitmap, file)
+        imageManager.copyImage(bitmap)
 
-        logo = Logo(title = "Try", imgUrl = currentPhotoUri.toString())
+        logoController.setLogo("Try", imageManager.getPhotoUri().toString())
+        logoController.updateLogo(requireContext())
 
-        val databaseConnection = LogoDatabaseConnection(requireContext())
-        databaseConnection.open()
-        databaseConnection.update(logo)
-        databaseConnection.close()
         Toast.makeText(requireContext(), "Logo modificado", Toast.LENGTH_LONG).show()
-        Log.i(
-            TAG,
-            "Modificado logo: ${logo.title} - ${logo.category} - ${logo.imgUrl}"
-        )
-
     }
 
 
     private fun saveLogo() {
         val bitmap = canvas.getBitmapToSave()
-        val file = imageManager.createImageFile(requireActivity())
+        imageManager.saveImage(bitmap, requireActivity())
 
-        imageManager.copyImage(bitmap, file)
+        logoController.setLogo("Try", imageManager.getPhotoUri().toString())
+        logoController.addLogo(requireContext())
 
-        currentPhotoUri = Uri.fromFile(file)
-
-        logo = Logo(title = "Try", imgUrl = currentPhotoUri.toString())
-
-        val databaseConnection = LogoDatabaseConnection(requireContext())
-        databaseConnection.open()
-        databaseConnection.insert(logo)
-        databaseConnection.close()
         Toast.makeText(requireContext(), "Logo creado", Toast.LENGTH_LONG).show()
-        Log.i(
-            TAG,
-            "Insertado logo: ${logo.title} - ${logo.category} - ${logo.imgUrl}"
-        )
+
     }
 
 
     private fun deleteLogo(){
-        imageManager.deleteImageFile(currentPhotoUri)
-        val databaseConnection = LogoDatabaseConnection(requireContext())
-        databaseConnection.open()
-        databaseConnection.delete(logo)
-        databaseConnection.close()
+        imageManager.deleteImageFile()
+        logoController.deleteLogo(requireContext())
+
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.popBackStack()
     }
 
 
     private fun loadSummaryScreen(){
-        val bundle = bundleOf("logo" to logo)
+        val bundle = bundleOf("logo" to logoController.getLogo())
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.navigate(R.id.nav_summary, bundle)
     }
 
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param isCreation Parameter 1.
-         * @return A new instance of fragment SewingMachineDetailsFragment.
-         */
-        @JvmStatic
-        fun newInstance(isCreation: Boolean, logo: Logo) =
-            SewingMachineDetailsFragment().apply {
-                arguments = Bundle().apply {
-                    putBoolean(CREATION_MODE, isCreation)
-                    putParcelable(LOGO, logo)
-                }
-            }
-    }
 
 }
