@@ -71,6 +71,7 @@ object ArduinoCommands {
 
                         //AVANZO 2cm
                         if (readMessage == "M") {
+                            Log.d("SEND_ORDERS", "$ordersToSend")
                             BluetoothService.write(ordersToSend[counter])
                             counter++
                             progressBar.progress = ((counter.toDouble()/ordersToSend.size.toDouble())*100).toInt()

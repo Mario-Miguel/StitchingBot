@@ -16,7 +16,7 @@ const val FACTOR_AJUSTE: Int = 6
 object Translator {
 
     var image: Bitmap = Bitmap.createBitmap(HEIGHT, WIDTH, Bitmap.Config.ARGB_8888)
-    var translation : MutableList<Pair<Int, Int>> = mutableListOf()
+    var translation: MutableList<Pair<Int, Int>> = mutableListOf()
     var translationDone: Boolean = false
     lateinit var weightMatrix: Array<IntArray>
 
@@ -40,11 +40,14 @@ object Translator {
         Log.i(TAG, "End of processing")
 
         translation = coords
-        translationDone =true
+        translationDone = true
     }
 
 
-    private fun processData(scaledBitmap: Bitmap, coords:MutableList<Pair<Int,Int>>): MutableList<Pair<Int,Int>>{
+    private fun processData(
+        scaledBitmap: Bitmap,
+        coords: MutableList<Pair<Int, Int>>
+    ): MutableList<Pair<Int, Int>> {
         //Se añaden los puntos en las respectivas matrices
         for (y in 0 until scaledBitmap.height) {
             for (x in 0 until scaledBitmap.width) {
@@ -58,87 +61,114 @@ object Translator {
                     weightMatrix[y][x] = POINT
 
                 }
-
             }
         }
 
         val orderedCoords = createCoordArray(coords).map {
             Pair(
-                (it.first * FACTOR_AJUSTE)+16,
-                (it.second * FACTOR_AJUSTE)+16
+                (it.first * FACTOR_AJUSTE) + 16,
+                (it.second * FACTOR_AJUSTE) + 16
             )
         }.filterIndexed { i, _ -> i % 2 == 0 }.toMutableList()
-
         return orderedCoords
     }
 
 
-    private fun createCoordArray(coords:MutableList<Pair<Int, Int>>): MutableList<Pair<Int, Int>> {
+    private fun createCoordArray(coords: MutableList<Pair<Int, Int>>): MutableList<Pair<Int, Int>> {
         val orderedCoordenates = mutableListOf<Pair<Int, Int>>()
         var actualCoord = coords[0]
         orderedCoordenates.add(actualCoord)
-        var horizontal = true
-        var vertical = false
+        var checkCoordInHorizontal = true
+        var checkCoordInVertical = false
 
         var counter = 0
 
-        while (counter<coords.size) {
-            if(horizontal){
-                if(checkPoint(actualCoord.second, actualCoord.first+1)){
-                    weightMatrix[actualCoord.second][actualCoord.first+1]=Int.MAX_VALUE
-                    actualCoord = Pair(actualCoord.first+1, actualCoord.second)
-                    orderedCoordenates.add(Pair(actualCoord.first, actualCoord.second))
-                }
-                else if(checkPoint(actualCoord.second, actualCoord.first-1)){
-                    weightMatrix[actualCoord.second][actualCoord.first-1]=Int.MAX_VALUE
-                    actualCoord = Pair(actualCoord.first-1, actualCoord.second)
-                    orderedCoordenates.add(Pair(actualCoord.first, actualCoord.second))
-                }
-                else{
-                    horizontal = false
-                    vertical=true
+        while (counter < coords.size) {
+            if (checkCoordInHorizontal) {
+                if (checkPoint(actualCoord.first + 1, actualCoord.second)) {
+                    actualCoord = addCoordToOrderedArray(
+                        actualCoord.first + 1,
+                        actualCoord.second,
+                        orderedCoordenates
+                    )
+                } else if (checkPoint(actualCoord.first - 1, actualCoord.second)) {
+                    actualCoord = addCoordToOrderedArray(
+                        actualCoord.first - 1,
+                        actualCoord.second,
+                        orderedCoordenates
+                    )
+                } else {
+                    checkCoordInHorizontal = false
+                    checkCoordInVertical = true
                 }
             }
 
-            if (vertical){
-                if(checkPoint(actualCoord.second+1, actualCoord.first)){
-                    weightMatrix[actualCoord.second+1][actualCoord.first]=Int.MAX_VALUE
-                    actualCoord = Pair(actualCoord.first, actualCoord.second+1)
-                    orderedCoordenates.add(Pair(actualCoord.first, actualCoord.second))
-                }
-                else if(checkPoint(actualCoord.second-1, actualCoord.first)){
-                    weightMatrix[actualCoord.second-1][actualCoord.first]=Int.MAX_VALUE
-                    actualCoord = Pair(actualCoord.first, actualCoord.second-1)
-                    orderedCoordenates.add(Pair(actualCoord.first, actualCoord.second))
-                }
-                else{
-                    actualCoord = findNearestCoord(actualCoord, coords)
-                    weightMatrix[actualCoord.second][actualCoord.first]=Int.MAX_VALUE
-                    orderedCoordenates.add(Pair(actualCoord.first, actualCoord.second))
+            if (checkCoordInVertical) {
+                if (checkPoint(actualCoord.first, actualCoord.second + 1)) {
+                    actualCoord = addCoordToOrderedArray(
+                        actualCoord.first,
+                        actualCoord.second + 1,
+                        orderedCoordenates
+                    )
 
+                } else if (checkPoint(actualCoord.first, actualCoord.second - 1)) {
+                    actualCoord = addCoordToOrderedArray(
+                        actualCoord.first,
+                        actualCoord.second - 1,
+                        orderedCoordenates
+                    )
+
+                } else {
+                    actualCoord = findNearestCoord(actualCoord, coords)
+                    actualCoord = addCoordToOrderedArray(
+                        actualCoord.first,
+                        actualCoord.second,
+                        orderedCoordenates
+                    )
                 }
-                horizontal = true
-                vertical=false
+                checkCoordInHorizontal = true
+                checkCoordInVertical = false
+            }
+
+            if(counter>2 && actualCoord.first == orderedCoordenates[counter-1].first && actualCoord.second == orderedCoordenates[counter-1].second){
+                Log.i(TAG, "Coordenada repetida")
             }
             counter++
         }
         return orderedCoordenates
     }
 
-    private fun checkPoint(x: Int, y:Int): Boolean{
-        return !(y+1>= weightMatrix.size || y-1<0 || x+1>= weightMatrix[0].size || x-1<0 || weightMatrix[y][x]!= POINT)
+    private fun checkPoint(x: Int, y: Int): Boolean {
+        return y + 1 < weightMatrix.size && y - 1 >= 0 && x + 1 < weightMatrix[0].size && x - 1 >= 0 && weightMatrix[y][x] == POINT
     }
 
-    private fun findNearestCoord(initialCoord: Pair<Int, Int>, coords:MutableList<Pair<Int, Int>>):Pair<Int, Int>{
+    private fun addCoordToOrderedArray(
+        x: Int,
+        y: Int,
+        orderedCoordenates: MutableList<Pair<Int, Int>>
+    ): Pair<Int, Int> {
+        weightMatrix[y][x] = Int.MAX_VALUE
+        val actualCoord = Pair(x, y)
+        orderedCoordenates.add(actualCoord)
+        return actualCoord
+    }
+
+    private fun findNearestCoord(
+        initialCoord: Pair<Int, Int>,
+        coords: MutableList<Pair<Int, Int>>
+    ): Pair<Int, Int> {
         var minDistance = Int.MAX_VALUE
         var coordToReturn = initialCoord
 
-        for(i in coords.indices){
-            if(weightMatrix[coords[i].second][coords[i].first]== POINT){
-                val distance = hypot((initialCoord.first - coords[i].first).toDouble(), (initialCoord.second-coords[i].second).toDouble()).toInt()
-                if (distance < minDistance){
-                    minDistance=distance
-                    coordToReturn=coords[i]
+        for (i in coords.indices) {
+            if (weightMatrix[coords[i].second][coords[i].first] == POINT) {
+                val distance = hypot(
+                    (initialCoord.first - coords[i].first).toDouble(),
+                    (initialCoord.second - coords[i].second).toDouble()
+                ).toInt()
+                if (distance < minDistance) {
+                    minDistance = distance
+                    coordToReturn = coords[i]
                 }
             }
         }
