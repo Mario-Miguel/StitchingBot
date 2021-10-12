@@ -10,8 +10,8 @@
 #define DIRX  2
 #define STEPX 3
 
-#define DIRY_1  7
-#define STEPY_1 6
+#define DIRY_1  4
+#define STEPY_1 5
 #define DIRY_2  8
 #define STEPY_2 9
 
