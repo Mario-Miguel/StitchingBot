@@ -1,63 +1,66 @@
-package es.uniovi.eii.stitchingbot.util.translator
+package es.uniovi.eii.stitchingbot.util
 
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.util.Log
-import kotlin.math.*
-
-const val TAG: String = "TranslateOrders"
-const val POINT: Int = 1
-const val HEIGHT: Int = 375
-const val WIDTH: Int = 375
-const val FACTOR_AJUSTE: Int = 6
-
-//1875
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import es.uniovi.eii.stitchingbot.util.Constants.TAG_TRANSLATE
+import kotlin.math.hypot
 
 object Translator {
+    private const val POINT: Int = 1
+    private const val HEIGHT: Int = 375
+    private const val WIDTH: Int = 375
+    private const val FACTOR_AJUSTE: Int = 6
 
     var image: Bitmap = Bitmap.createBitmap(HEIGHT, WIDTH, Bitmap.Config.ARGB_8888)
     var translation: MutableList<Pair<Int, Int>> = mutableListOf()
     var translationDone: Boolean = false
-    lateinit var weightMatrix: Array<IntArray>
+    var isInExecution = false
+    private lateinit var weightMatrix: Array<IntArray>
+
+    private val _actualProgress = MutableLiveData<Int>()
+    val actualProgress: LiveData<Int>
+        get() = _actualProgress
 
     fun run() {
+        isInExecution = true
+        _actualProgress.postValue(0)
 
-        Log.i(TAG, "${image.width} - ${image.height}")
+        Log.i(TAG_TRANSLATE, "${image.width} - ${image.height}")
         //La relacion es de 50 pixeles <-> 1mm
 
 
         val scaledBitmap = Bitmap.createScaledBitmap(image, WIDTH, HEIGHT, false)
-        Log.i(TAG, "Scaled: ${scaledBitmap.height}-${scaledBitmap.width}")
-
-        var coords: MutableList<Pair<Int, Int>> = mutableListOf()
+        Log.i(TAG_TRANSLATE, "Scaled: ${scaledBitmap.height}-${scaledBitmap.width}")
 
         //Matriz que va a tener los pesos de los distintos nodos
         weightMatrix = Array(scaledBitmap.height) {
             IntArray(scaledBitmap.width)
         }
 
-        coords = processData(scaledBitmap, coords)
-        Log.i(TAG, "End of processing")
-
-        translation = coords
+        translation = processData(scaledBitmap)
+        isInExecution = false
         translationDone = true
+        _actualProgress.postValue(0)
+        Log.i(TAG_TRANSLATE, "End of processing")
     }
 
 
     private fun processData(
         scaledBitmap: Bitmap,
-        coords: MutableList<Pair<Int, Int>>
     ): MutableList<Pair<Int, Int>> {
-        //Se añaden los puntos en las respectivas matrices
+        val coords = mutableListOf<Pair<Int, Int>>()
+
+        //Se añaden los puntos
         for (y in 0 until scaledBitmap.height) {
             for (x in 0 until scaledBitmap.width) {
                 val pixel = scaledBitmap.getPixel(x, y)
-
                 weightMatrix[y][x] = Int.MAX_VALUE
 
                 if (pixel == Color.BLACK) {
                     coords.add(Pair(x, y))
-
                     weightMatrix[y][x] = POINT
 
                 }
@@ -130,10 +133,8 @@ object Translator {
                 checkCoordInVertical = false
             }
 
-            if(counter>2 && actualCoord.first == orderedCoordenates[counter-1].first && actualCoord.second == orderedCoordenates[counter-1].second){
-                Log.i(TAG, "Coordenada repetida")
-            }
             counter++
+            _actualProgress.postValue(((counter.toDouble() / coords.size.toDouble()) * 100).toInt())
         }
         return orderedCoordenates
     }

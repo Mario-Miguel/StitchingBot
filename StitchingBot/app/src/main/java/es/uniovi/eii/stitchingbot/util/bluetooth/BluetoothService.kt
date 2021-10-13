@@ -3,20 +3,16 @@ package es.uniovi.eii.stitchingbot.util.bluetooth
 import android.bluetooth.BluetoothSocket
 import android.os.Handler
 import android.util.Log
+import es.uniovi.eii.stitchingbot.util.Constants
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 
-
-const val TAG = "BluetoothStitching"
-
 object BluetoothService {
 
-    var isInExecution = false
-
     private var connectionSocket: BluetoothSocket? = null
-    lateinit var mmInStream: InputStream
-    lateinit var mmOutStream: OutputStream
+    private lateinit var mmInStream: InputStream
+    private lateinit var mmOutStream: OutputStream
 
     private lateinit var handler: Handler
     var startedProcess = false
@@ -44,7 +40,7 @@ object BluetoothService {
             if (connectionSocket != null)
                 connectionSocket!!.close()
         } catch (e: IOException) {
-            Log.e(TAG, "Could not close the client socket", e)
+            Log.e(Constants.TAG_BLUETOOTH, "Could not close the client socket", e)
         }
     }
 

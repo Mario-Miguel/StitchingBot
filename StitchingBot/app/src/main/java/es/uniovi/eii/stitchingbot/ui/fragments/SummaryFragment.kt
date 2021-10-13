@@ -6,26 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
+import es.uniovi.eii.stitchingbot.controller.LogoController
+import es.uniovi.eii.stitchingbot.controller.SewingMachineController
 import es.uniovi.eii.stitchingbot.model.Logo
 import es.uniovi.eii.stitchingbot.model.SewingMachine
-import es.uniovi.eii.stitchingbot.util.ArduinoCommands
-import es.uniovi.eii.stitchingbot.util.translator.Translator
-import es.uniovi.eii.stitchingbot.util.ImageManager
-import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
+import es.uniovi.eii.stitchingbot.util.*
+
 import kotlinx.android.synthetic.main.fragment_arduino_connection.*
 import kotlinx.android.synthetic.main.fragment_summary.*
-import kotlinx.android.synthetic.main.fragment_summary.progressBar
 
 
-private const val LOGO = "logo"
-private const val SEWING_MACHINE = "machine"
-private const val ARDUINO = "arduino"
-private const val SUMMARY = "summary"
 
 /**
  * A simple [Fragment] subclass.
@@ -33,12 +29,12 @@ private const val SUMMARY = "summary"
  * create an instance of this fragment.
  */
 class SummaryFragment : Fragment() {
-    private var logo: Logo? = null
-    private var sewingMachine: SewingMachine? = null
 
-    private var bluetoothService: BluetoothService = BluetoothService
+    private var logoController = LogoController()
+    private var sewingMachineController = SewingMachineController()
 
-    private var translator: Translator = Translator
+    private val translator: Translator = Translator
+    private val arduinoCommands: ArduinoCommands = ArduinoCommands
     private val imageManager = ImageManager()
 
 
@@ -52,170 +48,233 @@ class SummaryFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        this@SummaryFragment.requireActivity().runOnUiThread {
-            progressBar.visibility = View.GONE
-            requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-        }
+        hideProgressBar()
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (arguments != null) {
-            val auxLogo = requireArguments().getParcelable<Logo>(LOGO)
-            val auxSewingMachine = requireArguments().getParcelable<SewingMachine>(SEWING_MACHINE)
-            if (auxLogo != null)
-                logo = auxLogo
-            if (auxSewingMachine != null)
-                sewingMachine = auxSewingMachine
+        loadActionButtons()
+        loadIncomingResources()
+        loadCardViewListeners()
+        updateArduinoStatus()
+        loadProgressBar()
 
-        }
-
-        if (logo != null) {
-            val logoImage =
-                imageManager.getImageFromUri(selectedUri = Uri.parse(logo!!.imgUrl), activity = requireActivity())
-            imgLogoSummary.setImageBitmap(logoImage)
-        }
-
-        loadListeners()
-
-
-        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-        // Instead of String any types of data can be used
-        navController.currentBackStackEntry?.savedStateHandle?.getLiveData<String>(ARDUINO)
-            ?.observe(viewLifecycleOwner) {
-                updateArduinoStatus(it)
-            }
-        navController.currentBackStackEntry?.savedStateHandle?.getLiveData<SewingMachine>(
-            SEWING_MACHINE
-        )
-            ?.observe(viewLifecycleOwner) {
-                updateSewingMachineStatus(it)
-            }
-
-        if (bluetoothService.isInExecution) {
-            progressBar.visibility = View.VISIBLE
-        }
-
-
-        btnStartExecution.isEnabled =
-            logo != null
-                    && sewingMachine != null
-                    && bluetoothService.getConnectionSocket()?.isConnected == true
-                    && translator.translationDone
-
-        btnStartTranslate.setOnClickListener { startTranslation() }
-
-        btnStartExecution.setOnClickListener { startExecution() }
     }
 
 
-    //##################################################################################################
-    private fun loadListeners() {
+    //##############################################################################################
+    private fun loadActionButtons() {
+        updateActionButtonsState()
+        btnStartTranslate.setOnClickListener { startTranslation() }
+        btnStartExecution.setOnClickListener { startExecution() }
+
+        btnPauseExecution.setOnClickListener { pauseExecution() }
+        btnStopExecution.setOnClickListener { stopExecution() }
+
+    }
+
+    private fun updateActionButtonsState() {
+        btnStartExecution.isEnabled = checkStartExecutionAvailability()
+        btnStartTranslate.isEnabled = checkStartTranslationAvailability()
+
+        if(arduinoCommands.isInExecution) {
+            btnStartTranslate.visibility = View.GONE
+            btnStartExecution.visibility = View.GONE
+            btnStopExecution.visibility = View.VISIBLE
+            btnPauseExecution.visibility = View.VISIBLE
+        }
+    }
+
+    private fun loadIncomingResources() {
+        if (arguments != null) {
+            val auxLogo = requireArguments().getParcelable<Logo>(Constants.LOGO)
+            if (auxLogo != null) {
+                if (auxLogo.id != logoController.getLogo().id) {
+                    translator.translationDone = false
+                }
+                logoController.setLogo(auxLogo)
+            }
+        }
+
+        if (logoController.isLogoSelected()) {
+            loadImageToCard(imgLogoSummary, logoController.getLogo().imgUrl)
+        }
+
+        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+        navController.currentBackStackEntry?.savedStateHandle?.getLiveData<SewingMachine>(
+            Constants.SEWING_MACHINE
+        )
+            ?.observe(viewLifecycleOwner) {
+                sewingMachineController.setSewingMachine(it)
+                updateSewingMachineCard()
+            }
+    }
+
+    private fun loadCardViewListeners() {
         cardViewLogo.setOnClickListener { loadLogoFragment() }
         cardViewSewingMachine.setOnClickListener { loadSewingMachineFragment() }
         cardViewArduino.setOnClickListener { loadArduinoFragment() }
     }
 
+    private fun loadProgressBar() {
+        if (arduinoCommands.isInExecution || translator.isInExecution) {
+            pbExecution.visibility = View.VISIBLE
+        }
+        translator.actualProgress.observe(viewLifecycleOwner,
+            { newProgress -> updateProgressBar("Traducción completada", newProgress) })
+        arduinoCommands.actualProgress.observe(viewLifecycleOwner,
+            { newProgress -> updateProgressBar("Ejecución completada", newProgress) })
+    }
 
+
+    private fun updateProgressBar(completionMessage: String, newProgress: Int) {
+        pbExecution.progress = newProgress
+        if (newProgress==100) {
+            if (this@SummaryFragment.isVisible) {
+                updateActionButtonsState()
+                hideProgressBar()
+                ShowDialog.showInfoDialog(requireActivity().applicationContext, completionMessage)
+            }
+        }
+    }
+
+
+    //##############################################################################################
+    private fun checkStartExecutionAvailability(): Boolean {
+        return logoController.isLogoSelected()
+                && sewingMachineController.isSewingMachineSelected()
+                && arduinoCommands.isConnected()
+                && translator.translationDone
+    }
+
+    private fun checkStartTranslationAvailability(): Boolean {
+        return !translator.isInExecution && !translator.translationDone
+    }
+
+    private fun hideProgressBar() {
+        pbExecution.visibility = View.GONE
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+    }
+
+    private fun loadImageToCard(imgComponent: ImageView, imgUrl: String?) {
+        val image =
+            imageManager.getImageFromUri(
+                selectedUri = Uri.parse(imgUrl),
+                activity = requireActivity()
+            )
+        imgComponent.setImageBitmap(image)
+    }
+
+    //##############################################################################################
     private fun loadArduinoFragment() {
-        val bundle = bundleOf(SUMMARY to true)
+        val bundle = bundleOf(Constants.SUMMARY to true)
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-        if (bluetoothService.getConnectionSocket()?.isConnected == true)
+        if (arduinoCommands.isConnected())
             navController.navigate(R.id.nav_arduino_configuration, bundle)
         else
             navController.navigate(R.id.nav_arduino_connection, bundle)
     }
 
-
     private fun loadLogoFragment() {
-        val bundle = bundleOf("creation" to false, LOGO to logo, SUMMARY to true)
+        val bundle =
+            bundleOf("creation" to false, Constants.LOGO to logoController.getLogo())
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+        navController.popBackStack()
+        navController.popBackStack()
         navController.navigate(R.id.nav_create_logo, bundle)
     }
 
-
     private fun loadSewingMachineFragment() {
-        val bundle = bundleOf(SUMMARY to true)
+        val bundle = bundleOf(Constants.SUMMARY to true)
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.navigate(R.id.nav_sewing_machines, bundle)
     }
 
 
-    //##################################################################################################
-    private fun updateSewingMachineStatus(sewingMachine: SewingMachine) {
-        this.sewingMachine = sewingMachine
-        imgSewingMachineSummary.setImageBitmap(
-            imageManager.getImageFromUri(
-                Uri.parse(sewingMachine.imgUrl),
-                requireActivity()
-            )
-        )
-        txtSewingMachineSummary.text = sewingMachine.name
+    //##############################################################################################
+    private fun updateSewingMachineCard() {
+
+        loadImageToCard(imgSewingMachineSummary, sewingMachineController.getSewingMachine().imgUrl)
+
+        txtSewingMachineSummary.text = sewingMachineController.getSewingMachine().name
     }
 
-    private fun updateArduinoStatus(status: String) {
-        this.bluetoothService = BluetoothService
-        if (bluetoothService.getConnectionSocket()?.isConnected == true) {
-            txtArduinoSummary.text = "Estado: $status"
-            imgRobotSummary.setImageDrawable(
-                getDrawable(
-                    requireContext(),
+    private fun updateArduinoStatus() {
+        val hasConnection = arduinoCommands.isConnected()
+        txtArduinoSummary.text = getString(
+            R.string.txt_arduino_summary,
+            if (hasConnection) "conectado" else "desconectado"
+        )
+
+        imgRobotSummary.setImageDrawable(
+            getDrawable(
+                requireContext(),
+                if (hasConnection)
                     R.drawable.ic_baseline_check_24
-                )
-            )
-        } else {
-            txtArduinoSummary.text = "Estado: $status"
-            imgRobotSummary.setImageDrawable(
-                getDrawable(
-                    requireContext(),
+                else
                     R.drawable.ic_baseline_clear_24
-                )
             )
-        }
+        )
 
     }
 
 //##################################################################################################
 
     private fun startTranslation() {
+        startThreadWithProgressBar {
+            translator.image = imageManager.getImageFromUri(
+                Uri.parse(logoController.getLogo().imgUrl),
+                requireActivity()
+            )!!
+            translator.run()
+        }
+    }
+
+
+    private fun startExecution() {
+        startThreadWithProgressBar {
+            arduinoCommands.doExecution(
+                translator.translation
+            )
+        }
+    }
+
+    private fun pauseExecution(){
+        arduinoCommands.pauseExecution()
+        btnPauseExecution.text=getString(R.string.btn_resume_execution)
+        btnPauseExecution.setOnClickListener { resumeExecution() }
+    }
+
+    private fun resumeExecution(){
+        arduinoCommands.resumeExecution()
+        btnPauseExecution.text=getText(R.string.btn_pause_execution)
+        btnPauseExecution.setOnClickListener { resumeExecution() }
+    }
+
+    private fun stopExecution(){
+        arduinoCommands.stopExecution()
+
+    }
+
+    private fun startThreadWithProgressBar(command: () -> Unit) {
         Thread {
             // display the indefinite progressbar
             this@SummaryFragment.requireActivity().runOnUiThread {
-                progressBar.visibility = View.VISIBLE
+                pbExecution.visibility = View.VISIBLE
                 requireActivity().window.setFlags(
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                 )
-
+                btnStartTranslate.isEnabled = false
+                btnStartExecution.isEnabled = false
             }
 
-            translator.image = imageManager.getImageFromUri(
-                Uri.parse(logo!!.imgUrl),
-                requireActivity()
-            )!!
-            translator.run()
+            //Add function here
+            command()
 
-            this@SummaryFragment.requireActivity().runOnUiThread {
-                if (this@SummaryFragment.isVisible) {
-                    btnStartExecution.isEnabled =
-                        logo != null && sewingMachine != null && bluetoothService.isConnected() && translator.translationDone
-
-                    progressBar.visibility = View.GONE
-                    requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-                }
-            }
         }.start()
-    }
-
-    private fun startExecution() {
-        progressBar.visibility = View.VISIBLE
-        ArduinoCommands.doExecution(
-            translator.translation,
-            progressBar,
-            requireActivity()
-        )
     }
 
 
@@ -232,8 +291,8 @@ class SummaryFragment : Fragment() {
         fun newInstance(logo: Logo, sewingMachine: SewingMachine) =
             SummaryFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable(LOGO, logo)
-                    putParcelable(SEWING_MACHINE, sewingMachine)
+                    putParcelable(Constants.LOGO, logo)
+                    putParcelable(Constants.SEWING_MACHINE, sewingMachine)
                 }
             }
     }

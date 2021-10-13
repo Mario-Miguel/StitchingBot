@@ -11,12 +11,12 @@ import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.controller.LogoController
 import es.uniovi.eii.stitchingbot.ui.canvas.MyCanvasView
 import es.uniovi.eii.stitchingbot.ui.canvas.tools.*
+import es.uniovi.eii.stitchingbot.util.Constants
+import es.uniovi.eii.stitchingbot.util.Constants.CREATION_MODE
+import es.uniovi.eii.stitchingbot.util.Constants.LOGO
 import es.uniovi.eii.stitchingbot.util.ImageManager
 import kotlinx.android.synthetic.main.fragment_create_logo.*
 
-
-private const val CREATION_MODE = "creation"
-private const val LOGO = "logo"
 
 /**
  * A simple [Fragment] subclass.
@@ -92,6 +92,8 @@ class CreateLogoFragment : Fragment() {
 
         btnDone.setOnClickListener { if(isCreation) saveLogo() else modifyLogo() }
         btnSew.setOnClickListener { loadSummaryScreen() }
+
+
     }
 
 

@@ -2,25 +2,24 @@ package es.uniovi.eii.stitchingbot
 
 import android.os.Bundle
 import android.view.Menu
-import com.google.android.material.navigation.NavigationView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.Toolbar
-import androidx.core.view.GravityCompat
-import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
+import com.google.android.material.navigation.NavigationView
+import es.uniovi.eii.stitchingbot.util.ArduinoCommands
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     lateinit var drawerLayout: DrawerLayout
     lateinit var navView: NavigationView
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -46,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             ), drawerLayout
         )
 
-        if (BluetoothService.isInExecution) {
+        if (ArduinoCommands.isInExecution) {
             navView.menu.getItem(navView.menu.size() - 1).isVisible = true
         }
 

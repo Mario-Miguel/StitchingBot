@@ -28,8 +28,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.ui.adapter.DevicesListAdapter
+import es.uniovi.eii.stitchingbot.util.Constants.TAG_BLUETOOTH
 import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
-import es.uniovi.eii.stitchingbot.util.bluetooth.TAG
 import es.uniovi.eii.stitchingbot.util.ShowDialog
 import kotlinx.android.synthetic.main.fragment_arduino_connection.*
 import java.io.IOException
@@ -200,7 +200,7 @@ class ArduinoConnectionFragment : Fragment() {
             // Connect to the remote device through the socket. This call blocks
             // until it succeeds or throws an exception.
             myBluetoothService.getConnectionSocket()!!.connect()
-            Log.i(TAG, "Device connected")
+            Log.i(TAG_BLUETOOTH, "Device connected")
             myBluetoothService.getHandler().obtainMessage(CONNECTING_STATUS, 1, -1).sendToTarget()
         } catch (connectException: IOException) {
             // Unable to connect; close the socket and return.

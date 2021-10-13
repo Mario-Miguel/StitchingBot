@@ -2,6 +2,7 @@ package es.uniovi.eii.stitchingbot.util
 
 import android.content.Context
 import android.content.DialogInterface
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 
 object ShowDialog {
@@ -13,5 +14,9 @@ object ShowDialog {
             .setNegativeButton("Cancel") { _, _ -> }
             .create()
             .show()
+    }
+
+    fun showInfoDialog(context: Context, message: String){
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 }

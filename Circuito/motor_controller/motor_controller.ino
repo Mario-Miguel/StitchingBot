@@ -44,8 +44,12 @@ SoftwareSerial BTSerial(rx, tx); // RX | TX of Arduino
 
 //#####################################################################################
 const String ASK_FOR_ACTIONS = "M";
-const String START_EXECUTION = "S";
+const String START_EXECUTION = "B";
 const char CONFIGURE_PULLEY = 'C';
+const char PAUSE_EXECUTION = 'P';
+const char RESUME_EXECUTION = 'R';
+const char STOP_EXECUTION = 'S';
+//TODO terminar de ponerr el pause/stop en el loop -> hay que reenviar de vuelta una orden con la letra para que pueda parar
 
 #define MAX_ARRAY_SIZE 50
 String actionsRead[MAX_ARRAY_SIZE];

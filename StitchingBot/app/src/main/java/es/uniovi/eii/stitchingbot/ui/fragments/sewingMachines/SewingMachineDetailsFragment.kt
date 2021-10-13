@@ -20,13 +20,14 @@ import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
 import es.uniovi.eii.stitchingbot.controller.SewingMachineController
 import es.uniovi.eii.stitchingbot.util.ArduinoCommands
+import es.uniovi.eii.stitchingbot.util.Constants.CREATION_MODE
+import es.uniovi.eii.stitchingbot.util.Constants.TAG_SEWINGMACHINE
 import es.uniovi.eii.stitchingbot.util.ImageManager
 import es.uniovi.eii.stitchingbot.util.ShowDialog
 import kotlinx.android.synthetic.main.fragment_sewing_machine_details.*
 
 
-private const val CREATION_MODE = "creation"
-private const val TAG = "SewingMachine"
+
 
 @RequiresApi(Build.VERSION_CODES.Q)
 private val PERMISSIONS = arrayOf(
@@ -65,7 +66,7 @@ class SewingMachineDetailsFragment : Fragment() {
             }
 
             if (granted) {
-                Log.d(TAG, "all permissions granted")
+                Log.d(TAG_SEWINGMACHINE, "all permissions granted")
                 selectImage(requireContext())
             } else {
                 showNotGrantedPermissionsMessage(nonGrantedPermissions)
@@ -122,7 +123,7 @@ class SewingMachineDetailsFragment : Fragment() {
 
     private fun imagePick(selectedImage: Uri) {
         imageManager.createPhotoFile(requireActivity())?.also {
-            Log.i(TAG, it.absolutePath)
+            Log.i(TAG_SEWINGMACHINE, it.absolutePath)
             val photoURI: Uri = FileProvider.getUriForFile(
                 requireContext(),
                 "es.uniovi.eii.stitchingbot",
@@ -190,14 +191,14 @@ class SewingMachineDetailsFragment : Fragment() {
                 sewingMachineController.addSewingMachine(requireContext())
                 Toast.makeText(requireContext(), "Máquina creada", Toast.LENGTH_LONG).show()
                 Log.i(
-                    TAG,
+                    TAG_SEWINGMACHINE,
                     "Insertada maquina de coser"
                 )
             } else {
                 sewingMachineController.updateSewingMachine(requireContext())
                 Toast.makeText(requireContext(), "Máquina modificada", Toast.LENGTH_LONG).show()
                 Log.i(
-                    TAG,
+                    TAG_SEWINGMACHINE,
                     "Update maquina de coser"
                 )
             }
@@ -269,7 +270,7 @@ class SewingMachineDetailsFragment : Fragment() {
 
                 // Continue only if the File was successfully created
                 imageManager.createPhotoFile(requireActivity())?.also {
-                    Log.i(TAG, it.absolutePath)
+                    Log.i(TAG_SEWINGMACHINE, it.absolutePath)
                     val photoURI: Uri = FileProvider.getUriForFile(
                         requireContext(),
                         "es.uniovi.eii.stitchingbot",

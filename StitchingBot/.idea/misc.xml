@@ -4,7 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../../../../../layout/custom_preview.xml" value="0.271875" />
+        <entry key="app/src/main/res/layout/fragment_create_logo.xml" value="0.18297101449275363" />
         <entry key="app/src/main/res/layout/fragment_sewing_machine_details.xml" value="0.39086294416243655" />
+        <entry key="app/src/main/res/layout/fragment_summary.xml" value="0.33" />
       </map>
     </option>
   </component>

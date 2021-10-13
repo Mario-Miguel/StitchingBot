@@ -1,8 +1,11 @@
 package es.uniovi.eii.stitchingbot.controller
 
 import android.content.Context
+import android.os.Bundle
 import es.uniovi.eii.stitchingbot.database.LogoDatabaseConnection
 import es.uniovi.eii.stitchingbot.model.Logo
+
+
 
 class LogoController {
 
@@ -50,4 +53,9 @@ class LogoController {
         databaseConnection.delete(logo)
         databaseConnection.close()
     }
+
+    fun isLogoSelected(): Boolean {
+        return getLogo().id != -1
+    }
+
 }

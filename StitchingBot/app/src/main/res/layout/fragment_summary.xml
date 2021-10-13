@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.SummaryFragment">
+    tools:context=".ui.fragments.SummaryFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -19,14 +19,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.033" >
+            app:layout_constraintVertical_bias="0.033">
 
             <ImageView
                 android:id="@+id/imgLogoSummary"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_baseline_add_24"
-                android:contentDescription="@string/desc_logo_summary" />
+                android:contentDescription="@string/desc_logo_summary"
+                android:src="@drawable/ic_baseline_add_24" />
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
@@ -38,14 +38,14 @@
             app:layout_constraintHorizontal_bias="0.066"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cardViewLogo"
-            app:layout_constraintVertical_bias="0.053" >
+            app:layout_constraintVertical_bias="0.053">
 
             <ImageView
                 android:id="@+id/imgSewingMachineSummary"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_baseline_add_24"
-                android:contentDescription="@string/txt_sewing_machine_summary" />
+                android:contentDescription="@string/txt_sewing_machine_summary"
+                android:src="@drawable/ic_baseline_add_24" />
 
             <TextView
                 android:id="@+id/txtSewingMachineSummary"
@@ -64,14 +64,14 @@
             app:layout_constraintHorizontal_bias="0.925"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cardViewLogo"
-            app:layout_constraintVertical_bias="0.053" >
+            app:layout_constraintVertical_bias="0.053">
 
             <ImageView
                 android:id="@+id/imgRobotSummary"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_baseline_clear_24"
-                android:contentDescription="@string/desc_img_arduino_summary" />
+                android:contentDescription="@string/desc_img_arduino_summary"
+                android:src="@drawable/ic_baseline_clear_24" />
 
             <TextView
                 android:id="@+id/txtArduinoSummary"
@@ -82,46 +82,76 @@
 
 
         <ProgressBar
-            android:id="@+id/progressBar"
+            android:id="@+id/pbExecution"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:max="100"
             android:minWidth="100dp"
-            android:minHeight="20dp"
+            android:minHeight="50dp"
             android:progress="0"
+            android:scaleY="5"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.75" />
+            app:layout_constraintVertical_bias="0.867" />
 
         <Button
             android:id="@+id/btnStartExecution"
-            android:layout_width="match_parent"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:enabled="false"
             android:text="@string/btn_start_summary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.539"
+            app:layout_constraintHorizontal_bias="0.938"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.976" />
 
         <Button
             android:id="@+id/btnStartTranslate"
-            android:layout_width="match_parent"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:text="@string/btn_start_translate"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.539"
+            app:layout_constraintEnd_toStartOf="@+id/btnStartExecution"
+            app:layout_constraintHorizontal_bias="0.486"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.90" />
+            app:layout_constraintVertical_bias="0.976" />
+
+        <Button
+            android:id="@+id/btnStopExecution"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="@string/btn_stop_execution"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.938"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.976"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/btnPauseExecution"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_pause_execution"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnStartExecution"
+            app:layout_constraintHorizontal_bias="0.486"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.976"
+            android:visibility="gone"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

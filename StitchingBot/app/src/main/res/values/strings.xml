@@ -1,17 +1,16 @@
 <resources>
     <string name="app_name">StitchingBot</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open">Abrir navigation drawer</string>
+    <string name="navigation_drawer_close">Cerrar navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Configuración</string>
     <string name="menu_logos_list">Logotipos</string>
-    <string name="menu_load_file">Load file</string>
     <string name="menu_sewing_machines">Máquinas de coser</string>
-    <string name="menu_arduino_config">Arduino configuration</string>
-    <string name="img_logo">Logo\'s image</string>
-    <string name="logo_name">Logo\'s name</string>
+    <string name="menu_arduino_config">Configuración de Arduino</string>
+    <string name="img_logo">Imagen del Logo</string>
+    <string name="logo_name">Nombre del Logo</string>
     <string name="btn_free_drawing_description">Free drawing button selector</string>
     <string name="btn_circle_drawing_description">Circle drawing button selector</string>
     <string name="btn_square_drawing_description">Square drawing button selector</string>
@@ -21,31 +20,19 @@
     <string name="available_devices_header">Dispositivos disponibles</string>
     <string name="connected_devices_header">Dispositivos emparejados</string>
     <string name="fab_find_devices">Buscar dispositivos</string>
-    <string name="title_activity_bluetooth_try">BluetoothTryActivity</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="search_button_description">Search button</string>
+    <string name="search_button_description">Botón de búsqueda</string>
     <string name="txt_devices_list_header">Dispositivos encontrados</string>
     <string name="menu_arduino_connection">Configuración del robot</string>
     <string name="img_machine">Imagen de la máquina de coser</string>
     <string name="machine_name">Nombre de la máquina</string>
     <string name="menu_sewing_machine_details">Detalles de la máquina de coser</string>
     <string name="txtSewingMachineName">Nombre</string>
-    <string name="menuPedalDetails">Pedal electrico</string>
     <string name="imgSewingMachineDetails">Imagen de la máquina de coser</string>
     <string name="btnSewingmachinesActionDefault">Agregar</string>
     <string name="menu_summary">Resumen de la ejecucion</string>
     <string name="action_delete">Eliminar</string>
     <string name="txt_sewing_machine_summary">Añadir máquina de coser</string>
-    <string name="txt_arduino_summary">Estado: desconectado</string>
     <string name="btn_start_summary">Comenzar</string>
     <string name="desc_img_arduino_summary">Estado de la conexión del arduino</string>
     <string name="desc_logo_summary">Logotipo seleccionado</string>
@@ -54,4 +41,8 @@
     <string name="delete_button">DeleteButton</string>
     <string name="label_motor_steps">Pasos</string>
     <string name="btn_try_steps">Probar pasos</string>
+    <string name="txt_arduino_summary">Estado: %1$s.</string>
+    <string name="btn_pause_execution">Pausa</string>
+    <string name="btn_stop_execution">Stop</string>
+    <string name="btn_resume_execution">Reanudar</string>
 </resources>

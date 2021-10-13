@@ -54,4 +54,8 @@ class SewingMachineController {
 
         return list
     }
+
+    fun isSewingMachineSelected(): Boolean {
+        return getSewingMachine().id != -1
+    }
 }
