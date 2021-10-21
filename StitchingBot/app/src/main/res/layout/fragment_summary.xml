@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragments.SummaryFragment">
+    tools:context=".ui.fragments.summary.SummaryFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -130,7 +130,6 @@
             android:id="@+id/btnStopExecution"
             android:layout_width="180dp"
             android:layout_height="wrap_content"
-            android:enabled="false"
             android:text="@string/btn_stop_execution"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -146,7 +145,20 @@
             android:layout_height="wrap_content"
             android:text="@string/btn_pause_execution"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btnStartExecution"
+            app:layout_constraintEnd_toStartOf="@+id/btnStopExecution"
+            app:layout_constraintHorizontal_bias="0.486"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.976"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/btnResumeExecution"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_resume_execution"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnStopExecution"
             app:layout_constraintHorizontal_bias="0.486"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

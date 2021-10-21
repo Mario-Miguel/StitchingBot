@@ -11,7 +11,6 @@ import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.controller.LogoController
 import es.uniovi.eii.stitchingbot.ui.canvas.MyCanvasView
 import es.uniovi.eii.stitchingbot.ui.canvas.tools.*
-import es.uniovi.eii.stitchingbot.util.Constants
 import es.uniovi.eii.stitchingbot.util.Constants.CREATION_MODE
 import es.uniovi.eii.stitchingbot.util.Constants.LOGO
 import es.uniovi.eii.stitchingbot.util.ImageManager

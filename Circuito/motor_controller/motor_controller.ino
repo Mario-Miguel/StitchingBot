@@ -49,20 +49,19 @@ const char CONFIGURE_PULLEY = 'C';
 const char PAUSE_EXECUTION = 'P';
 const char RESUME_EXECUTION = 'R';
 const char STOP_EXECUTION = 'S';
-//TODO terminar de ponerr el pause/stop en el loop -> hay que reenviar de vuelta una orden con la letra para que pueda parar
+//TODO terminar de poner el pause/stop en el loop -> hay que reenviar de vuelta una orden con la letra para que pueda parar
 
 #define MAX_ARRAY_SIZE 50
 String actionsRead[MAX_ARRAY_SIZE];
 int timeActionsRead[MAX_ARRAY_SIZE];
 int xCoords[MAX_ARRAY_SIZE];
 int yCoords[MAX_ARRAY_SIZE];
-//int hasToChange[MAX_ARRAY_SIZE];
 
 int actionCounter = 0;
 unsigned long startActionTime = 0;
 boolean entradaLeida = false;
 boolean areActionsRemaining = false;
-//boolean actualPedalState = true;
+boolean isPaused = false;
 
 String receivedString = "";
 
@@ -90,23 +89,31 @@ void setup() {
 
 void loop() {
 
-  bluetoothRead();
-
-  //  if(!digitalRead(FIN_CARRY)){
-  //    runPulleyMotor();
-  //  }
-}
-
-//#####################################################################################
-
-void bluetoothRead() {
   if (Serial1.available() > 0) {
     receivedString = Serial1.readString();
     delay(100);
-
+    
     if (receivedString.charAt(0) == CONFIGURE_PULLEY ) {
       int steps = receivedString.substring(2).toInt();
       configurePulleyMotor(steps);
+    }
+    else if (receivedString.indexOf(PAUSE_EXECUTION) >= 0 ) {
+      Serial1.println(PAUSE_EXECUTION);
+      isPaused = true;
+    }
+    else if (receivedString.indexOf(RESUME_EXECUTION) >= 0) {
+      Serial1.println(RESUME_EXECUTION);
+      isPaused = false;
+    }
+    else if (receivedString.indexOf(STOP_EXECUTION) >= 0) {
+      Serial1.println(STOP_EXECUTION);
+      actionCounter = 0;
+      resetArrays();
+      entradaLeida = false;
+      receivedString = "";
+      areActionsRemaining = false;
+      isPaused = false;
+      delay(100);
     }
     else if (receivedString == START_EXECUTION) {
       startAutohome();
@@ -115,6 +122,7 @@ void bluetoothRead() {
       resetArrays();
       entradaLeida = false;
       receivedString = "";
+      
       delay(100);
     }
     else {
@@ -127,7 +135,7 @@ void bluetoothRead() {
 
   //---------------------------------------
 
-  if (areActionsRemaining) {
+  if (areActionsRemaining && !isPaused) {
 
     if (actionCounter == MAX_ARRAY_SIZE) {
       Serial.println(">Pide más acciones");
@@ -142,6 +150,7 @@ void bluetoothRead() {
       executeActions();
     }
   }
+
 }
 
 //#####################################################################################

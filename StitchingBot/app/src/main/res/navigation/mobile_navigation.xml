@@ -44,7 +44,7 @@
 
     <fragment
         android:id="@+id/nav_summary"
-        android:name="es.uniovi.eii.stitchingbot.ui.fragments.SummaryFragment"
+        android:name="es.uniovi.eii.stitchingbot.ui.fragments.summary.SummaryFragment"
         android:label="@string/menu_summary"
         tools:layout="@layout/fragment_summary" />
 

@@ -31,8 +31,9 @@ class ImageManager {
         return currentPhotoUri
     }
 
-    fun getImageFromUri(selectedUri: Uri = currentPhotoUri, activity: Activity): Bitmap? {
+    fun getImageFromUri(url: String? = currentPhotoUri.toString(), activity: Activity): Bitmap? {
         var image: Bitmap
+        val selectedUri=Uri.parse(url)
         if (selectedUri != null) {
             activity.contentResolver.openFileDescriptor(selectedUri, "r")
                 .use { pfd ->
@@ -103,7 +104,7 @@ class ImageManager {
 
     fun copyImageFromGallery(selectedImage: Uri, file: File, activity: Activity){
         val bitmap = getImageFromUri(
-            selectedImage,
+            selectedImage.toString(),
             activity
         )
         saveImageToFile(bitmap, file)

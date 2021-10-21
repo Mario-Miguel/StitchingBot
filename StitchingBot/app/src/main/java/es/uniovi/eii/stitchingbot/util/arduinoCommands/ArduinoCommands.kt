@@ -1,8 +1,9 @@
-package es.uniovi.eii.stitchingbot.util
+package es.uniovi.eii.stitchingbot.util.arduinoCommands
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.*
 import es.uniovi.eii.stitchingbot.util.Constants.ASK_FOR_ACTIONS
 import es.uniovi.eii.stitchingbot.util.Constants.CONFIGURE_PULLEY
 import es.uniovi.eii.stitchingbot.util.Constants.PAUSE_EXECUTION
@@ -15,57 +16,48 @@ import java.io.IOException
 object ArduinoCommands {
 
     private val bluetoothService = BluetoothService
-    var isInExecution = false
-    var isInPause = false
-    private var actionsSent = 0
+    private val stateManager = StateManager
+    private var actionsSent: Int = 0
 
     private val _actualProgress = MutableLiveData<Int>()
     val actualProgress: LiveData<Int>
         get() = _actualProgress
+
 
     fun doMotorStepsTest(motorSteps: Int) {
         val stringToSend = "$CONFIGURE_PULLEY;$motorSteps"
         bluetoothService.write(stringToSend)
     }
 
-    fun doExecution(
-        translation: MutableList<Pair<Int, Int>>,
+    fun startExecution(
+        translation: MutableList<Pair<Int, Int>>
     ) {
         _actualProgress.postValue(0)
-        isInExecution = true
-
         bluetoothService.startedProcess = true
+        stateManager.changeTo(ExecutingState())
 
-        val ordersToSend = mutableListOf<String>()
-        val auxString = StringBuilder()
-        var counter = 0
-        for (coord in translation) {
-            auxString.append("${coord.first},${coord.second};")
-            counter++
-            if (counter == 50) {
-                ordersToSend.add(auxString.toString())
-                auxString.clear()
-                counter = 0
-            }
-        }
+        val ordersToSend = createOrdersToSendStrings(translation)
+
+        beginSendingAndReceivingOrders(ordersToSend)
+
+        actionsSent = 0
+        stateManager.changeTo(StoppedState())
+        _actualProgress.postValue(0)
+    }
 
 
+    private fun beginSendingAndReceivingOrders(ordersToSend: MutableList<String>) {
         val buffer = ByteArray(1024) // buffer store for the stream
         var bytes = 0 // bytes returned from read()
         var hasMessage = false
         Log.i("BluetoothStitching", "Connected thread run")
-
-        actionsSent = 0
         bluetoothService.write(START_EXECUTION)
-
 
         // Keep listening to the InputStream until an exception occurs
         while (actionsSent < ordersToSend.size) {
             try {
-                /*
-                Read from the InputStream from Arduino until termination character is reached.
-                Then send the whole String message to GUI Handler.
-                 */
+                //Read from the InputStream from Arduino until termination character is reached.
+                //Then send the whole String message to Handler.
                 buffer[bytes] = bluetoothService.read()
                 if (buffer[bytes] != 0.toByte())
                     hasMessage = true
@@ -87,46 +79,61 @@ object ArduinoCommands {
                 break
             }
         }
-        isInExecution = false
-        _actualProgress.postValue(0)
 
+        stateManager.changeTo(StoppedState())
     }
 
     private fun dispatchReadMessage(readMessage: String, ordersToSend: MutableList<String>) {
-        when(readMessage){
-            ASK_FOR_ACTIONS->{
-                bluetoothService.write(ordersToSend[actionsSent])
-                actionsSent++
-                _actualProgress.postValue(((actionsSent.toDouble() / ordersToSend.size.toDouble()) * 100).toInt())
+        when (readMessage) {
+            ASK_FOR_ACTIONS -> {
+                sendOrders(ordersToSend)
             }
-            PAUSE_EXECUTION->{
-
-            }
-            RESUME_EXECUTION ->{
-
-            }
-            STOP_EXECUTION->{
-
+            STOP_EXECUTION -> {
+                actionsSent = ordersToSend.size
             }
         }
+    }
 
+    private fun sendOrders(ordersToSend: MutableList<String>) {
+        bluetoothService.write(ordersToSend[actionsSent])
+        actionsSent++
+        _actualProgress.postValue(((actionsSent.toDouble() / ordersToSend.size.toDouble()) * 100).toInt())
+    }
+
+    private fun createOrdersToSendStrings(translation: MutableList<Pair<Int, Int>>): MutableList<String> {
+        val ordersToSend: MutableList<String> = mutableListOf()
+        val auxString = StringBuilder()
+        var counter = 0
+        for (coord in translation) {
+            auxString.append("${coord.first},${coord.second};")
+            counter++
+            if (counter == 50) {
+                ordersToSend.add(auxString.toString())
+                auxString.clear()
+                counter = 0
+            }
+        }
+        return ordersToSend
     }
 
     fun pauseExecution() {
         bluetoothService.write(PAUSE_EXECUTION)
-        isInPause = true
+        stateManager.changeTo(PausedState())
     }
 
     fun resumeExecution() {
         bluetoothService.write(RESUME_EXECUTION)
-        isInPause = false
+        stateManager.changeTo(ExecutingState())
     }
 
     fun stopExecution() {
         bluetoothService.write(STOP_EXECUTION)
+        stateManager.changeTo(StoppedState())
     }
 
     fun isConnected(): Boolean {
         return bluetoothService.getConnectionSocket()?.isConnected == true
     }
+
+
 }
