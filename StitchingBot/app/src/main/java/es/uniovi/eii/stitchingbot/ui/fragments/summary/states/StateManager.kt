@@ -18,6 +18,10 @@ object StateManager {
         _actualState.value!!.showInterface(summaryFragment)
     }
 
+    fun isInitial():Boolean{
+        return _actualState.value is StoppedState
+    }
+
     fun changeToInitial() {
         changeTo(StoppedState())
     }

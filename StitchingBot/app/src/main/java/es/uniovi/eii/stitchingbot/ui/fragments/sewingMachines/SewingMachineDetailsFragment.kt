@@ -69,7 +69,7 @@ class SewingMachineDetailsFragment : Fragment() {
                 Log.d(TAG_SEWINGMACHINE, "all permissions granted")
                 selectImage(requireContext())
             } else {
-                showNotGrantedPermissionsMessage(nonGrantedPermissions)
+                ShowDialog.showNotGrantedPermissionsMessage(nonGrantedPermissions, requireContext())
             }
         }
 
@@ -289,13 +289,6 @@ class SewingMachineDetailsFragment : Fragment() {
         navController.popBackStack()
     }
 
-    private fun showNotGrantedPermissionsMessage(nonGrantedPermissions: MutableList<String>) {
-        val permissionsString = nonGrantedPermissions.reduce { acc, str -> "$acc - $str" }
 
-        ShowDialog.showDialogOK(
-            requireContext(),
-            "Se necesitan los permisos: $permissionsString"
-        ) { _, _ -> }
-    }
 
 }

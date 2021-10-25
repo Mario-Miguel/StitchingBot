@@ -8,6 +8,7 @@ import es.uniovi.eii.stitchingbot.util.Constants.ASK_FOR_ACTIONS
 import es.uniovi.eii.stitchingbot.util.Constants.CONFIGURE_PULLEY
 import es.uniovi.eii.stitchingbot.util.Constants.PAUSE_EXECUTION
 import es.uniovi.eii.stitchingbot.util.Constants.RESUME_EXECUTION
+import es.uniovi.eii.stitchingbot.util.Constants.START_AUTOHOME
 import es.uniovi.eii.stitchingbot.util.Constants.START_EXECUTION
 import es.uniovi.eii.stitchingbot.util.Constants.STOP_EXECUTION
 import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
@@ -55,28 +56,33 @@ object ArduinoCommands {
 
         // Keep listening to the InputStream until an exception occurs
         while (actionsSent < ordersToSend.size) {
-            try {
-                //Read from the InputStream from Arduino until termination character is reached.
-                //Then send the whole String message to Handler.
-                buffer[bytes] = bluetoothService.read()
-                if (buffer[bytes] != 0.toByte())
-                    hasMessage = true
+            if(!bluetoothService.isBluetoothEnabled()){
+                pauseExecution()
+            }
+            else {
+                try {
+                    //Read from the InputStream from Arduino until termination character is reached.
+                    //Then send the whole String message to Handler.
+                    buffer[bytes] = bluetoothService.read()
+                    if (buffer[bytes] != 0.toByte())
+                        hasMessage = true
 
-                var readMessage: String
-                if (buffer[bytes] == '\n'.toByte()) {
-                    readMessage = String(buffer, 0, bytes).trim()
+                    var readMessage: String
+                    if (buffer[bytes] == '\n'.toByte()) {
+                        readMessage = String(buffer, 0, bytes).trim()
 
-                    dispatchReadMessage(readMessage, ordersToSend)
+                        dispatchReadMessage(readMessage, ordersToSend)
 
-                    bytes = 0
-                    hasMessage = false
-                    buffer.fill(0)
-                } else if (hasMessage) {
-                    bytes++
+                        bytes = 0
+                        hasMessage = false
+                        buffer.fill(0)
+                    } else if (hasMessage) {
+                        bytes++
+                    }
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    break
                 }
-            } catch (e: IOException) {
-                e.printStackTrace()
-                break
             }
         }
 
@@ -131,9 +137,12 @@ object ArduinoCommands {
         stateManager.changeTo(StoppedState())
     }
 
-    fun isConnected(): Boolean {
-        return bluetoothService.getConnectionSocket()?.isConnected == true
+    fun move(direction: String){
+        bluetoothService.write(direction)
     }
 
+    fun startAutoHome() {
+        bluetoothService.write(START_AUTOHOME)
+    }
 
 }

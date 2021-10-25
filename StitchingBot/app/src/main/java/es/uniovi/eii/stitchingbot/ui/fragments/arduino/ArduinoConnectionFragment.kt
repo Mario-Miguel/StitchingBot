@@ -1,26 +1,16 @@
 package es.uniovi.eii.stitchingbot.ui.fragments.arduino
 
 import android.Manifest
-import android.bluetooth.BluetoothAdapter
+import android.app.Activity
 import android.bluetooth.BluetoothDevice
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
@@ -28,38 +18,53 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.ui.adapter.DevicesListAdapter
-import es.uniovi.eii.stitchingbot.util.Constants.TAG_BLUETOOTH
-import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
 import es.uniovi.eii.stitchingbot.util.ShowDialog
+import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
 import kotlinx.android.synthetic.main.fragment_arduino_connection.*
-import java.io.IOException
 import java.util.*
-
-val MY_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
-const val CONNECTING_STATUS = 1
 
 class ArduinoConnectionFragment : Fragment() {
 
-    private var bluetoothAdapter: BluetoothAdapter? = null
     private lateinit var deviceAdapter: DevicesListAdapter
-    private val REQUEST_ENABLE_BT: Int = 3
-    private val REQUEST_PERMISSION_BLUETOOTH: Int = 5
+    private var bluetoothService: BluetoothService = BluetoothService
 
     private var comesFromSummary: Boolean = false
 
+    private val enableBluetooth = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_CANCELED) {
+            Log.i("BluetoothStitching", "No se ha activado el bluetooth")
+        }
+    }
 
-    var myBluetoothService: BluetoothService = BluetoothService
+    private val getPermissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            var granted = true
+            val nonGrantedPermissions = mutableListOf<String>()
+            permissions.entries.forEach {
+                if (!it.value) {
+                    granted = false
+                    if (it.key == "android.permission.BLUETOOTH")
+                        nonGrantedPermissions.add("Bluetooth")
+                    else {
+                        nonGrantedPermissions.add("Localizacion")
+                    }
+                }
+            }
+            if (!granted) {
+                ShowDialog.showNotGrantedPermissionsMessage(nonGrantedPermissions, requireContext())
+            }
+        }
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_arduino_connection, container, false)
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -68,79 +73,37 @@ class ArduinoConnectionFragment : Fragment() {
             comesFromSummary = requireArguments().getBoolean("summary")
         }
 
-        if(BluetoothService.isConnected()){
+        if (BluetoothService.isConnected()) {
             startConfigurationFragment()
         }
 
         initBluetoothAdapter()
         //Register receiver
-        val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
-        requireActivity().registerReceiver(receiver, filter)
+        bluetoothService.registerReceiver(requireActivity()) { device -> addDeviceToAdapter(device) }
 
         initUI()
-
     }
-
 
     override fun onDestroy() {
         super.onDestroy()
-
-        if (bluetoothAdapter != null) {
-            bluetoothAdapter!!.cancelDiscovery()
-        }
-        requireActivity().unregisterReceiver(receiver)
-
+        bluetoothService.cancelDiscovery()
+        bluetoothService.unregisterReceiver(requireActivity())
     }
-
 
     /**
      * Función que inicia el BluetoothAdapter. Se encarga de pedir los permisos necesarios para el
      * correcto funcionamiento.
      */
     private fun initBluetoothAdapter() {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        bluetoothService.enableBluetooth(enableBluetooth)
 
-        if (bluetoothAdapter == null) {
-            Log.i("BluetoothStitching", "No hay bluetooth disponible")
-        }
-
-        if (!bluetoothAdapter!!.isEnabled) {
-            Log.i("BluetoothStitching", "hay bluetooth disponible")
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
-        }
-
-        if (ContextCompat.checkSelfPermission(
-                this.requireContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION
+        getPermissions.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.BLUETOOTH
             )
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-
-            // Permission is not granted
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this.requireActivity(),
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            ) {
-
-                Log.i("BluetoothStitching", "Permission must be granted to use the app.")
-            } else {
-
-                // Request permission.
-                ActivityCompat.requestPermissions(
-                    this.requireActivity(),
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    REQUEST_PERMISSION_BLUETOOTH
-                )
-            }
-        } else {
-            // Permission has already been granted.
-            Log.i("BluetoothStitching", "Permission already granted.")
-        }
-
+        )
     }
-
 
     private fun initUI() {
         //Se crea el listener
@@ -160,7 +123,6 @@ class ArduinoConnectionFragment : Fragment() {
     }
 
     private fun bondDevice(bluetoothDevice: BluetoothDevice) {
-        //TODO crear la progressbar
         Thread {
             // display the indefinite progressbar
             this@ArduinoConnectionFragment.requireActivity().runOnUiThread {
@@ -169,11 +131,9 @@ class ArduinoConnectionFragment : Fragment() {
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                 )
-
             }
 
-            // performing some dummy time taking operation
-            createHandler()
+            configureHandler()
             createConnection(bluetoothDevice)
 
             // when the task is completed, make progressBar gone
@@ -182,44 +142,28 @@ class ArduinoConnectionFragment : Fragment() {
                 requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             }
         }.start()
-
     }
 
+    private fun configureHandler() {
+        bluetoothService.setHandlerCommands({
+            Log.i("BluetoothStitching", "Conectado correctamente, cambiar de pantalla")
+            startConfigurationFragment()
+        }, {
+            Log.i("BluetoothStitching", "No se ha podido conectar")
+            ShowDialog.showDialogOK(requireContext(), "No se ha podido conectar") { _, _ -> }
+        })
+    }
 
     private fun createConnection(bluetoothDevice: BluetoothDevice) {
-        bluetoothAdapter!!.cancelDiscovery()
-        try {
-
-            //Try to create socket with uuid
-            myBluetoothService.setConnectionSocket(
-                bluetoothDevice.createInsecureRfcommSocketToServiceRecord(
-                    MY_UUID
-                )
-            )
-
-            // Connect to the remote device through the socket. This call blocks
-            // until it succeeds or throws an exception.
-            myBluetoothService.getConnectionSocket()!!.connect()
-            Log.i(TAG_BLUETOOTH, "Device connected")
-            myBluetoothService.getHandler().obtainMessage(CONNECTING_STATUS, 1, -1).sendToTarget()
-        } catch (connectException: IOException) {
-            // Unable to connect; close the socket and return.
-            myBluetoothService.closeConnectionSocket()
-            myBluetoothService.getHandler().obtainMessage(CONNECTING_STATUS, -1, -1).sendToTarget()
-
-
-        }
+        bluetoothService.tryToConnect(bluetoothDevice)
     }
-
 
     private fun startConfigurationFragment() {
         val bundle = bundleOf("summary" to comesFromSummary)
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.popBackStack()
         navController.navigate(R.id.nav_arduino_configuration, bundle)
-
     }
-
 
     /**
      * Añade un nuevo dispositivo al adapter
@@ -227,108 +171,11 @@ class ArduinoConnectionFragment : Fragment() {
     private fun addDeviceToAdapter(device: BluetoothDevice) {
         Log.i("BluetoothStitching", "Añadido dispositivo")
         deviceAdapter.addElement(device)
-
     }
-
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            REQUEST_ENABLE_BT -> {
-                if (resultCode == AppCompatActivity.RESULT_CANCELED) {
-                    Log.i("BluetoothStitching", "No se ha activado el bluetooth")
-                }
-            }
-
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            REQUEST_PERMISSION_BLUETOOTH -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this.requireContext(), "Permission granted.", Toast.LENGTH_SHORT)
-                        .show()
-
-                } else {
-                    Toast.makeText(
-                        this.requireContext(),
-                        "Permission must be granted to use the application.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }
-    }
-
 
     private fun startDiscovery() {
         deviceAdapter.clearElements()
-        if (bluetoothAdapter!!.isDiscovering) {
-            Log.i("BluetoothStitching", "Cancel discovery")
-            bluetoothAdapter!!.cancelDiscovery()
-        }
-        Log.i("BluetoothStitching", "Start discovery")
-        bluetoothAdapter!!.startDiscovery()
+        bluetoothService.enableBluetoothAndExecute(enableBluetooth){bluetoothService.startDiscovering()}
     }
-
-
-    private val receiver = object : BroadcastReceiver() {
-
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                BluetoothDevice.ACTION_FOUND -> {
-                    // Discovery has found a device. Get the BluetoothDevice
-                    // object and its info from the Intent.
-                    val bDevice: BluetoothDevice? =
-                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                    if (bDevice != null) {
-                        //val device = Device(bDevice)
-
-                        Log.i(
-                            "BluetoothStitching",
-                            "Dispositivo: ${bDevice.name} - ${bDevice.address}"
-                        )
-                        addDeviceToAdapter(bDevice)
-                    }
-                }
-            }
-        }
-    }
-
-
-    private fun createHandler() {
-        val handler = object : Handler(Looper.getMainLooper()) {
-            override fun handleMessage(msg: Message) {
-                when (msg.what) {
-                    CONNECTING_STATUS -> when (msg.arg1) {
-                        1 -> {
-                            Log.i(
-                                "BluetoothStitching",
-                                "Conectado correctamente, cambiar de pantalla"
-                            )
-
-                            startConfigurationFragment()
-                        }
-                        -1 -> {
-                            Log.i("BluetoothStitching", "No se ha podido conectar")
-                            ShowDialog.showDialogOK(requireContext(), "No se ha podido conectar") { _, _ ->}
-                        }
-                    }
-                }
-            }
-        }
-
-        myBluetoothService.setHandler(handler)
-    }
-
 
 }
-
-
-

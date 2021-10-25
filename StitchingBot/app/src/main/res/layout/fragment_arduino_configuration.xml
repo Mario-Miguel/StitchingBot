@@ -48,6 +48,17 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.211" />
 
+        <ImageButton
+            android:id="@+id/btnRightArrow"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_baseline_arrow_right_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.669"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.211" />
         <!--Final de botonera-->
 
         <Button
@@ -63,74 +74,68 @@
             app:layout_constraintVertical_bias="0.468" />
 
 
-        <ImageButton
-            android:id="@+id/btnRightArrow"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@drawable/ic_baseline_arrow_right_24"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/txtMotorSteps"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/label_motor_steps"
+            app:endIconMode="clear_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.669"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.211" />
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="@+id/btnAxisDone"
+            app:layout_constraintTop_toBottomOf="@+id/btnAutoHome"
+            app:layout_constraintVertical_bias="0.263">
 
-        <TextView
-            android:id="@+id/txtXAxis"
-            android:layout_width="100dp"
-            android:layout_height="30dp"
-            android:background="#ffffff"
-            android:gravity="center_vertical"
-            android:paddingStart="15dp"
-            android:text="X: 0"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.25"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.6" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:id="@+id/txtYAxis"
-            android:layout_width="100dp"
-            android:layout_height="30dp"
-            android:gravity="center_vertical"
-            android:paddingStart="15dp"
-            android:text="Y: 0"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.8"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.6" />
+        <Button
+            android:id="@+id/btnConfigTrySteps"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/btn_try_steps"
+            app:layout_constraintBottom_toBottomOf="@+id/txtMotorSteps"
+            app:layout_constraintEnd_toEndOf="@+id/btnDisconnect"
+            app:layout_constraintStart_toEndOf="@+id/txtMotorSteps"
+            app:layout_constraintTop_toTopOf="@+id/txtMotorSteps" />
 
         <Button
             android:id="@+id/btnAxisDone"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="10dp"
             android:text="¡Hecho!"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.207"
+            app:layout_constraintEnd_toStartOf="@+id/btnDisconnect"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.837" />
 
         <Button
             android:id="@+id/btnDisconnect"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="50dp"
             android:text="Desconectar"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.83"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@+id/btnAxisDone"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.837" />
-
-
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

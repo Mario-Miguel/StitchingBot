@@ -19,4 +19,13 @@ object ShowDialog {
     fun showInfoDialog(context: Context, message: String){
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
+
+    fun showNotGrantedPermissionsMessage(nonGrantedPermissions: MutableList<String>, context: Context) {
+        val permissionsString = nonGrantedPermissions.reduce { acc, str -> "$acc - $str" }
+
+        showDialogOK(
+            context,
+            "Se necesitan los permisos: $permissionsString"
+        ) { _, _ -> }
+    }
 }

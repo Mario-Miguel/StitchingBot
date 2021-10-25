@@ -6,6 +6,7 @@ import es.uniovi.eii.stitchingbot.controller.SewingMachineController
 import es.uniovi.eii.stitchingbot.ui.fragments.summary.SummaryFragment
 import es.uniovi.eii.stitchingbot.util.Translator
 import es.uniovi.eii.stitchingbot.util.arduinoCommands.ArduinoCommands
+import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
 import kotlinx.android.synthetic.main.fragment_summary.*
 
 class StoppedState: State() {
@@ -32,12 +33,10 @@ class StoppedState: State() {
         return logoController.isLogoSelected()
                 && sewingMachineController.isSewingMachineSelected()
                 && translator.translationDone
-        && ArduinoCommands.isConnected()
+        && BluetoothService.isConnected()
     }
 
     private fun checkStartTranslationAvailability(translator: Translator): Boolean {
         return !translator.isInExecution && !translator.translationDone
     }
-
-
 }

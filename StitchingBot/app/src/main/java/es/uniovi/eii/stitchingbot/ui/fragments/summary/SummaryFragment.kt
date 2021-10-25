@@ -1,10 +1,14 @@
 package es.uniovi.eii.stitchingbot.ui.fragments.summary
 
+import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -17,6 +21,7 @@ import es.uniovi.eii.stitchingbot.model.SewingMachine
 import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.StateManager
 import es.uniovi.eii.stitchingbot.util.*
 import es.uniovi.eii.stitchingbot.util.arduinoCommands.ArduinoCommands
+import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
 import kotlinx.android.synthetic.main.fragment_summary.*
 
 
@@ -32,6 +37,7 @@ class SummaryFragment : Fragment() {
 
     val translator: Translator = Translator
     private val stateManager = StateManager
+    private val bluetoothService = BluetoothService
     private val arduinoCommands: ArduinoCommands = ArduinoCommands
     private val imageManager = ImageManager()
 
@@ -68,7 +74,7 @@ class SummaryFragment : Fragment() {
 
         btnPauseExecution.setOnClickListener { arduinoCommands.pauseExecution() }
         btnStopExecution.setOnClickListener { arduinoCommands.stopExecution() }
-        btnResumeExecution.setOnClickListener { arduinoCommands.resumeExecution() }
+        btnResumeExecution.setOnClickListener { resumeExecution() }
     }
 
 
@@ -143,7 +149,7 @@ class SummaryFragment : Fragment() {
     private fun loadArduinoFragment() {
         val bundle = bundleOf(Constants.SUMMARY to true)
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-        if (arduinoCommands.isConnected())
+        if (bluetoothService.isConnected())
             navController.navigate(R.id.nav_arduino_configuration, bundle)
         else
             navController.navigate(R.id.nav_arduino_connection, bundle)
@@ -172,7 +178,7 @@ class SummaryFragment : Fragment() {
     }
 
     private fun updateArduinoStatus() {
-        val hasConnection = arduinoCommands.isConnected()
+        val hasConnection = bluetoothService.isConnected()
         txtArduinoSummary.text = getString(
             R.string.txt_arduino_summary,
             if (hasConnection) "conectado" else "desconectado"
@@ -202,14 +208,20 @@ class SummaryFragment : Fragment() {
         }.start()
     }
 
+
     private fun startExecution() {
-        Thread {
-            arduinoCommands.startExecution(
-                translator.translation
-            )
-        }.start()
+        bluetoothService.enableBluetoothAndExecute(enableBluetooth) {
+            Thread {
+                arduinoCommands.startExecution(
+                    translator.translation
+                )
+            }.start()
+        }
     }
 
+    private fun resumeExecution() {
+        bluetoothService.enableBluetoothAndExecute(enableBluetooth) { arduinoCommands.resumeExecution() }
+    }
 
     companion object {
         /**
@@ -228,5 +240,13 @@ class SummaryFragment : Fragment() {
                     putParcelable(Constants.SEWING_MACHINE, sewingMachine)
                 }
             }
+    }
+
+    private val enableBluetooth = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_CANCELED) {
+            Log.i("BluetoothStitching", "No se ha activado el bluetooth")
+        }
     }
 }

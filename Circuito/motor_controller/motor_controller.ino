@@ -48,7 +48,12 @@ const String START_EXECUTION = "B";
 const char CONFIGURE_PULLEY = 'C';
 const char PAUSE_EXECUTION = 'P';
 const char RESUME_EXECUTION = 'R';
-const char STOP_EXECUTION = 'S';
+const char STOP_EXECUTION = 'T';
+const char UP = 'W';
+const char DOWN = 'S';
+const char LEFT = 'A';
+const char RIGHT = 'D';
+const char START_AUTOHOME = 'H'
 //TODO terminar de poner el pause/stop en el loop -> hay que reenviar de vuelta una orden con la letra para que pueda parar
 
 #define MAX_ARRAY_SIZE 50
