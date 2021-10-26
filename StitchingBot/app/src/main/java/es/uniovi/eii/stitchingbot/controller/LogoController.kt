@@ -5,22 +5,20 @@ import android.os.Bundle
 import es.uniovi.eii.stitchingbot.database.LogoDatabaseConnection
 import es.uniovi.eii.stitchingbot.model.Logo
 
-
-
 class LogoController {
 
     private var logo = Logo()
 
-    fun setLogo(title: String? = logo.title, url: String? = logo.imgUrl){
+    fun setLogo(title: String? = logo.title, url: String? = logo.imgUrl) {
         val auxLogo = Logo(logo.id, title, url, logo.category)
         this.logo = auxLogo
     }
 
-    fun setLogo(logo: Logo){
-        this.logo=logo
+    fun setLogo(logo: Logo) {
+        this.logo = logo
     }
 
-    fun getLogo():Logo{
+    fun getLogo(): Logo {
         return this.logo
     }
 
@@ -33,25 +31,34 @@ class LogoController {
         return list
     }
 
-    fun addLogo(context:Context){
+    fun addLogo(context: Context) {
         val databaseConnection = LogoDatabaseConnection(context)
         databaseConnection.open()
         databaseConnection.insert(logo)
         databaseConnection.close()
     }
 
-    fun updateLogo(context: Context){
+    fun updateLogo(context: Context) {
         val databaseConnection = LogoDatabaseConnection(context)
         databaseConnection.open()
         databaseConnection.update(logo)
         databaseConnection.close()
     }
 
-    fun deleteLogo(context: Context){
+    fun deleteLogo(context: Context) {
         val databaseConnection = LogoDatabaseConnection(context)
         databaseConnection.open()
         databaseConnection.delete(logo)
         databaseConnection.close()
+    }
+
+    fun getLastLogoAdded(context: Context): Logo {
+        val databaseConnection = LogoDatabaseConnection(context)
+        databaseConnection.open()
+        val auxLogo = databaseConnection.getLastElement()
+        databaseConnection.close()
+
+        return auxLogo
     }
 
     fun isLogoSelected(): Boolean {

@@ -9,4 +9,5 @@
     <dimen name="editor_buttons_height">80dp</dimen>
     <dimen name="editor_buttons_width">80dp</dimen>
     <dimen name="device_list_item_height">60dp</dimen>
+    <dimen name="image_btn_inset">5dp</dimen>
 </resources>

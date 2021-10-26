@@ -9,8 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.controller.LogoController
-import es.uniovi.eii.stitchingbot.ui.canvas.MyCanvasView
-import es.uniovi.eii.stitchingbot.ui.canvas.tools.*
+import es.uniovi.eii.stitchingbot.ui.canvas.toolsButtons.*
 import es.uniovi.eii.stitchingbot.util.Constants.CREATION_MODE
 import es.uniovi.eii.stitchingbot.util.Constants.LOGO
 import es.uniovi.eii.stitchingbot.util.ImageManager
@@ -24,10 +23,8 @@ import kotlinx.android.synthetic.main.fragment_create_logo.*
 class CreateLogoFragment : Fragment() {
 
     private var isCreation: Boolean = true
-    private lateinit var canvas: MyCanvasView
     private val imageManager = ImageManager()
     private val logoController = LogoController()
-
 
 
     override fun onCreateView(
@@ -42,9 +39,8 @@ class CreateLogoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        this.canvas = canvasView
         initializeButtons()
-
+        loadButtonToolbar()
         if (arguments != null) {
             isCreation = requireArguments().getBoolean(CREATION_MODE)
             logoController.setLogo(requireArguments().getParcelable(LOGO)!!)
@@ -52,7 +48,6 @@ class CreateLogoFragment : Fragment() {
                 showLogoImage()
         }
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         if(!isCreation){
@@ -62,7 +57,6 @@ class CreateLogoFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if(item.itemId == R.id.action_delete){
             deleteLogo()
@@ -70,63 +64,45 @@ class CreateLogoFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-
-    private fun initializeButtons(){
-        btnCircleDrawing.setOnClickListener {
-            canvas.tool = CircleTool()
-        }
-        btnSquareDrawing.setOnClickListener {
-            canvas.tool = SquareTool()
-        }
-        btnFreeDrawing.setOnClickListener {
-            canvas.tool = FreeDrawingTool()
-        }
-        btnLineDrawing.setOnClickListener {
-            canvas.tool = LineTool()
-        }
-
-        btnEraseOption.setOnClickListener {
-            canvas.tool = EraseTool()
-        }
-
-        btnDone.setOnClickListener { if(isCreation) saveLogo() else modifyLogo() }
-        btnSew.setOnClickListener { loadSummaryScreen() }
-
-
+    private fun loadButtonToolbar(){
+        buttonToolbar.addView(FreeDrawingToolButton(requireContext(), canvasView))
+        buttonToolbar.addView(CircleToolButton(requireContext(), canvasView))
+        buttonToolbar.addView(RectangleToolButton(requireContext(), canvasView))
+        buttonToolbar.addView(LineToolButton(requireContext(), canvasView))
+        buttonToolbar.addView(EraseToolButton(requireContext(), canvasView))
     }
 
+    private fun initializeButtons(){
+        btnDone.setOnClickListener { if(isCreation) saveLogo() else modifyLogo() }
+        btnSew.setOnClickListener { loadSummaryScreen() }
+    }
 
     private fun showLogoImage(){
         imageManager.setPhotoUri(Uri.parse(logoController.getLogo().imgUrl))
         val image = imageManager.getImageFromUri(activity=requireActivity())!!
-        canvas.setImage(image)
+        canvasView.setImage(image)
     }
 
-
     private fun modifyLogo(){
-        val bitmap = canvas.getBitmapToSave()
+        val bitmap = canvasView.getBitmapToSave()
         imageManager.setPhotoUri(Uri.parse(logoController.getLogo().imgUrl))
-
         imageManager.copyImage(bitmap)
 
         logoController.setLogo("Try", imageManager.getPhotoUri().toString())
         logoController.updateLogo(requireContext())
-
         Toast.makeText(requireContext(), "Logo modificado", Toast.LENGTH_LONG).show()
     }
 
-
     private fun saveLogo() {
-        val bitmap = canvas.getBitmapToSave()
+        val bitmap = canvasView.getBitmapToSave()
         imageManager.saveImage(bitmap, requireActivity())
 
         logoController.setLogo("Try", imageManager.getPhotoUri().toString())
         logoController.addLogo(requireContext())
+        logoController.setLogo(logoController.getLastLogoAdded(requireContext()))
 
         Toast.makeText(requireContext(), "Logo creado", Toast.LENGTH_LONG).show()
-
     }
-
 
     private fun deleteLogo(){
         imageManager.deleteImageFile()
@@ -136,13 +112,9 @@ class CreateLogoFragment : Fragment() {
         navController.popBackStack()
     }
 
-
     private fun loadSummaryScreen(){
         val bundle = bundleOf("logo" to logoController.getLogo())
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.navigate(R.id.nav_summary, bundle)
     }
-
-
-
 }

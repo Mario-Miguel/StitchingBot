@@ -1,51 +1,49 @@
 package es.uniovi.eii.stitchingbot.ui.canvas.tools
 
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
+import android.graphics.*
 
-class EraseTool: Tool {
+class EraseTool: Tool() {
 
     //TODO Terminar de hacer esto
-    var currentX: Float = 0F
-    var currentY: Float = 0F
-    lateinit var paint: Paint
+    override var paint = Paint().apply {
+        color = Color.WHITE
+        // Smooths out edges of what is drawn without affecting shape.
+        isAntiAlias = true
+        // Dithering affects how colors with higher-precision than the device are down-sampled.
+        isDither = true
+        style = Paint.Style.STROKE // default: FILL
+        strokeJoin = Paint.Join.ROUND // default: MITER
+        strokeCap = Paint.Cap.ROUND // default: BUTT
+        strokeWidth = 22f // default: Hairline-width (really thin)
+    }
 
     override fun touchStart(
-        currentX: Float,
-        currentY: Float,
+        beginCoordinate:PointF,
         paint: Paint,
         path: Path
     ) {
-        this.currentX = currentX
-        this.currentY = currentY
-        this.paint = paint
-        this.paint.color = Color.WHITE
-        this.paint.strokeWidth=22f
+        this.beginCoordinate.x = beginCoordinate.x
+        this.beginCoordinate.y = beginCoordinate.y
 
+        path.reset()
+        path.moveTo(beginCoordinate.x, beginCoordinate.y)
     }
 
-    override fun touchMove(motionTouchEventX: Float, motionTouchEventY: Float, path: Path, extraCanvas: Canvas) {
-
+    override fun touchMove(endCoordinate:PointF, path: Path, canvas: Canvas) {
         path.quadTo(
-            currentX,
-            currentY,
-            (motionTouchEventX + currentX) / 2,
-            (motionTouchEventY + currentY) / 2
+            beginCoordinate.x,
+            beginCoordinate.y,
+            (endCoordinate.x + beginCoordinate.x) / 2,
+            (endCoordinate.y + beginCoordinate.y) / 2
         )
-        currentX = motionTouchEventX
-        currentY = motionTouchEventY
+        beginCoordinate.x = endCoordinate.x
+        beginCoordinate.y = endCoordinate.y
 
         // Draw the path in the extra bitmap to save it.
-        extraCanvas.drawPath(path, paint)
-
+        canvas.drawPath(path, paint)
     }
 
-
-    override fun touchUp(path: Path, extraCanvas:Canvas) {
+    override fun touchUp(endCoordinate:PointF, path: Path, canvas:Canvas) {
         path.reset()
     }
-
-
 }

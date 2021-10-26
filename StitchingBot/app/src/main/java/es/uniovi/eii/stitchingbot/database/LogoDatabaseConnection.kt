@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import es.uniovi.eii.stitchingbot.model.Logo
 
-class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(context){
+class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(context) {
 
     override fun insert(element: Logo) {
         val values = ContentValues()
@@ -13,7 +13,7 @@ class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(contex
         database!!.insert(DatabaseHelper.TABLE_LOGOS, null, values)
     }
 
-    override fun update(element: Logo){
+    override fun update(element: Logo) {
         val values = ContentValues()
         values.putAll(dbHelper!!.getInsertParamsLogosTable(element))
         val where = "id=?"
@@ -22,7 +22,7 @@ class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(contex
         database!!.update(DatabaseHelper.TABLE_LOGOS, values, where, whereArgs)
     }
 
-    override fun delete(element: Logo){
+    override fun delete(element: Logo) {
         val where = "id=?"
         val whereArgs = arrayOf("${element.id}")
 
@@ -59,4 +59,29 @@ class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(contex
 
         return logos
     }
+
+    fun getLastElement(): Logo {
+        val orderBy = "id DESC LIMIT 1"
+        val cursor = database!!.query(
+            DatabaseHelper.TABLE_LOGOS,
+            dbHelper!!.getAllLogosColumns(),
+            null,
+            null,
+            null,
+            null,
+            orderBy
+        )
+
+        cursor.moveToFirst()
+        val logo = Logo(
+            cursor.getInt(0),
+            cursor.getString(1),
+            cursor.getString(2),
+            cursor.getString(3)
+        )
+        cursor.close()
+
+        return logo
+    }
+
 }

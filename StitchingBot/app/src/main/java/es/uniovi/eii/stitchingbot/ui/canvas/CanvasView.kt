@@ -21,12 +21,10 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewConfiguration
 import androidx.core.content.res.ResourcesCompat
 import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.ui.canvas.tools.FreeDrawingTool
 import es.uniovi.eii.stitchingbot.ui.canvas.tools.Tool
-import kotlin.math.abs
 
 
 // Stroke width for the the paint.
@@ -35,8 +33,10 @@ private const val STROKE_WIDTH = 12f
 /**
  * Custom view that follows touch events to draw on a canvas.
  */
-class MyCanvasView : View {
+class CanvasView : View {
 
+    //####################################################
+    var isDrawing: Boolean = false
     var tool: Tool = FreeDrawingTool()
 
     // Holds the path you are currently drawing.
@@ -44,9 +44,9 @@ class MyCanvasView : View {
 
     private val drawColor = ResourcesCompat.getColor(resources, R.color.black, null)
     private val backgroundColor = ResourcesCompat.getColor(resources, R.color.white, null)
-    private lateinit var extraCanvas: Canvas
+    private lateinit var canvas: Canvas
     private var logoImage: Bitmap? = null
-    private lateinit var extraBitmap: Bitmap
+    private lateinit var actualDrawing: Bitmap
     private lateinit var frame: Rect
 
     // Set up the paint with which to draw.
@@ -62,18 +62,17 @@ class MyCanvasView : View {
         strokeWidth = STROKE_WIDTH // default: Hairline-width (really thin)
     }
 
-    /**
-     * Don't draw every single pixel.
-     * If the finger has has moved less than this distance, don't draw. scaledTouchSlop, returns
-     * the distance in pixels a touch can wander before we think the user is scrolling.
-     */
-    private val touchTolerance = ViewConfiguration.get(context).scaledTouchSlop
+    private val framePaint = Paint().apply {
+        color = Color.DKGRAY
+        isAntiAlias = true
+        // Dithering affects how colors with higher-precision than the device are down-sampled.
+        isDither = true
+        style = Paint.Style.STROKE // default: FILL
+        strokeJoin = Paint.Join.ROUND // default: MITER
+        strokeCap = Paint.Cap.ROUND // default: BUTT
+        strokeWidth = STROKE_WIDTH
+    }
 
-    private var currentX = 0f
-    private var currentY = 0f
-
-    private var motionTouchEventX = 0f
-    private var motionTouchEventY = 0f
 
     /**
      * Called whenever the view changes size.
@@ -83,37 +82,31 @@ class MyCanvasView : View {
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
         super.onSizeChanged(width, height, oldWidth, oldHeight)
 
-        if (::extraBitmap.isInitialized) extraBitmap.recycle()
-        extraBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        extraCanvas = Canvas(extraBitmap)
-        extraCanvas.drawColor(backgroundColor)
+        if (::actualDrawing.isInitialized) actualDrawing.recycle()
+        actualDrawing = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        canvas = Canvas(actualDrawing)
+        canvas.drawColor(backgroundColor)
 
         // Calculate a rectangular frame around the picture.
-        val inset = 50
-        frame = Rect(inset, inset, width - inset, width - inset)
+        val inset = 5
+        frame = Rect(inset, inset, width - inset, height - inset)
 
-        if (logoImage != null)
-            extraCanvas.drawBitmap(logoImage!!, inset.toFloat(), inset.toFloat(), null)
+        if (logoImage != null) {
+            canvas.drawBitmap(logoImage!!, inset.toFloat(), inset.toFloat(), null)
+        }
     }
 
     override fun onDraw(canvas: Canvas) {
-        //canvas.drawColor(backgroundColor)
-        canvas.drawARGB(0,0,0,0)
+        canvas.drawARGB(0, 0, 0, 0)
         // Draw the bitmap that has the saved path.
-        canvas.drawBitmap(extraBitmap, 0f, 0f, null)
+        canvas.drawBitmap(actualDrawing, 0f, 0f, null)
 
         // Draw a frame around the canvas.
-        val auxPaint = Paint().apply {
-            color = Color.DKGRAY
-            isAntiAlias = true
-            // Dithering affects how colors with higher-precision than the device are down-sampled.
-            isDither = true
-            style = Paint.Style.STROKE // default: FILL
-            strokeJoin = Paint.Join.ROUND // default: MITER
-            strokeCap = Paint.Cap.ROUND // default: BUTT
-            strokeWidth = STROKE_WIDTH
+        canvas.drawRect(frame, framePaint)
+
+        if (isDrawing) {
+            tool.draw(canvas, paint)
         }
-        extraCanvas.drawRect(frame, auxPaint)
 
     }
 
@@ -129,13 +122,10 @@ class MyCanvasView : View {
      * does not handle click actions.
      */
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        motionTouchEventX = event.x
-        motionTouchEventY = event.y
-
         when (event.action) {
-            MotionEvent.ACTION_DOWN -> touchStart()
-            MotionEvent.ACTION_MOVE -> touchMove()
-            MotionEvent.ACTION_UP -> touchUp()
+            MotionEvent.ACTION_DOWN -> touchStart(event.x, event.y)
+            MotionEvent.ACTION_MOVE -> touchMove(event.x, event.y)
+            MotionEvent.ACTION_UP -> touchUp(event.x, event.y)
         }
         return true
     }
@@ -147,40 +137,21 @@ class MyCanvasView : View {
      * concise and makes it easier to change what happens for each event.
      * No need to call invalidate because we are not drawing anything.
      */
-//    private fun touchStart() {
-//        path.reset()
-//        path.moveTo(motionTouchEventX, motionTouchEventY)
-//        currentX = motionTouchEventX
-//        currentY = motionTouchEventY
-//    }
-    private fun touchStart() {
-        path.reset()
-        path.moveTo(motionTouchEventX, motionTouchEventY)
-        currentX = motionTouchEventX
-        currentY = motionTouchEventY
-        path.reset()
-        path.moveTo(currentX, currentY)
-
-        tool.touchStart(currentX, currentY, paint, path)
-        //invalidate()
-    }
-
-
-    private fun touchMove() {
-        val dx = abs(motionTouchEventX - currentX)
-        val dy = abs(motionTouchEventY - currentY)
-        if (dx >= touchTolerance || dy >= touchTolerance) {
-            tool.touchMove(motionTouchEventX, motionTouchEventY, path, extraCanvas)
-            currentX = motionTouchEventX
-            currentY = motionTouchEventY
-        }
+    private fun touchStart(x:Float, y:Float) {
+        isDrawing = true
+        tool.touchStart(PointF(x, y), paint, path)
         invalidate()
     }
 
+    private fun touchMove(x:Float, y:Float) {
+        tool.touchMove(PointF(x, y), path, canvas)
+        invalidate()
+    }
 
-    private fun touchUp() {
+    private fun touchUp(x:Float, y:Float) {
         // Reset the path so it doesn't get drawn again.
-        tool.touchUp(path, extraCanvas)
+        isDrawing = false
+        tool.touchUp(PointF(x, y), path, canvas)
         invalidate()
     }
 
@@ -193,19 +164,16 @@ class MyCanvasView : View {
         )
 
         val auxCanvas = Canvas(cutBitmap)
-        val srcRect = Rect(frame.left + 20, frame.top + 20, frame.right - 20, frame.bottom - 20)
+        val srcRect = Rect(frame.left + 5, frame.top + 5, frame.right - 5, frame.bottom - 5)
         val destRect = Rect(0, 0, 1000, 1000)
 
-        auxCanvas.drawBitmap(extraBitmap, srcRect, destRect, null)
-
+        auxCanvas.drawBitmap(actualDrawing, srcRect, destRect, null)
         return cutBitmap
-
     }
 
     fun setImage(bitmap: Bitmap) {
         logoImage = bitmap
     }
-
 
     /**
      * Copy Constructor
@@ -241,7 +209,6 @@ class MyCanvasView : View {
         setup()
     }
 
-
     /**
      * Common initialization.
      *
@@ -249,6 +216,4 @@ class MyCanvasView : View {
     private fun setup() {
         setLayerType(LAYER_TYPE_HARDWARE, null)
     }
-
-
 }
