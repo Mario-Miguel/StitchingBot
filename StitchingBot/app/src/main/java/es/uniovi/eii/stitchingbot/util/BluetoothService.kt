@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.util.bluetooth
+package es.uniovi.eii.stitchingbot.util
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -13,7 +13,6 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
-import es.uniovi.eii.stitchingbot.util.Constants
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -172,7 +171,7 @@ object BluetoothService {
     }
 
     fun isBluetoothEnabled(): Boolean{
-        return bluetoothAdapter!=null && bluetoothAdapter!!.isEnabled
+        return bluetoothAdapter !=null && bluetoothAdapter!!.isEnabled
     }
 
     fun startDiscovering() {

@@ -101,6 +101,10 @@ module huecoRodamiento(x, y, z){
     }
 }
 
+module sujeccionFinalDeCarrera(){
+    cube([15, 35, 40]);
+}
+
 //Módulo principal
 module soporteVarillaSuperiorV2(conTapa){
     translate([0,0,35]){
@@ -121,6 +125,8 @@ module soporteVarillaSuperiorV2(conTapa){
             
             
         }
+        translate([-15, 55, 5])
+            sujeccionFinalDeCarrera();
         if(conTapa){
             translate([0,0,65]){
                 difference(){

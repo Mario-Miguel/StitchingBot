@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.util.arduinoCommands
+package es.uniovi.eii.stitchingbot.util
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -11,7 +11,6 @@ import es.uniovi.eii.stitchingbot.util.Constants.RESUME_EXECUTION
 import es.uniovi.eii.stitchingbot.util.Constants.START_AUTOHOME
 import es.uniovi.eii.stitchingbot.util.Constants.START_EXECUTION
 import es.uniovi.eii.stitchingbot.util.Constants.STOP_EXECUTION
-import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
 import java.io.IOException
 
 object ArduinoCommands {

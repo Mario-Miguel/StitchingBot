@@ -5,8 +5,7 @@ import es.uniovi.eii.stitchingbot.controller.LogoController
 import es.uniovi.eii.stitchingbot.controller.SewingMachineController
 import es.uniovi.eii.stitchingbot.ui.fragments.summary.SummaryFragment
 import es.uniovi.eii.stitchingbot.util.Translator
-import es.uniovi.eii.stitchingbot.util.arduinoCommands.ArduinoCommands
-import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
+import es.uniovi.eii.stitchingbot.util.BluetoothService
 import kotlinx.android.synthetic.main.fragment_summary.*
 
 class StoppedState: State() {

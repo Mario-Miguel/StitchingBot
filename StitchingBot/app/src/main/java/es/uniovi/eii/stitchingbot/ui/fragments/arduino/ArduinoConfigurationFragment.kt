@@ -13,8 +13,8 @@ import es.uniovi.eii.stitchingbot.util.Constants.LEFT
 import es.uniovi.eii.stitchingbot.util.Constants.RIGHT
 import es.uniovi.eii.stitchingbot.util.Constants.UP
 import es.uniovi.eii.stitchingbot.util.ShowDialog
-import es.uniovi.eii.stitchingbot.util.arduinoCommands.ArduinoCommands
-import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
+import es.uniovi.eii.stitchingbot.util.ArduinoCommands
+import es.uniovi.eii.stitchingbot.util.BluetoothService
 import kotlinx.android.synthetic.main.fragment_arduino_configuration.*
 import kotlinx.android.synthetic.main.fragment_arduino_configuration.txtMotorSteps
 

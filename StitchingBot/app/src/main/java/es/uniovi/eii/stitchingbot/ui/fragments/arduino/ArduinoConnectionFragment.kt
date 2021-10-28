@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.ui.adapter.DevicesListAdapter
 import es.uniovi.eii.stitchingbot.util.ShowDialog
-import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
+import es.uniovi.eii.stitchingbot.util.BluetoothService
 import kotlinx.android.synthetic.main.fragment_arduino_connection.*
 import java.util.*
 

@@ -17,9 +17,9 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
+import es.uniovi.eii.stitchingbot.util.BluetoothService
 import es.uniovi.eii.stitchingbot.controller.SewingMachineController
-import es.uniovi.eii.stitchingbot.util.arduinoCommands.ArduinoCommands
+import es.uniovi.eii.stitchingbot.util.ArduinoCommands
 import es.uniovi.eii.stitchingbot.util.Constants.CREATION_MODE
 import es.uniovi.eii.stitchingbot.util.Constants.TAG_SEWINGMACHINE
 import es.uniovi.eii.stitchingbot.util.ImageManager

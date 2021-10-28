@@ -20,8 +20,8 @@ import es.uniovi.eii.stitchingbot.model.Logo
 import es.uniovi.eii.stitchingbot.model.SewingMachine
 import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.StateManager
 import es.uniovi.eii.stitchingbot.util.*
-import es.uniovi.eii.stitchingbot.util.arduinoCommands.ArduinoCommands
-import es.uniovi.eii.stitchingbot.util.bluetooth.BluetoothService
+import es.uniovi.eii.stitchingbot.util.ArduinoCommands
+import es.uniovi.eii.stitchingbot.util.BluetoothService
 import kotlinx.android.synthetic.main.fragment_summary.*
 
 

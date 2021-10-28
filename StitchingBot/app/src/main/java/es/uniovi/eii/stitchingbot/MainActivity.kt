@@ -13,7 +13,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
-import es.uniovi.eii.stitchingbot.util.arduinoCommands.ArduinoCommands
 
 class MainActivity : AppCompatActivity() {
 
