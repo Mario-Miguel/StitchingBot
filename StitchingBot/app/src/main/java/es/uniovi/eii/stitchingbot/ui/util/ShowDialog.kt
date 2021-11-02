@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.util
+package es.uniovi.eii.stitchingbot.ui.util
 
 import android.content.Context
 import android.content.DialogInterface

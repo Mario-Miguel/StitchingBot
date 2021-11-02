@@ -11,6 +11,10 @@
         <entry key="app/src/main/res/layout/fragment_create_logo.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_sewing_machine_details.xml" value="0.39086294416243655" />
         <entry key="app/src/main/res/layout/fragment_summary.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.1" />
+        <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.1" />
+        <entry key="app/src/main/res/menu/add_button.xml" value="0.1" />
+        <entry key="app/src/main/res/menu/delete_button.xml" value="0.1" />
       </map>
     </option>
   </component>

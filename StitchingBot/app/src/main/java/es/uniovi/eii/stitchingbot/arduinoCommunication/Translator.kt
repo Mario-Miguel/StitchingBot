@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.util
+package es.uniovi.eii.stitchingbot.arduinoCommunication
 
 import android.graphics.Bitmap
 import android.graphics.Color

@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.util
+package es.uniovi.eii.stitchingbot.arduinoCommunication
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -26,14 +26,14 @@ object ArduinoCommands {
 
     fun doMotorStepsTest(motorSteps: Int) {
         val stringToSend = "$CONFIGURE_PULLEY;$motorSteps"
-        bluetoothService.write(stringToSend)
+        BluetoothService.write(stringToSend)
     }
 
     fun startExecution(
         translation: MutableList<Pair<Int, Int>>
     ) {
         _actualProgress.postValue(0)
-        bluetoothService.startedProcess = true
+        BluetoothService.startedProcess = true
         stateManager.changeTo(ExecutingState())
 
         val ordersToSend = createOrdersToSendStrings(translation)
@@ -51,18 +51,18 @@ object ArduinoCommands {
         var bytes = 0 // bytes returned from read()
         var hasMessage = false
         Log.i("BluetoothStitching", "Connected thread run")
-        bluetoothService.write(START_EXECUTION)
+        BluetoothService.write(START_EXECUTION)
 
         // Keep listening to the InputStream until an exception occurs
         while (actionsSent < ordersToSend.size) {
-            if(!bluetoothService.isBluetoothEnabled()){
+            if(!BluetoothService.isBluetoothEnabled()){
                 pauseExecution()
             }
             else {
                 try {
                     //Read from the InputStream from Arduino until termination character is reached.
                     //Then send the whole String message to Handler.
-                    buffer[bytes] = bluetoothService.read()
+                    buffer[bytes] = BluetoothService.read()
                     if (buffer[bytes] != 0.toByte())
                         hasMessage = true
 
@@ -100,7 +100,7 @@ object ArduinoCommands {
     }
 
     private fun sendOrders(ordersToSend: MutableList<String>) {
-        bluetoothService.write(ordersToSend[actionsSent])
+        BluetoothService.write(ordersToSend[actionsSent])
         actionsSent++
         _actualProgress.postValue(((actionsSent.toDouble() / ordersToSend.size.toDouble()) * 100).toInt())
     }
@@ -122,26 +122,26 @@ object ArduinoCommands {
     }
 
     fun pauseExecution() {
-        bluetoothService.write(PAUSE_EXECUTION)
+        BluetoothService.write(PAUSE_EXECUTION)
         stateManager.changeTo(PausedState())
     }
 
     fun resumeExecution() {
-        bluetoothService.write(RESUME_EXECUTION)
+        BluetoothService.write(RESUME_EXECUTION)
         stateManager.changeTo(ExecutingState())
     }
 
     fun stopExecution() {
-        bluetoothService.write(STOP_EXECUTION)
+        BluetoothService.write(STOP_EXECUTION)
         stateManager.changeTo(StoppedState())
     }
 
     fun move(direction: String){
-        bluetoothService.write(direction)
+        BluetoothService.write(direction)
     }
 
     fun startAutoHome() {
-        bluetoothService.write(START_AUTOHOME)
+        BluetoothService.write(START_AUTOHOME)
     }
 
 }

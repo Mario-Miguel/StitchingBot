@@ -14,14 +14,16 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
+import es.uniovi.eii.stitchingbot.arduinoCommunication.ArduinoCommands
+import es.uniovi.eii.stitchingbot.arduinoCommunication.BluetoothService
+import es.uniovi.eii.stitchingbot.arduinoCommunication.Translator
 import es.uniovi.eii.stitchingbot.controller.LogoController
 import es.uniovi.eii.stitchingbot.controller.SewingMachineController
 import es.uniovi.eii.stitchingbot.model.Logo
 import es.uniovi.eii.stitchingbot.model.SewingMachine
 import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.StateManager
+import es.uniovi.eii.stitchingbot.ui.util.ShowDialog
 import es.uniovi.eii.stitchingbot.util.*
-import es.uniovi.eii.stitchingbot.util.ArduinoCommands
-import es.uniovi.eii.stitchingbot.util.BluetoothService
 import kotlinx.android.synthetic.main.fragment_summary.*
 
 
@@ -39,7 +41,6 @@ class SummaryFragment : Fragment() {
     private val stateManager = StateManager
     private val bluetoothService = BluetoothService
     private val arduinoCommands: ArduinoCommands = ArduinoCommands
-    private val imageManager = ImageManager()
 
 
     override fun onCreateView(
@@ -136,11 +137,7 @@ class SummaryFragment : Fragment() {
     }
 
     private fun loadImageToCard(imgComponent: ImageView, imgUrl: String?) {
-        val image =
-            imageManager.getImageFromUri(
-                url = imgUrl,
-                activity = requireActivity()
-            )
+        val image = sewingMachineController.getImageFromUrl(requireActivity(), imgUrl)
         imgComponent.setImageBitmap(image)
     }
 
@@ -200,10 +197,7 @@ class SummaryFragment : Fragment() {
     private fun startTranslation() {
         Thread {
             stateManager.startTranslate()
-            translator.image = imageManager.getImageFromUri(
-                url = logoController.getLogo().imgUrl,
-                activity = requireActivity()
-            )!!
+            translator.image = logoController.getImage(requireActivity())
             translator.run()
         }.start()
     }

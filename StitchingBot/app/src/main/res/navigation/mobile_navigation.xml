@@ -13,9 +13,9 @@
 
     <fragment
         android:id="@+id/nav_create_logo"
-        android:name="es.uniovi.eii.stitchingbot.ui.fragments.logos.CreateLogoFragment"
+        android:name="es.uniovi.eii.stitchingbot.ui.fragments.logos.LogoEditorFragment"
         android:label="@string/menu_create_logo"
-        tools:layout="@layout/fragment_create_logo" />
+        tools:layout="@layout/fragment_logo_editor" />
 
     <fragment
         android:id="@+id/nav_sewing_machines"

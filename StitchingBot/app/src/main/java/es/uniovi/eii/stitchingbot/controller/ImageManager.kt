@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.util
+package es.uniovi.eii.stitchingbot.controller
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -17,21 +17,7 @@ import java.util.*
 
 class ImageManager {
 
-    private lateinit var currentPhotoUri: Uri
-
-    fun setPhotoUri(uri: Uri) {
-        currentPhotoUri = uri
-    }
-
-    fun setPhotoUri(url: String) {
-        currentPhotoUri = Uri.parse(url)
-    }
-
-    fun getPhotoUri(): Uri {
-        return currentPhotoUri
-    }
-
-    fun getImageFromUri(url: String? = currentPhotoUri.toString(), activity: Activity): Bitmap? {
+    fun getImageFromUri(url: String?, activity: Activity): Bitmap? {
         var image: Bitmap
         val selectedUri=Uri.parse(url)
         if (selectedUri != null) {
@@ -76,35 +62,36 @@ class ImageManager {
         )
     }
 
-    fun deleteImageIfSaved(){
-        if(this::currentPhotoUri.isInitialized){
-            deleteImageFile()
+    fun deleteImageIfSaved(url: String?){
+        if(!url.isNullOrEmpty()){
+            deleteImageFile(url)
         }
     }
 
 
-    fun deleteImageFile() {
+    fun deleteImageFile(url: String?) {
         //TODO hacer mensaje de confirmación
-        val file = File(currentPhotoUri.path!!)
+        val file = File(Uri.parse(url).path!!)
         if (file.exists()) {
             file.delete()
         }
     }
 
-    fun saveImage(bitmap: Bitmap?, activity: Activity) {
+
+    fun saveImageReturningUri(bitmap: Bitmap?, activity: Activity):Uri {
         val file = createImageFile(activity)
         saveImageToFile(bitmap, file)
-        currentPhotoUri = Uri.fromFile(file)
+        return Uri.fromFile(file)
     }
 
-    fun copyImage(bitmap: Bitmap?) {
-        val file = File(currentPhotoUri.path!!)
+    fun copyImage(bitmap: Bitmap?, url:String?) {
+        val file = File(Uri.parse(url).path!!)
         saveImageToFile(bitmap, file)
     }
 
-    fun copyImageFromGallery(selectedImage: Uri, file: File, activity: Activity){
+    fun copyImageFromGallery(selectedImage: String, file: File, activity: Activity){
         val bitmap = getImageFromUri(
-            selectedImage.toString(),
+            selectedImage,
             activity
         )
         saveImageToFile(bitmap, file)

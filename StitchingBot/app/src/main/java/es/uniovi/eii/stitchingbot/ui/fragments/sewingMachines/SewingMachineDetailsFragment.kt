@@ -3,7 +3,6 @@ package es.uniovi.eii.stitchingbot.ui.fragments.sewingMachines
 import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -13,20 +12,16 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.util.BluetoothService
 import es.uniovi.eii.stitchingbot.controller.SewingMachineController
-import es.uniovi.eii.stitchingbot.util.ArduinoCommands
+import es.uniovi.eii.stitchingbot.arduinoCommunication.ArduinoCommands
+import es.uniovi.eii.stitchingbot.arduinoCommunication.BluetoothService
 import es.uniovi.eii.stitchingbot.util.Constants.CREATION_MODE
 import es.uniovi.eii.stitchingbot.util.Constants.TAG_SEWINGMACHINE
-import es.uniovi.eii.stitchingbot.util.ImageManager
-import es.uniovi.eii.stitchingbot.util.ShowDialog
+import es.uniovi.eii.stitchingbot.ui.util.ShowDialog
 import kotlinx.android.synthetic.main.fragment_sewing_machine_details.*
-
-
 
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -39,12 +34,10 @@ private val PERMISSIONS = arrayOf(
 class SewingMachineDetailsFragment : Fragment() {
     private var isCreation: Boolean = false
     private var sewingMachineController = SewingMachineController()
-    private val imageManager = ImageManager()
-
 
     private val getImageFromGallery = registerForActivityResult(
         ActivityResultContracts.GetContent()
-    ) { if (it != null) imagePick(it) }
+    ) { if (it != null) imagePick(it.toString()) }
 
     private val getImageFromCamera = registerForActivityResult(
         ActivityResultContracts.TakePicture()
@@ -121,37 +114,18 @@ class SewingMachineDetailsFragment : Fragment() {
     }
 
 
-    private fun imagePick(selectedImage: Uri) {
-        imageManager.createPhotoFile(requireActivity())?.also {
-            Log.i(TAG_SEWINGMACHINE, it.absolutePath)
-            val photoURI: Uri = FileProvider.getUriForFile(
-                requireContext(),
-                "es.uniovi.eii.stitchingbot",
-                it
-            )
-
-            imageManager.deleteImageIfSaved()
-            imageManager.setPhotoUri(photoURI)
-            imageManager.copyImageFromGallery(selectedImage, it, requireActivity())
-
-
-        }
-
+    private fun imagePick(selectedImage: String) {
+        sewingMachineController.createImageFile(requireActivity()){_, file->sewingMachineController.copyImageFromFile(selectedImage, file, requireActivity())}
         imgSewingMachineDetails.setImageBitmap(
-            imageManager.getImageFromUri(
-                activity=requireActivity()
-            )
+            sewingMachineController.getImage(requireActivity())
         )
     }
 
     private fun imageTake() {
         imgSewingMachineDetails.setImageBitmap(
-            imageManager.getImageFromUri(
-                activity=requireActivity()
-            )
+            sewingMachineController.getImage(requireActivity())
         )
     }
-
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun loadDefaultScreen() {
@@ -171,11 +145,8 @@ class SewingMachineDetailsFragment : Fragment() {
         txtMotorSteps.editText!!.setText(sewingMachineController.getSewingMachine().motorSteps.toString())
 
         if (!sewingMachineController.getSewingMachine().imgUrl.isNullOrEmpty()) {
-            imageManager.setPhotoUri(sewingMachineController.getSewingMachine().imgUrl!!)
             imgSewingMachineDetails.setImageBitmap(
-                imageManager.getImageFromUri(
-                    activity=requireActivity(),
-                )
+                sewingMachineController.getImage(requireActivity())
             )
         }
     }
@@ -184,7 +155,7 @@ class SewingMachineDetailsFragment : Fragment() {
         if (checkFields()) {
             val name = txtSewingMachineName.editText!!.text.toString()
             val motorSteps = txtMotorSteps.editText!!.text.toString().toInt()
-            sewingMachineController.setSewingMachine(name=name,imgUrl=imageManager.getPhotoUri().toString(), motorSteps=motorSteps)
+            sewingMachineController.setSewingMachine(name=name, motorSteps=motorSteps)
 
             Log.i("SMDETAILS", "img url: ${sewingMachineController.getSewingMachine()}")
             if (isCreation) {
@@ -235,12 +206,9 @@ class SewingMachineDetailsFragment : Fragment() {
 
 
     private fun deleteMachine() {
-        imageManager.deleteImageFile()
         sewingMachineController.deleteSewingMachine(requireContext())
-
         goBack()
     }
-
 
     private fun selectImage(context: Context) {
         val options = arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")
@@ -262,24 +230,10 @@ class SewingMachineDetailsFragment : Fragment() {
         builder.show()
     }
 
-
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            // Ensure that there's a camera activity to handle the intent
             takePictureIntent.resolveActivity(requireActivity().packageManager)?.also {
-
-                // Continue only if the File was successfully created
-                imageManager.createPhotoFile(requireActivity())?.also {
-                    Log.i(TAG_SEWINGMACHINE, it.absolutePath)
-                    val photoURI: Uri = FileProvider.getUriForFile(
-                        requireContext(),
-                        "es.uniovi.eii.stitchingbot",
-                        it
-                    )
-                    imageManager.deleteImageIfSaved()
-                    imageManager.setPhotoUri(photoURI)
-                    getImageFromCamera.launch(photoURI)
-                }
+                sewingMachineController.createImageFile(requireActivity()){photoURI, _ -> getImageFromCamera.launch(photoURI)}
             }
         }
     }
@@ -288,7 +242,4 @@ class SewingMachineDetailsFragment : Fragment() {
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.popBackStack()
     }
-
-
-
 }

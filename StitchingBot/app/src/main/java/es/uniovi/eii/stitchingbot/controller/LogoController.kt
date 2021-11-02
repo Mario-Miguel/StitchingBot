@@ -1,13 +1,15 @@
 package es.uniovi.eii.stitchingbot.controller
 
+import android.app.Activity
 import android.content.Context
-import android.os.Bundle
+import android.graphics.Bitmap
 import es.uniovi.eii.stitchingbot.database.LogoDatabaseConnection
 import es.uniovi.eii.stitchingbot.model.Logo
 
 class LogoController {
 
     private var logo = Logo()
+    private val imageManager = ImageManager()
 
     fun setLogo(title: String? = logo.title, url: String? = logo.imgUrl) {
         val auxLogo = Logo(logo.id, title, url, logo.category)
@@ -39,6 +41,7 @@ class LogoController {
     }
 
     fun updateLogo(context: Context) {
+        setLogo()
         val databaseConnection = LogoDatabaseConnection(context)
         databaseConnection.open()
         databaseConnection.update(logo)
@@ -46,6 +49,7 @@ class LogoController {
     }
 
     fun deleteLogo(context: Context) {
+        imageManager.deleteImageFile(getLogo().imgUrl)
         val databaseConnection = LogoDatabaseConnection(context)
         databaseConnection.open()
         databaseConnection.delete(logo)
@@ -63,6 +67,22 @@ class LogoController {
 
     fun isLogoSelected(): Boolean {
         return getLogo().id != -1
+    }
+
+    fun getImage(activity: Activity): Bitmap {
+        return imageManager.getImageFromUri(
+            getLogo().imgUrl,
+            activity
+        )!!
+    }
+
+    fun copyImage(bitmap: Bitmap) {
+        imageManager.copyImage(bitmap, getLogo().imgUrl)
+    }
+
+    fun saveImage(bitmap: Bitmap, activity: Activity) {
+        val uri = imageManager.saveImageReturningUri(bitmap, activity)
+        setLogo(url=uri.toString())
     }
 
 }

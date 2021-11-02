@@ -1,4 +1,4 @@
-package es.uniovi.eii.stitchingbot.util
+package es.uniovi.eii.stitchingbot.arduinoCommunication
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -13,6 +13,7 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
+import es.uniovi.eii.stitchingbot.util.Constants
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream

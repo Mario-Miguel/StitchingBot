@@ -1,6 +1,5 @@
 package es.uniovi.eii.stitchingbot.ui.fragments.logos
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -12,18 +11,16 @@ import es.uniovi.eii.stitchingbot.controller.LogoController
 import es.uniovi.eii.stitchingbot.ui.canvas.toolsButtons.*
 import es.uniovi.eii.stitchingbot.util.Constants.CREATION_MODE
 import es.uniovi.eii.stitchingbot.util.Constants.LOGO
-import es.uniovi.eii.stitchingbot.util.ImageManager
-import kotlinx.android.synthetic.main.fragment_create_logo.*
+import kotlinx.android.synthetic.main.fragment_logo_editor.*
 
 
 /**
  * A simple [Fragment] subclass.
  * create an instance of this fragment.
  */
-class CreateLogoFragment : Fragment() {
+class LogoEditorFragment : Fragment() {
 
     private var isCreation: Boolean = true
-    private val imageManager = ImageManager()
     private val logoController = LogoController()
 
 
@@ -32,7 +29,7 @@ class CreateLogoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {        // Inflate the layout for this fragment
         setHasOptionsMenu(true)
-        return inflater.inflate(R.layout.fragment_create_logo, container, false)
+        return inflater.inflate(R.layout.fragment_logo_editor, container, false)
     }
 
 
@@ -78,26 +75,21 @@ class CreateLogoFragment : Fragment() {
     }
 
     private fun showLogoImage(){
-        imageManager.setPhotoUri(Uri.parse(logoController.getLogo().imgUrl))
-        val image = imageManager.getImageFromUri(activity=requireActivity())!!
+        val image = logoController.getImage(activity=requireActivity())
         canvasView.setImage(image)
     }
 
     private fun modifyLogo(){
         val bitmap = canvasView.getBitmapToSave()
-        imageManager.setPhotoUri(Uri.parse(logoController.getLogo().imgUrl))
-        imageManager.copyImage(bitmap)
-
-        logoController.setLogo("Try", imageManager.getPhotoUri().toString())
+        logoController.copyImage(bitmap)
         logoController.updateLogo(requireContext())
+
         Toast.makeText(requireContext(), "Logo modificado", Toast.LENGTH_LONG).show()
     }
 
     private fun saveLogo() {
         val bitmap = canvasView.getBitmapToSave()
-        imageManager.saveImage(bitmap, requireActivity())
-
-        logoController.setLogo("Try", imageManager.getPhotoUri().toString())
+        logoController.saveImage(bitmap, requireActivity())
         logoController.addLogo(requireContext())
         logoController.setLogo(logoController.getLastLogoAdded(requireContext()))
 
@@ -105,7 +97,6 @@ class CreateLogoFragment : Fragment() {
     }
 
     private fun deleteLogo(){
-        imageManager.deleteImageFile()
         logoController.deleteLogo(requireContext())
 
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)

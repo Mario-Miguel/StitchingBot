@@ -50,7 +50,7 @@ class DatabaseHelper(context: Context) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        TODO("Not yet implemented")
+
     }
 
     fun getInsertParamsSewingMachinesTable(sewingMachine: SewingMachine): ContentValues{

@@ -18,8 +18,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.ui.adapter.DevicesListAdapter
-import es.uniovi.eii.stitchingbot.util.ShowDialog
-import es.uniovi.eii.stitchingbot.util.BluetoothService
+import es.uniovi.eii.stitchingbot.ui.util.ShowDialog
+import es.uniovi.eii.stitchingbot.arduinoCommunication.BluetoothService
 import kotlinx.android.synthetic.main.fragment_arduino_connection.*
 import java.util.*
 
