@@ -7,7 +7,6 @@
     tools:context=".ui.fragments.arduino.ArduinoConnectionFragment">
 
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -25,7 +24,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:theme="@style/AppTheme.DARKBLUE"/>
 
         <LinearLayout
             android:id="@+id/linearLayout"
@@ -68,7 +68,8 @@
             app:layout_constraintHorizontal_bias="0.895"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.95" />
+            app:layout_constraintVertical_bias="0.95"
+            />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

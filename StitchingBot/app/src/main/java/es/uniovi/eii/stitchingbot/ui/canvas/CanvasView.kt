@@ -111,8 +111,10 @@ class CanvasView : View {
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val length =
-            if (widthMeasureSpec < heightMeasureSpec) widthMeasureSpec else heightMeasureSpec
+        val length = if (widthMeasureSpec < heightMeasureSpec)
+            widthMeasureSpec
+        else
+            heightMeasureSpec
 
         super.onMeasure(length, length)
     }

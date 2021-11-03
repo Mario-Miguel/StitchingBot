@@ -17,6 +17,7 @@
             android:id="@+id/btnUpArrow"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:contentDescription="@string/btn_up_arrow_description"
             android:src="@drawable/ic_baseline_arrow_up_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -28,6 +29,7 @@
             android:id="@+id/btnDownArrow"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:contentDescription="@string/btn_down_arrow_description"
             android:src="@drawable/ic_baseline_arrow_down_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -40,6 +42,7 @@
             android:id="@+id/btnLeftArrow"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:contentDescription="@string/btn_left_arrow_description"
             android:src="@drawable/ic_baseline_arrow_left_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -52,6 +55,7 @@
             android:id="@+id/btnRightArrow"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:contentDescription="@string/btn_right_arrow_description"
             android:src="@drawable/ic_baseline_arrow_right_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -65,7 +69,8 @@
             android:id="@+id/btnAutoHome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Auto Home"
+            android:text="@string/btn_auto_home"
+            android:theme="@style/AppTheme.DARKBLUE"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.503"
@@ -86,11 +91,12 @@
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@+id/btnAxisDone"
             app:layout_constraintTop_toBottomOf="@+id/btnAutoHome"
-            app:layout_constraintVertical_bias="0.263">
+            app:layout_constraintVertical_bias="0.263"
+            android:theme="@style/AppTheme.DARKBLUE">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:inputType="number"
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -105,7 +111,8 @@
             app:layout_constraintBottom_toBottomOf="@+id/txtMotorSteps"
             app:layout_constraintEnd_toEndOf="@+id/btnDisconnect"
             app:layout_constraintStart_toEndOf="@+id/txtMotorSteps"
-            app:layout_constraintTop_toTopOf="@+id/txtMotorSteps" />
+            app:layout_constraintTop_toTopOf="@+id/txtMotorSteps"
+            android:theme="@style/AppTheme.DARKBLUE"/>
 
         <Button
             android:id="@+id/btnAxisDone"
@@ -113,7 +120,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="50dp"
             android:layout_marginEnd="10dp"
-            android:text="¡Hecho!"
+            android:text="@string/btn_axis_done"
+            android:theme="@style/AppTheme.DARKBLUE"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnDisconnect"
             app:layout_constraintHorizontal_bias="0.5"
@@ -128,7 +136,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="50dp"
-            android:text="Desconectar"
+            android:text="@string/btn_disconnect"
+            android:theme="@style/AppTheme.DARKBLUE"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"

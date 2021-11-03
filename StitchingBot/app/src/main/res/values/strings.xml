@@ -45,4 +45,13 @@
     <string name="btn_pause_execution">Pausa</string>
     <string name="btn_stop_execution">Stop</string>
     <string name="btn_resume_execution">Reanudar</string>
+    <string name="btn_up_arrow_description">Move up</string>
+    <string name="btn_down_arrow_description">Move down</string>
+    <string name="btn_left_arrow_description">Move left</string>
+    <string name="btn_right_arrow_description">Move right</string>
+    <string name="btn_axis_done">¡Hecho!</string>
+    <string name="btn_disconnect">Desconectar</string>
+    <string name="btn_auto_home">Auto Home</string>
+    <string name="btn_save">Guardar</string>
+    <string name="btn_sew">Coser</string>
 </resources>

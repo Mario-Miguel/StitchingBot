@@ -99,7 +99,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.867" />
+            app:layout_constraintVertical_bias="0.867"
+            android:theme="@style/AppTheme.DARKBLUE"/>
 
         <Button
             android:id="@+id/btnStartExecution"
@@ -112,7 +113,8 @@
             app:layout_constraintHorizontal_bias="0.938"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.976" />
+            app:layout_constraintVertical_bias="0.976"
+            android:theme="@style/AppTheme.DARKBLUE"/>
 
         <Button
             android:id="@+id/btnStartTranslate"
@@ -124,7 +126,8 @@
             app:layout_constraintHorizontal_bias="0.486"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.976" />
+            app:layout_constraintVertical_bias="0.976"
+            android:theme="@style/AppTheme.DARKBLUE"/>
 
         <Button
             android:id="@+id/btnStopExecution"
@@ -137,7 +140,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.976"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:theme="@style/AppTheme.DARKBLUE"/>
 
         <Button
             android:id="@+id/btnPauseExecution"
@@ -150,7 +154,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.976"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:theme="@style/AppTheme.DARKBLUE"/>
 
         <Button
             android:id="@+id/btnResumeExecution"
@@ -163,7 +168,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.976"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:theme="@style/AppTheme.DARKBLUE"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
