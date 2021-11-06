@@ -8,19 +8,9 @@ import es.uniovi.eii.stitchingbot.ui.canvas.tools.LineTool
 
 class LineToolButton : ToolButton {
 
-    override fun setup(canvas: CanvasView) {
-        setImageResource(R.drawable.ic_method_draw_image)
-        setOnClickListener {
-            canvas.tool = LineTool()
-        }
-
-        super.setup(canvas)
-    }
-
     constructor(context: Context, canvas: CanvasView) : super(context) {
         setup(canvas)
     }
-
 
     constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
         context,
@@ -30,4 +20,12 @@ class LineToolButton : ToolButton {
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context) : super(context)
+
+    override fun setup(canvas: CanvasView) {
+        setImageResource(R.drawable.ic_method_draw_image)
+        setOnClickListener {
+            canvas.tool = LineTool()
+        }
+        super.setup(canvas)
+    }
 }

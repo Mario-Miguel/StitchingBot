@@ -9,7 +9,6 @@ class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(contex
     override fun insert(element: Logo) {
         val values = ContentValues()
         values.putAll(dbHelper!!.getInsertParamsLogosTable(element))
-
         database!!.insert(DatabaseHelper.TABLE_LOGOS, null, values)
     }
 
@@ -18,16 +17,13 @@ class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(contex
         values.putAll(dbHelper!!.getInsertParamsLogosTable(element))
         val where = "id=?"
         val whereArgs = arrayOf("${element.id}")
-
         database!!.update(DatabaseHelper.TABLE_LOGOS, values, where, whereArgs)
     }
 
     override fun delete(element: Logo) {
         val where = "id=?"
         val whereArgs = arrayOf("${element.id}")
-
         database!!.delete(DatabaseHelper.TABLE_LOGOS, where, whereArgs)
-
     }
 
     override fun getAllData(): ArrayList<Logo> {
@@ -54,12 +50,16 @@ class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(contex
             logos.add(logo)
             cursor.moveToNext()
         }
-
         cursor.close()
 
         return logos
     }
 
+    /**
+     * Obtiene el último logotipo añadido a la base de datos
+     *
+     * @return último logo añadido a la base de datos
+     */
     fun getLastElement(): Logo {
         val orderBy = "id DESC LIMIT 1"
         val cursor = database!!.query(
@@ -71,7 +71,6 @@ class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(contex
             null,
             orderBy
         )
-
         cursor.moveToFirst()
         val logo = Logo(
             cursor.getInt(0),

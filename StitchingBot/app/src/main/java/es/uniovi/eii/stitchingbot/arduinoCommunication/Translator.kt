@@ -25,23 +25,13 @@ object Translator {
     val actualProgress: LiveData<Int>
         get() = _actualProgress
 
+    /**
+     * Inicia el proceso de traducción del logotipo en órdenes a enviar al robot.
+     */
     fun run() {
         isInExecution = true
         _actualProgress.postValue(0)
-
-        Log.i(TAG_TRANSLATE, "${image.width} - ${image.height}")
-        //La relacion es de 50 pixeles <-> 1mm
-
-
-        val scaledBitmap = Bitmap.createScaledBitmap(image, WIDTH, HEIGHT, false)
-        Log.i(TAG_TRANSLATE, "Scaled: ${scaledBitmap.height}-${scaledBitmap.width}")
-
-        //Matriz que va a tener los pesos de los distintos nodos
-        weightMatrix = Array(scaledBitmap.height) {
-            IntArray(scaledBitmap.width)
-        }
-
-        translation = processData(scaledBitmap)
+        translation = processData(image)
         isInExecution = false
         translationDone = true
         _actualProgress.postValue(0)
@@ -49,10 +39,22 @@ object Translator {
         Log.i(TAG_TRANSLATE, "End of processing")
     }
 
-
+    /**
+     * Procesa la imagen del logotipo para crear una lista de coordenadas que enviar al robot.
+     *
+     * @param image imagen del logotipo
+     * @return MutableList<Pair<Int, Int>>, lista con las coordenadas que enviar al robot.
+     */
     private fun processData(
-        scaledBitmap: Bitmap,
+        image: Bitmap,
     ): MutableList<Pair<Int, Int>> {
+        val scaledBitmap = Bitmap.createScaledBitmap(image, WIDTH, HEIGHT, false)
+
+        //Matriz que va a tener los pesos de los distintos nodos
+        weightMatrix = Array(scaledBitmap.height) {
+            IntArray(scaledBitmap.width)
+        }
+
         val coords = mutableListOf<Pair<Int, Int>>()
 
         //Se añaden los puntos
@@ -64,11 +66,9 @@ object Translator {
                 if (pixel == Color.BLACK) {
                     coords.add(Pair(x, y))
                     weightMatrix[y][x] = POINT
-
                 }
             }
         }
-
         val orderedCoords = createCoordArray(coords).map {
             Pair(
                 (it.first * FACTOR_AJUSTE) + 16,
@@ -78,7 +78,12 @@ object Translator {
         return orderedCoords
     }
 
-
+    /**
+     * Método que ordena una lista de coordenadas de tal forma que se puedan ejecutar poor el robot.
+     *
+     * @param coords, lista con las coordenadas desordenadas
+     * @return MutableList<Pair<Int, Int>>, lista con las coordenadas ya ordenadas
+     */
     private fun createCoordArray(coords: MutableList<Pair<Int, Int>>): MutableList<Pair<Int, Int>> {
         val orderedCoordenates = mutableListOf<Pair<Int, Int>>()
         var actualCoord = coords[0]
@@ -134,17 +139,36 @@ object Translator {
                 checkCoordInHorizontal = true
                 checkCoordInVertical = false
             }
-
             counter++
             _actualProgress.postValue(((counter.toDouble() / coords.size.toDouble()) * 100).toInt())
         }
         return orderedCoordenates
     }
 
+    /**
+     * Comprueba si dos puntos se pueden utilizar como coordenada válida
+     *
+     * @param x valor x de la coordenada
+     * @param y valor y de la coordenada
+     */
     private fun checkPoint(x: Int, y: Int): Boolean {
-        return y + 1 < weightMatrix.size && y - 1 >= 0 && x + 1 < weightMatrix[0].size && x - 1 >= 0 && weightMatrix[y][x] == POINT
+        return y + 1 < weightMatrix.size
+                && y - 1 >= 0
+                && x + 1 < weightMatrix[0].size
+                && x - 1 >= 0
+                && weightMatrix[y][x] == POINT
     }
 
+    /**
+     * Método que añade una coordenada a la lista de coordenadas ya ordenadas.
+     *
+     * También actualiza el valor de la matriz de pesos en la coordenada en cuestion para que sea
+     * Int.MAX_VALUE
+     *
+     * @param x valor x de la coordenada
+     * @param y valor y de la coordenada
+     * @param orderedCoordenates, lista de coordenadas ya ordenadas
+     */
     private fun addCoordToOrderedArray(
         x: Int,
         y: Int,
@@ -156,6 +180,13 @@ object Translator {
         return actualCoord
     }
 
+    /**
+     * Método que encuentra la coordenada más cercana a otra.
+     *
+     * @param initialCoord coordenada de la cual se parte para encontrar la más cercana
+     * @param coords, lista de coordenadas totales
+     * @return Pair<Int, Int>, coordenada más cercana a la que se provee como parámetro
+     */
     private fun findNearestCoord(
         initialCoord: Pair<Int, Int>,
         coords: MutableList<Pair<Int, Int>>
@@ -177,6 +208,4 @@ object Translator {
         }
         return coordToReturn
     }
-
-
 }

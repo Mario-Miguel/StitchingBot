@@ -13,10 +13,6 @@ class ExecutingState : State() {
         summaryFragment.btnResumeExecution.visibility = View.GONE
         summaryFragment.btnStartTranslate.visibility = View.GONE
         summaryFragment.btnStartExecution.visibility = View.GONE
-
         summaryFragment.pbExecution.visibility = View.VISIBLE
-
     }
-
-
 }

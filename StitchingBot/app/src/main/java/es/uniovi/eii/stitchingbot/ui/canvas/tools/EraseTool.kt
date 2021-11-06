@@ -2,23 +2,20 @@ package es.uniovi.eii.stitchingbot.ui.canvas.tools
 
 import android.graphics.*
 
-class EraseTool: Tool() {
+class EraseTool : Tool() {
 
-    //TODO Terminar de hacer esto
     override var paint = Paint().apply {
         color = Color.WHITE
-        // Smooths out edges of what is drawn without affecting shape.
         isAntiAlias = true
-        // Dithering affects how colors with higher-precision than the device are down-sampled.
         isDither = true
-        style = Paint.Style.STROKE // default: FILL
-        strokeJoin = Paint.Join.ROUND // default: MITER
-        strokeCap = Paint.Cap.ROUND // default: BUTT
-        strokeWidth = 22f // default: Hairline-width (really thin)
+        style = Paint.Style.STROKE
+        strokeJoin = Paint.Join.ROUND
+        strokeCap = Paint.Cap.ROUND
+        strokeWidth = 22f
     }
 
     override fun touchStart(
-        beginCoordinate:PointF,
+        beginCoordinate: PointF,
         paint: Paint,
         path: Path
     ) {
@@ -29,7 +26,7 @@ class EraseTool: Tool() {
         path.moveTo(beginCoordinate.x, beginCoordinate.y)
     }
 
-    override fun touchMove(endCoordinate:PointF, path: Path, canvas: Canvas) {
+    override fun touchMove(endCoordinate: PointF, path: Path, canvas: Canvas) {
         path.quadTo(
             beginCoordinate.x,
             beginCoordinate.y,
@@ -43,7 +40,11 @@ class EraseTool: Tool() {
         canvas.drawPath(path, paint)
     }
 
-    override fun touchUp(endCoordinate:PointF, path: Path, canvas:Canvas) {
+    override fun touchUp(endCoordinate: PointF, path: Path, canvas: Canvas) {
         path.reset()
+    }
+
+    override fun draw(canvas: Canvas, paint: Paint) {
+
     }
 }

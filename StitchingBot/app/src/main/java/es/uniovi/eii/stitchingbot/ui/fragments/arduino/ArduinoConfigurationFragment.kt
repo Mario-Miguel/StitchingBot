@@ -18,13 +18,11 @@ import es.uniovi.eii.stitchingbot.arduinoCommunication.BluetoothService
 import kotlinx.android.synthetic.main.fragment_arduino_configuration.*
 import kotlinx.android.synthetic.main.fragment_arduino_configuration.txtMotorSteps
 
-
 class ArduinoConfigurationFragment : Fragment() {
 
     private var bluetoothService: BluetoothService = BluetoothService
     private var arduinoCommands = ArduinoCommands
     private var comesFromSummary: Boolean = false
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +31,6 @@ class ArduinoConfigurationFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_arduino_configuration, container, false)
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,34 +41,59 @@ class ArduinoConfigurationFragment : Fragment() {
         initUI()
     }
 
-
+    /**
+     * Inicia los elementos de la interfaz de esta pantalla
+     */
     private fun initUI() {
-        btnUpArrow.setOnClickListener { checkIsInInitialStateAndExecute{arduinoCommands.move(UP)} }
-        btnDownArrow.setOnClickListener { checkIsInInitialStateAndExecute { arduinoCommands.move(DOWN) } }
-        btnLeftArrow.setOnClickListener { checkIsInInitialStateAndExecute { arduinoCommands.move(LEFT) }}
-        btnRightArrow.setOnClickListener { checkIsInInitialStateAndExecute { arduinoCommands.move(RIGHT) } }
+        btnUpArrow.setOnClickListener { checkIsInInitialStateAndExecute { arduinoCommands.move(UP) } }
+        btnDownArrow.setOnClickListener {
+            checkIsInInitialStateAndExecute {
+                arduinoCommands.move(
+                    DOWN
+                )
+            }
+        }
+        btnLeftArrow.setOnClickListener {
+            checkIsInInitialStateAndExecute {
+                arduinoCommands.move(
+                    LEFT
+                )
+            }
+        }
+        btnRightArrow.setOnClickListener {
+            checkIsInInitialStateAndExecute {
+                arduinoCommands.move(
+                    RIGHT
+                )
+            }
+        }
         btnAutoHome.setOnClickListener { checkIsInInitialStateAndExecute { arduinoCommands.startAutoHome() } }
-
-        btnConfigTrySteps.setOnClickListener{checkIsInInitialStateAndExecute {tryStepsButtonAction()}}
-
-        btnAxisDone.setOnClickListener { onClickDone() }
-        btnDisconnect.setOnClickListener { onClickDisconnect() }
+        btnConfigTrySteps.setOnClickListener { checkIsInInitialStateAndExecute { onTryStepsButtonClick() } }
+        btnAxisDone.setOnClickListener { onDoneButtonClick() }
+        btnDisconnect.setOnClickListener { onDisconnectButtonClick() }
     }
 
-
+    /**
+     * Comprueba si el robot está ejecutando alguna acción. En caso contrario, ejecuta la acción
+     * que se le pasa por parámetro.
+     *
+     * @param function función que se desea ejecutar en caso de que el robot no esté ejecutando ninguna acción
+     */
     private fun checkIsInInitialStateAndExecute(function: () -> Unit) {
-        if(StateManager.isInitial()){
+        if (StateManager.isInitial()) {
             function()
-        }
-        else{
+        } else {
             ShowDialog.showDialogOK(
                 requireContext(),
                 "No se puede realizar esta acción, ejecución en curso",
-            ) { _, _ ->  }
+            ) { _, _ -> }
         }
     }
 
-    private fun tryStepsButtonAction() {
+    /**
+     * Acción que se ejecuta cuando el usuario pulsa el botón btnConfigTrySteps
+     */
+    private fun onTryStepsButtonClick() {
         val motorSteps = txtMotorSteps.editText!!.text.toString().toInt()
 
         if (bluetoothService.isBluetoothEnabled()) {
@@ -80,11 +102,14 @@ class ArduinoConfigurationFragment : Fragment() {
             ShowDialog.showDialogOK(
                 requireContext(),
                 "Se requiere Tener el bluetooth activado",
-            ) { _, _ ->  }
+            ) { _, _ -> }
         }
     }
 
-    private fun onClickDone() {
+    /**
+     * Acción que se ejecuta cuando el usuario pulsa el botón btnAxisDone
+     */
+    private fun onDoneButtonClick() {
         if (!comesFromSummary) {
             val navController = requireActivity().findNavController(R.id.nav_host_fragment)
             navController.popBackStack()
@@ -93,7 +118,10 @@ class ArduinoConfigurationFragment : Fragment() {
         }
     }
 
-    private fun onClickDisconnect() {
+    /**
+     * Acción que se ejecuta cuando el usuario pulsa el botón btnDisconnect
+     */
+    private fun onDisconnectButtonClick() {
         bluetoothService.closeConnectionSocket()
         if (!comesFromSummary) {
             val navController = requireActivity().findNavController(R.id.nav_host_fragment)
@@ -104,7 +132,10 @@ class ArduinoConfigurationFragment : Fragment() {
         }
     }
 
-    private fun goBackToSummary(status: String){
+    /**
+     * Acción que envía al usuario al fragment SummaryFragment
+     */
+    private fun goBackToSummary(status: String) {
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.getBackStackEntry(R.id.nav_summary).savedStateHandle.set(
             "arduino",

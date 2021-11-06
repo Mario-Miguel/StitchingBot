@@ -9,9 +9,23 @@ import androidx.core.content.res.ResourcesCompat
 import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.ui.canvas.CanvasView
 
-abstract class ToolButton: AppCompatImageButton {
+abstract class ToolButton : AppCompatImageButton {
 
-    open fun setup(canvas: CanvasView){
+    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
+        context,
+        attrs,
+        defStyle
+    )
+
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context) : super(context)
+
+    /**
+     * Inicia el botón de una herramienta
+     *
+     * @param canvas Canvas sobre el que se va a utilizar la herramienta
+     */
+    protected open fun setup(canvas: CanvasView) {
         setBackgroundColor(ResourcesCompat.getColor(resources, R.color.white, null))
         val outValue = TypedValue()
         context.theme.resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
@@ -21,29 +35,4 @@ abstract class ToolButton: AppCompatImageButton {
         val height = resources.getDimension(R.dimen.editor_buttons_width).toInt()
         layoutParams = LinearLayout.LayoutParams(width, height, 1F)
     }
-
-    /**
-     * Copy Constructor
-     * @param context
-     * @param attrs
-     * @param defStyle
-     */
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
-        context,
-        attrs,
-        defStyle
-    )
-
-    /**
-     * Copy Constructor
-     * @param context
-     * @param attrs
-     */
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-
-    /**
-     * Copy Constructor
-     * @param context
-     */
-    constructor(context: Context) : super(context)
 }

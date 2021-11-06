@@ -8,19 +8,9 @@ import es.uniovi.eii.stitchingbot.ui.canvas.tools.EraseTool
 
 class EraseToolButton : ToolButton {
 
-    override fun setup(canvas: CanvasView) {
-        setImageResource(R.drawable.ic_eraser)
-        setOnClickListener {
-            canvas.tool = EraseTool()
-        }
-
-        super.setup(canvas)
-    }
-
     constructor(context: Context, canvas: CanvasView) : super(context) {
         setup(canvas)
     }
-
 
     constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
         context,
@@ -30,4 +20,12 @@ class EraseToolButton : ToolButton {
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context) : super(context)
+
+    override fun setup(canvas: CanvasView) {
+        setImageResource(R.drawable.ic_eraser)
+        setOnClickListener {
+            canvas.tool = EraseTool()
+        }
+        super.setup(canvas)
+    }
 }

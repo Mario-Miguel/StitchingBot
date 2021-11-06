@@ -11,17 +11,46 @@ abstract class DatabaseConnection<T>(context: Context) {
         dbHelper = DatabaseHelper(context)
     }
 
+    /**
+     * Abre una conexión con la base de datos
+     */
     fun open() {
         database = dbHelper!!.writableDatabase
     }
 
+    /**
+     * Cierra la conexión con la base de datos
+     */
     fun close() {
         dbHelper!!.close()
     }
 
+    /**
+     * Añade un elemento a la base de datos
+     *
+     * @param element elemento que se desea añadir a la base de datos
+     */
     abstract fun insert(element: T)
+
+    /**
+     * Actualiza un elemento en la base de datos
+     *
+     * @param element elemento que se desea actualizar en la base de datos
+     */
     abstract fun update(element: T)
+
+    /**
+     * Elimina un elemento de la base de datos
+     *
+     * @param element elemento que se desea eliminar de la base de datos
+     */
     abstract fun delete(element: T)
+
+    /**
+     * Obtiene todos los elementos de la base de datos
+     *
+     * @return todos los elementos existentes en la base de datos
+     */
     abstract fun getAllData(): ArrayList<T>
 
 }

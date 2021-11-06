@@ -8,7 +8,7 @@ import android.graphics.PointF
 class FreeDrawingTool : Tool() {
 
     override fun touchStart(
-        beginCoordinate:PointF,
+        beginCoordinate: PointF,
         paint: Paint,
         path: Path
     ) {
@@ -20,7 +20,7 @@ class FreeDrawingTool : Tool() {
 
     }
 
-    override fun touchMove(endCoordinate:PointF, path: Path, canvas: Canvas) {
+    override fun touchMove(endCoordinate: PointF, path: Path, canvas: Canvas) {
         path.quadTo(
             beginCoordinate.x,
             beginCoordinate.y,
@@ -35,8 +35,11 @@ class FreeDrawingTool : Tool() {
 
     }
 
-    override fun touchUp(endCoordinate:PointF, path: Path, canvas:Canvas) {
+    override fun touchUp(endCoordinate: PointF, path: Path, canvas: Canvas) {
         path.reset()
+    }
+
+    override fun draw(canvas: Canvas, paint: Paint) {
     }
 
 }

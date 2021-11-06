@@ -13,16 +13,10 @@ import es.uniovi.eii.stitchingbot.util.Constants.CREATION_MODE
 import es.uniovi.eii.stitchingbot.util.Constants.LOGO
 import kotlinx.android.synthetic.main.fragment_logo_editor.*
 
-
-/**
- * A simple [Fragment] subclass.
- * create an instance of this fragment.
- */
 class LogoEditorFragment : Fragment() {
 
     private var isCreation: Boolean = true
     private val logoController = LogoController()
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,7 +26,6 @@ class LogoEditorFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_logo_editor, container, false)
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -41,13 +34,13 @@ class LogoEditorFragment : Fragment() {
         if (arguments != null) {
             isCreation = requireArguments().getBoolean(CREATION_MODE)
             logoController.setLogo(requireArguments().getParcelable(LOGO)!!)
-            if(logoController.getLogo().id>=0)
+            if (logoController.getLogo().id >= 0)
                 showLogoImage()
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        if(!isCreation){
+        if (!isCreation) {
             menu.clear()
             inflater.inflate(R.menu.delete_button, menu)
         }
@@ -55,57 +48,97 @@ class LogoEditorFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == R.id.action_delete){
-            deleteLogo()
+        if (item.itemId == R.id.action_delete) {
+            onDeleteLogoMenuClick()
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun loadButtonToolbar(){
-        buttonToolbar.addView(FreeDrawingToolButton(requireContext(), canvasView))
-        buttonToolbar.addView(CircleToolButton(requireContext(), canvasView))
-        buttonToolbar.addView(RectangleToolButton(requireContext(), canvasView))
-        buttonToolbar.addView(LineToolButton(requireContext(), canvasView))
-        buttonToolbar.addView(EraseToolButton(requireContext(), canvasView))
+    /**
+     * Carga la barra de herramientas que ofrece el editor
+     */
+    private fun loadButtonToolbar() {
+        getButtonsList().forEach { button -> buttonToolbar.addView(button) }
     }
 
-    private fun initializeButtons(){
-        btnDone.setOnClickListener { if(isCreation) saveLogo() else modifyLogo() }
-        btnSew.setOnClickListener { loadSummaryScreen() }
+    /**
+     * Devuelve la lista de herramientas que ofrece el editor
+     *
+     * @return lista con los botones de las herramientas
+     */
+    private fun getButtonsList(): Array<ToolButton> {
+        return arrayOf(
+            FreeDrawingToolButton(requireContext(), canvasView),
+            CircleToolButton(requireContext(), canvasView),
+            RectangleToolButton(requireContext(), canvasView),
+            LineToolButton(requireContext(), canvasView),
+            EraseToolButton(requireContext(), canvasView)
+        )
     }
 
-    private fun showLogoImage(){
-        val image = logoController.getImage(activity=requireActivity())
+    /**
+     * Inicializa los listeners de los botones de la vista
+     */
+    private fun initializeButtons() {
+        btnDone.setOnClickListener { onDoneButtonClick() }
+        btnSew.setOnClickListener { onSewButtonClick() }
+    }
+
+    /**
+     *  Muestra en el Canvas la imagen del logotipo seleccionado
+     */
+    private fun showLogoImage() {
+        val image = logoController.getImage(activity = requireActivity())
         canvasView.setImage(image)
     }
 
-    private fun modifyLogo(){
+    /**
+     * Maneja el evento del click en el botón btnDone
+     */
+    private fun onDoneButtonClick() {
+        if (isCreation)
+            saveLogo()
+        else
+            modifyLogo()
+    }
+
+    /**
+     * Se comunica con el controller para modificar el logotipo editado
+     */
+    private fun modifyLogo() {
         val bitmap = canvasView.getBitmapToSave()
         logoController.copyImage(bitmap)
         logoController.updateLogo(requireContext())
-
         Toast.makeText(requireContext(), "Logo modificado", Toast.LENGTH_LONG).show()
     }
 
+    /**
+     * Se comunica con el controller para guardar el logotipo
+     */
     private fun saveLogo() {
         val bitmap = canvasView.getBitmapToSave()
         logoController.saveImage(bitmap, requireActivity())
         logoController.addLogo(requireContext())
         logoController.setLogo(logoController.getLastLogoAdded(requireContext()))
-
         Toast.makeText(requireContext(), "Logo creado", Toast.LENGTH_LONG).show()
     }
 
-    private fun deleteLogo(){
+    /**
+     *  Maneja el evento del click en la opción de menú [R.id.action_delete]
+     */
+    private fun onDeleteLogoMenuClick() {
         logoController.deleteLogo(requireContext())
-
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.popBackStack()
     }
 
-    private fun loadSummaryScreen(){
+    /**
+     * Maneja el evento del click en el botón btnSew
+     */
+    private fun onSewButtonClick() {
         val bundle = bundleOf("logo" to logoController.getLogo())
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.navigate(R.id.nav_summary, bundle)
     }
+
 }

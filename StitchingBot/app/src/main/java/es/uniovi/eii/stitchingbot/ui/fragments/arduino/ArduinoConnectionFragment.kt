@@ -27,9 +27,11 @@ class ArduinoConnectionFragment : Fragment() {
 
     private lateinit var deviceAdapter: DevicesListAdapter
     private var bluetoothService: BluetoothService = BluetoothService
-
     private var comesFromSummary: Boolean = false
 
+    /**
+     * Evento para activar el bluetooth
+     */
     private val enableBluetooth = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
@@ -38,6 +40,9 @@ class ArduinoConnectionFragment : Fragment() {
         }
     }
 
+    /**
+     * Evento para pedir al usuario los permisos necesarios para el funcionamiento de esta pantalla
+     */
     private val getPermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             var granted = true
@@ -72,15 +77,12 @@ class ArduinoConnectionFragment : Fragment() {
         if (arguments != null) {
             comesFromSummary = requireArguments().getBoolean("summary")
         }
-
         if (BluetoothService.isConnected()) {
             startConfigurationFragment()
         }
 
         initBluetoothAdapter()
-        //Register receiver
         bluetoothService.registerReceiver(requireActivity()) { device -> addDeviceToAdapter(device) }
-
         initUI()
     }
 
@@ -91,26 +93,26 @@ class ArduinoConnectionFragment : Fragment() {
     }
 
     /**
-     * Función que inicia el BluetoothAdapter. Se encarga de pedir los permisos necesarios para el
-     * correcto funcionamiento.
+     * Función que inicia la acción de activar el bluetooth en el dispositivo y pide los permisos
+     * necesarios al usuario.
+     *
      */
     private fun initBluetoothAdapter() {
-        bluetoothService.enableBluetooth(enableBluetooth)
-
-        getPermissions.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.BLUETOOTH
+        bluetoothService.enableBluetoothAndExecute(enableBluetooth) {
+            getPermissions.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.BLUETOOTH
+                )
             )
-        )
+        }
     }
 
+    /**
+     * Inicia los elementos de la interfaz de esta pantalla
+     */
     private fun initUI() {
-        //Se crea el listener
-        val handler = DevicesListAdapter.OnItemClickListener { device -> bondDevice(device) }
-        //Se crea el adapter con el listener
-        deviceAdapter = DevicesListAdapter(handler)
-
+        deviceAdapter = DevicesListAdapter { device -> onDeviceClick(device) }
         rvDevicesList.adapter = deviceAdapter
         rvDevicesList.layoutManager = LinearLayoutManager(this.context)
         rvDevicesList.addItemDecoration(
@@ -119,12 +121,18 @@ class ArduinoConnectionFragment : Fragment() {
                 DividerItemDecoration.VERTICAL
             )
         )
-        fabDiscoverDevices.setOnClickListener { startDiscovery() }
+        fabDiscoverDevices.setOnClickListener { onDiscoverFABClick() }
     }
 
-    private fun bondDevice(bluetoothDevice: BluetoothDevice) {
+    /**
+     * Maneja el evento de click sobre un dispositivo.
+     *
+     * Empareja el dispositivo sobre el que se ha hecho click con la app
+     *
+     * @param bluetoothDevice dispositivo seleccionado
+     */
+    private fun onDeviceClick(bluetoothDevice: BluetoothDevice) {
         Thread {
-            // display the indefinite progressbar
             this@ArduinoConnectionFragment.requireActivity().runOnUiThread {
                 progressBar.visibility = View.VISIBLE
                 requireActivity().window.setFlags(
@@ -136,7 +144,6 @@ class ArduinoConnectionFragment : Fragment() {
             configureHandler()
             createConnection(bluetoothDevice)
 
-            // when the task is completed, make progressBar gone
             this@ArduinoConnectionFragment.requireActivity().runOnUiThread {
                 progressBar.visibility = View.GONE
                 requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
@@ -144,20 +151,29 @@ class ArduinoConnectionFragment : Fragment() {
         }.start()
     }
 
+    /**
+     *  Configura el Handler que maneja la conexión bluetooth con el dispositivo
+     */
     private fun configureHandler() {
         bluetoothService.setHandlerCommands({
-            Log.i("BluetoothStitching", "Conectado correctamente, cambiar de pantalla")
             startConfigurationFragment()
         }, {
-            Log.i("BluetoothStitching", "No se ha podido conectar")
             ShowDialog.showDialogOK(requireContext(), "No se ha podido conectar") { _, _ -> }
         })
     }
 
+    /**
+     * Inicia la conexión con un dispositivo
+     *
+     * @param bluetoothDevice dispositivo con el que se quiere establecer una conexión
+     */
     private fun createConnection(bluetoothDevice: BluetoothDevice) {
         bluetoothService.tryToConnect(bluetoothDevice)
     }
 
+    /**
+     * Lleva al usuario al fraagment [ArduinoConfigurationFragment]
+     */
     private fun startConfigurationFragment() {
         val bundle = bundleOf("summary" to comesFromSummary)
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
@@ -169,13 +185,15 @@ class ArduinoConnectionFragment : Fragment() {
      * Añade un nuevo dispositivo al adapter
      */
     private fun addDeviceToAdapter(device: BluetoothDevice) {
-        Log.i("BluetoothStitching", "Añadido dispositivo")
         deviceAdapter.addElement(device)
     }
 
-    private fun startDiscovery() {
+    /**
+     * Maneja el evento de hacer click sobre [fabDiscoverDevices]
+     */
+    private fun onDiscoverFABClick() {
         deviceAdapter.clearElements()
-        bluetoothService.enableBluetoothAndExecute(enableBluetooth){bluetoothService.startDiscovering()}
+        bluetoothService.enableBluetoothAndExecute(enableBluetooth) { bluetoothService.startDiscovering() }
     }
 
 }

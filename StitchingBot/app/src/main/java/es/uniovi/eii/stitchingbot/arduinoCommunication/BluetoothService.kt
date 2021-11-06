@@ -29,14 +29,13 @@ object BluetoothService {
     var startedProcess = false
 
     init {
-        setHandler({},{})
+        setHandler()
         initBluetoothAdapter()
     }
 
-    private fun getConnectionSocket(): BluetoothSocket? {
-        return connectionSocket
-    }
-
+    /**
+     * Cierra el socket de conexión bluetooth
+     */
     fun closeConnectionSocket() {
         try {
             if (connectionSocket != null)
@@ -46,10 +45,16 @@ object BluetoothService {
         }
     }
 
-    fun isConnected(): Boolean{
-        return if(connectionSocket == null) false else connectionSocket!!.isConnected
+    /**
+     * Funcion que devuelve el estado de conexión del socket bluetooth
+     */
+    fun isConnected(): Boolean {
+        return if (connectionSocket == null) false else connectionSocket!!.isConnected
     }
 
+    /**
+     * Escribe datos para ser enviados
+     */
     fun write(input: String) {
         val bytes = input.toByteArray() //converts entered String into bytes
         Log.i("BluetoothStitching", "Mensaje enviado")
@@ -60,33 +65,41 @@ object BluetoothService {
         }
     }
 
-    fun read(): Byte{
+    /**
+     * Lee los datos recibidos desde la entrada bluetooth
+     */
+    fun read(): Byte {
         return mmInStream.read().toByte()
     }
 
+    /**
+     * Método que intenta conectar el dispositivo móvil con el dispositivo bluetooth seleccionado
+     *
+     * @param bluetoothDevice Dispositivo bluetooth con el que establecer conexión
+     */
     fun tryToConnect(bluetoothDevice: BluetoothDevice) {
         bluetoothAdapter!!.cancelDiscovery()
         try {
-            //Try to create socket with uuid
             setConnectionSocket(
                 bluetoothDevice.createInsecureRfcommSocketToServiceRecord(
                     Constants.MY_UUID
                 )
             )
-            // Connect to the remote device through the socket. This call blocks
-            // until it succeeds or throws an exception.
-            getConnectionSocket()!!.connect()
+            connectionSocket!!.connect()
             Log.i(Constants.TAG_BLUETOOTH, "Device connected")
             handler.obtainMessage(Constants.CONNECTING_STATUS, 1, -1).sendToTarget()
         } catch (connectException: IOException) {
-            // Unable to connect; close the socket and return.
             closeConnectionSocket()
             handler.obtainMessage(Constants.CONNECTING_STATUS, -1, -1).sendToTarget()
-
         }
     }
 
-    private fun setReceiver(command:(bDevice:BluetoothDevice)->Unit) {
+    /**
+     * Inicia el recibidor
+     *
+     * @param command Acción a ejecutar en caso de que no se encuentre el dispositivo bluetooth
+     */
+    private fun setReceiver(command: (bDevice: BluetoothDevice) -> Unit) {
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 when (intent.action) {
@@ -94,10 +107,6 @@ object BluetoothService {
                         val bDevice: BluetoothDevice? =
                             intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                         if (bDevice != null) {
-                            Log.i(
-                                "BluetoothStitching",
-                                "Dispositivo: ${bDevice.name} - ${bDevice.address}"
-                            )
                             command(bDevice)
                         }
                     }
@@ -106,34 +115,50 @@ object BluetoothService {
         }
     }
 
-    fun registerReceiver(activity: Activity, command:(bDevice:BluetoothDevice)->Unit) {
+    /**
+     * Registra el receiver en la Activity que se le pasa por parámetro
+     *
+     * @param activity actividad a la que se le va a asociar el recibidor
+     * @param command acción que se desea ejecutar si no se encuentra el dispositivo
+     */
+    fun registerReceiver(activity: Activity, command: (bDevice: BluetoothDevice) -> Unit) {
         setReceiver { device -> command(device) }
         val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
         activity.registerReceiver(receiver, filter)
     }
 
-    fun unregisterReceiver(activity: Activity){
+    /**
+     * Elimina el recibidor de la Activity asoiciada
+     */
+    fun unregisterReceiver(activity: Activity) {
         activity.unregisterReceiver(receiver)
     }
 
-    fun setHandlerCommands(okCommand:()->Unit, errCommand:()->Unit){
+    /**
+     * Inicia las acciones a ejecutar en caso de éxito o fracaso
+     *
+     * @param okCommand accion a ejecutar en caso de éxito
+     * @param errCommand acción a ejecutar en caso de fracaso
+     */
+    fun setHandlerCommands(okCommand: () -> Unit, errCommand: () -> Unit) {
         setHandler(okCommand, errCommand)
     }
 
-    private fun setHandler(okCommand:()->Unit, errCommand:()->Unit){
+    /**
+     * Inicia el handler para la conexión con el dispositivo
+     *
+     * @param okCommand accion a ejecutar en caso de éxito
+     * @param errCommand acción a ejecutar en caso de fracaso
+     */
+    private fun setHandler(okCommand: () -> Unit = {}, errCommand: () -> Unit = {}) {
         handler = object : Handler(Looper.getMainLooper()) {
             override fun handleMessage(msg: Message) {
                 when (msg.what) {
                     Constants.CONNECTING_STATUS -> when (msg.arg1) {
                         1 -> {
-                            Log.i(
-                                "BluetoothStitching",
-                                "Conectado correctamente, cambiar de pantalla"
-                            )
                             okCommand()
                         }
                         -1 -> {
-                            Log.i("BluetoothStitching", "No se ha podido conectar")
                             errCommand()
                         }
                     }
@@ -142,6 +167,11 @@ object BluetoothService {
         }
     }
 
+    /**
+     * Inicia el socket de conexión bluetooth, el Stream de entrada y el Stream de salida
+     *
+     * @param socket socket de conexión bluetooth
+     */
     private fun setConnectionSocket(socket: BluetoothSocket) {
         connectionSocket = socket
         mmInStream = connectionSocket!!.inputStream
@@ -149,7 +179,9 @@ object BluetoothService {
     }
 
 //##################################################################################################
-
+    /**
+     * Inicia el [BluetoothAdapter]
+     */
     private fun initBluetoothAdapter() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if (bluetoothAdapter == null) {
@@ -157,38 +189,60 @@ object BluetoothService {
         }
     }
 
-    fun enableBluetooth(enableBluetooth: ActivityResultLauncher<Intent>) {
+    /**
+     * Lanza el evento de activación del bluetooth en caso de no estar activado ya
+     *
+     * @param enableBluetooth evento de activación del bluetooth del dispositivo móvil
+     */
+    private fun enableBluetooth(enableBluetooth: ActivityResultLauncher<Intent>) {
         if (!bluetoothAdapter!!.isEnabled) {
             Log.i("BluetoothStitching", "hay bluetooth disponible")
             enableBluetooth.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
         }
     }
 
-    fun enableBluetoothAndExecute(enableBluetooth: ActivityResultLauncher<Intent>, function: () -> Unit) {
+    /**
+     * Lanza el evento de activación del bluetooth en caso de no estar activado ya. En caso de no
+     * activarse, ejecuta la función pasada por parámetro
+     *
+     * @param enableBluetooth evento de activación del bluetooth del dispositivo móvil
+     * @param function función a ejecutar en caso de no activarse el bluetooth
+     */
+    fun enableBluetoothAndExecute(
+        enableBluetooth: ActivityResultLauncher<Intent>,
+        function: () -> Unit
+    ) {
         enableBluetooth(enableBluetooth)
-        if(isBluetoothEnabled()) {
+        if (isBluetoothEnabled()) {
             function()
         }
     }
 
-    fun isBluetoothEnabled(): Boolean{
-        return bluetoothAdapter !=null && bluetoothAdapter!!.isEnabled
+    /**
+     * Devuelve el estado de acivación del bluetooth del dispositivo móvil
+     *
+     * @return true si está activado o false en caso contrario
+     */
+    fun isBluetoothEnabled(): Boolean {
+        return bluetoothAdapter != null && bluetoothAdapter!!.isEnabled
     }
 
+    /**
+     * Inicia el escaneo de dispositivos bluetooth disponibles
+     */
     fun startDiscovering() {
         if (bluetoothAdapter!!.isDiscovering) {
-            Log.i("BluetoothStitching", "Cancel discovery")
             bluetoothAdapter!!.cancelDiscovery()
         }
-        Log.i("BluetoothStitching", "Start discovery")
         bluetoothAdapter!!.startDiscovery()
     }
 
+    /**
+     * Cancela el escaneo de dispositivos bluetooth disponibles
+     */
     fun cancelDiscovery() {
         if (bluetoothAdapter != null) {
             bluetoothAdapter!!.cancelDiscovery()
         }
     }
-
-
 }

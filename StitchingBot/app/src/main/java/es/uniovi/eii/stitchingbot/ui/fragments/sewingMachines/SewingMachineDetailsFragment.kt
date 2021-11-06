@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,34 +14,41 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
-import es.uniovi.eii.stitchingbot.controller.SewingMachineController
 import es.uniovi.eii.stitchingbot.arduinoCommunication.ArduinoCommands
 import es.uniovi.eii.stitchingbot.arduinoCommunication.BluetoothService
-import es.uniovi.eii.stitchingbot.util.Constants.CREATION_MODE
-import es.uniovi.eii.stitchingbot.util.Constants.TAG_SEWINGMACHINE
+import es.uniovi.eii.stitchingbot.controller.SewingMachineController
 import es.uniovi.eii.stitchingbot.ui.util.ShowDialog
+import es.uniovi.eii.stitchingbot.util.Constants.CREATION_MODE
 import kotlinx.android.synthetic.main.fragment_sewing_machine_details.*
 
-
-@RequiresApi(Build.VERSION_CODES.Q)
-private val PERMISSIONS = arrayOf(
-    Manifest.permission.CAMERA,
-    Manifest.permission.ACCESS_MEDIA_LOCATION
-)
-
-
 class SewingMachineDetailsFragment : Fragment() {
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private val permissions = arrayOf(
+        Manifest.permission.CAMERA,
+        Manifest.permission.ACCESS_MEDIA_LOCATION
+    )
+
     private var isCreation: Boolean = false
     private var sewingMachineController = SewingMachineController()
 
+    /**
+     * Evento para activar obtener una imagen de la galeria del dispositivo móvil
+     */
     private val getImageFromGallery = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { if (it != null) imagePick(it.toString()) }
 
+    /**
+     * Evento para activar obtener una imagen de la cámara del dispositivo móvil
+     */
     private val getImageFromCamera = registerForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { if (it) imageTake() }
 
+    /**
+     * Evento para pedir al usuario los permisos necesarios para el funcionamiento de esta pantalla
+     */
     private val getPermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             var granted = true
@@ -59,13 +65,11 @@ class SewingMachineDetailsFragment : Fragment() {
             }
 
             if (granted) {
-                Log.d(TAG_SEWINGMACHINE, "all permissions granted")
                 selectImage(requireContext())
             } else {
                 ShowDialog.showNotGrantedPermissionsMessage(nonGrantedPermissions, requireContext())
             }
         }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +77,6 @@ class SewingMachineDetailsFragment : Fragment() {
             isCreation = it.getBoolean(CREATION_MODE)
         }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,16 +86,15 @@ class SewingMachineDetailsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_sewing_machine_details, container, false)
     }
 
-
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (arguments != null)
+        if (arguments != null) {
             isCreation = requireArguments().getBoolean(CREATION_MODE)
+        }
 
         loadDefaultScreen()
-
         if (!isCreation) {
             loadUpdateScreen()
         }
@@ -108,39 +110,61 @@ class SewingMachineDetailsFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.action_delete) {
-            deleteMachine()
+            onDeleteMachineMenuClick()
         }
         return super.onOptionsItemSelected(item)
     }
 
-
+    /**
+     * Obtiene una imagen de la galería, la guarda en el almacenamiento de la app y la muestra en el
+     * componente [imgSewingMachineDetails]
+     *
+     * Función que se invoca al seleccionar una imagen de la galería del usuario.
+     *
+     * @param selectedImage url de la imagen seleccionada
+     */
     private fun imagePick(selectedImage: String) {
-        sewingMachineController.createImageFile(requireActivity()){_, file->sewingMachineController.copyImageFromFile(selectedImage, file, requireActivity())}
+        sewingMachineController.createImageFileAndDispatchAction(requireActivity()) { _, file ->
+            sewingMachineController.copyImageToFile(
+                selectedImage,
+                file,
+                requireActivity()
+            )
+        }
         imgSewingMachineDetails.setImageBitmap(
             sewingMachineController.getImage(requireActivity())
         )
     }
 
+    /**
+     * Obtiene una imagen scada con la cámara y la muestra en el componente [imgSewingMachineDetails]
+     */
     private fun imageTake() {
         imgSewingMachineDetails.setImageBitmap(
             sewingMachineController.getImage(requireActivity())
         )
     }
 
+    /**
+     * Carga la pantalla por defecto que se le mostrará al usuario
+     */
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun loadDefaultScreen() {
-        btnSewingMachineAction.setOnClickListener { confirmButtonAction() }
+        btnSewingMachineAction.setOnClickListener { onSewingMachineActionClick() }
         imgSewingMachineDetails.setOnClickListener {
-            getPermissions.launch(PERMISSIONS)
+            getPermissions.launch(permissions)
         }
         txtMotorSteps.editText!!.setText(sewingMachineController.getSewingMachine().motorSteps.toString())
-        btnTrySteps.setOnClickListener { tryStepsButtonAction() }
+        btnTrySteps.setOnClickListener { onTryStepsButtonClick() }
     }
 
+    /**
+     * Cambia los componentes para que se ajusten a la modificación de la máquina de coser
+     */
     private fun loadUpdateScreen() {
         sewingMachineController.setSewingMachine(requireArguments().getParcelable("machine")!!)
 
-        btnSewingMachineAction.text = "Modificar"
+        btnSewingMachineAction.text = getString(R.string.btn_sewing_machine_text)
         txtSewingMachineName.editText!!.setText(sewingMachineController.getSewingMachine().name)
         txtMotorSteps.editText!!.setText(sewingMachineController.getSewingMachine().motorSteps.toString())
 
@@ -151,41 +175,41 @@ class SewingMachineDetailsFragment : Fragment() {
         }
     }
 
-    private fun confirmButtonAction() {
+    /**
+     * Evento que se lanza al pulsar sobre el botón [btnSewingMachineAction]
+     */
+    private fun onSewingMachineActionClick() {
         if (checkFields()) {
             val name = txtSewingMachineName.editText!!.text.toString()
             val motorSteps = txtMotorSteps.editText!!.text.toString().toInt()
-            sewingMachineController.setSewingMachine(name=name, motorSteps=motorSteps)
-
-            Log.i("SMDETAILS", "img url: ${sewingMachineController.getSewingMachine()}")
+            sewingMachineController.setSewingMachine(name = name, motorSteps = motorSteps)
             if (isCreation) {
                 sewingMachineController.addSewingMachine(requireContext())
                 Toast.makeText(requireContext(), "Máquina creada", Toast.LENGTH_LONG).show()
-                Log.i(
-                    TAG_SEWINGMACHINE,
-                    "Insertada maquina de coser"
-                )
             } else {
                 sewingMachineController.updateSewingMachine(requireContext())
                 Toast.makeText(requireContext(), "Máquina modificada", Toast.LENGTH_LONG).show()
-                Log.i(
-                    TAG_SEWINGMACHINE,
-                    "Update maquina de coser"
-                )
             }
-
             goBack()
         } else {
             Toast.makeText(requireContext(), "Rellene todos los campos", Toast.LENGTH_LONG).show()
         }
     }
 
+    /**
+     * Comprueba que todos los campos requeridos para la modificación/creación de la máquina sean correctos
+     *
+     * @return true si todos los campos son correctos, false en caso contrario
+     */
     private fun checkFields(): Boolean {
         return txtSewingMachineName.editText!!.text.isNotBlank() && txtSewingMachineName.editText!!.text.isNotEmpty() && txtMotorSteps.editText!!.text.toString()
             .isNotBlank()
     }
 
-    private fun tryStepsButtonAction() {
+    /**
+     * Evento que se lanza al pulsar sobre el botón [btnTrySteps]
+     */
+    private fun onTryStepsButtonClick() {
         val arduinoCommands = ArduinoCommands
         val motorSteps = txtMotorSteps.editText!!.text.toString().toInt()
 
@@ -199,30 +223,41 @@ class SewingMachineDetailsFragment : Fragment() {
         }
     }
 
+    /**
+     * Lleva al usuario al fragment ArduinoConnectionFragment
+     */
     private fun goToArduinoConnectionFragment() {
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.navigate(R.id.nav_arduino_connection)
     }
 
-
-    private fun deleteMachine() {
+    /**
+     *  Maneja el evento del click en la opción de menú [R.id.action_delete]
+     */
+    private fun onDeleteMachineMenuClick() {
         sewingMachineController.deleteSewingMachine(requireContext())
         goBack()
     }
 
+    /**
+     * Muestra el dialogo utilizado para que el usuario decida cómo obtener la imagen de su máquina
+     * de coser
+     *
+     * @param context Conterxto desde el que se llama a la función
+     */
     private fun selectImage(context: Context) {
-        val options = arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")
+        val options = arrayOf<CharSequence>("Sacar foto", "Escoger de la galería", "Cancelar")
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-        builder.setTitle("Choose your sewing machine picture")
+        builder.setTitle("Escoge la foto de tu máquina de coser")
         builder.setItems(options) { dialog, item ->
             when {
-                options[item] == "Take Photo" -> {
-                    dispatchTakePictureIntent()
+                options[item] == "Sacar foto" -> {
+                    launchTakePictureIntent()
                 }
-                options[item] == "Choose from Gallery" -> {
+                options[item] == "Escoger de la galería" -> {
                     getImageFromGallery.launch("image/*")
                 }
-                options[item] == "Cancel" -> {
+                options[item] == "Cancelar" -> {
                     dialog.dismiss()
                 }
             }
@@ -230,14 +265,24 @@ class SewingMachineDetailsFragment : Fragment() {
         builder.show()
     }
 
-    private fun dispatchTakePictureIntent() {
+    /**
+     * Lanza el evento para sacar una foto
+     */
+    private fun launchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             takePictureIntent.resolveActivity(requireActivity().packageManager)?.also {
-                sewingMachineController.createImageFile(requireActivity()){photoURI, _ -> getImageFromCamera.launch(photoURI)}
+                sewingMachineController.createImageFileAndDispatchAction(requireActivity()) { photoURI, _ ->
+                    getImageFromCamera.launch(
+                        photoURI
+                    )
+                }
             }
         }
     }
 
+    /**
+     * Lleva una pantalla hacia atrás al usuario
+     */
     private fun goBack() {
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
         navController.popBackStack()

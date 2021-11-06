@@ -26,22 +26,25 @@ import es.uniovi.eii.stitchingbot.ui.util.ShowDialog
 import es.uniovi.eii.stitchingbot.util.*
 import kotlinx.android.synthetic.main.fragment_summary.*
 
-
-/**
- * A simple [Fragment] subclass.
- * Use the [SummaryFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class SummaryFragment : Fragment() {
 
     var logoController = LogoController()
     var sewingMachineController = SewingMachineController()
-
     val translator: Translator = Translator
     private val stateManager = StateManager
     private val bluetoothService = BluetoothService
     private val arduinoCommands: ArduinoCommands = ArduinoCommands
 
+    /**
+     * Evento para activar el bluetooth
+     */
+    private val enableBluetooth = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_CANCELED) {
+            Log.i("BluetoothStitching", "No se ha activado el bluetooth")
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,11 +59,10 @@ class SummaryFragment : Fragment() {
         pbExecution.visibility = View.GONE
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        loadActionButtons()
+        loadButtonsListeners()
         loadIncomingResources()
         loadCardViews()
         loadLiveDataObservers()
@@ -68,17 +70,21 @@ class SummaryFragment : Fragment() {
 
 //##################################################################################################
 
-    private fun loadActionButtons() {
+    /**
+     * Inicia los listeners de los botones de la interfaz
+     */
+    private fun loadButtonsListeners() {
         stateManager.showInterface(this)
-        btnStartTranslate.setOnClickListener { startTranslation() }
-        btnStartExecution.setOnClickListener { startExecution() }
-
+        btnStartTranslate.setOnClickListener { onStartTranslateButtonClick() }
+        btnStartExecution.setOnClickListener { onStartExecutionButtonClick() }
         btnPauseExecution.setOnClickListener { arduinoCommands.pauseExecution() }
         btnStopExecution.setOnClickListener { arduinoCommands.stopExecution() }
-        btnResumeExecution.setOnClickListener { resumeExecution() }
+        btnResumeExecution.setOnClickListener { onResumeExecutionButtonClick() }
     }
 
-
+    /**
+     * Carga los elementos que se le pasan a este fragment como argumentos
+     */
     private fun loadIncomingResources() {
         if (arguments != null) {
             val auxLogo = requireArguments().getParcelable<Logo>(Constants.LOGO)
@@ -89,12 +95,15 @@ class SummaryFragment : Fragment() {
                 logoController.setLogo(auxLogo)
             }
         }
-
         if (logoController.isLogoSelected()) {
             loadImageToCard(imgLogoSummary, logoController.getLogo().imgUrl)
         }
     }
 
+    /**
+     * Inicia los listenes de las CardViews del fragment. Tambien carga los datos de la máquina de
+     * coser seleccionada y del estado de conexión con el robot
+     */
     private fun loadCardViews() {
         cardViewLogo.setOnClickListener { loadLogoFragment() }
         cardViewSewingMachine.setOnClickListener { loadSewingMachineFragment() }
@@ -111,6 +120,9 @@ class SummaryFragment : Fragment() {
         updateArduinoStatus()
     }
 
+    /**
+     * Carga los observers necesarios para actualizar las barras de progreso y los estrados de la ejecución
+     */
     private fun loadLiveDataObservers() {
         translator.actualProgress.observe(viewLifecycleOwner,
             { newProgress -> updateProgressBar("Traducción completada", newProgress) })
@@ -121,6 +133,9 @@ class SummaryFragment : Fragment() {
         }
     }
 
+    /**
+     *
+     */
     private fun updateProgressBar(completionMessage: String, newProgress: Int) {
         pbExecution.progress = newProgress
         if (newProgress == 0) {
@@ -136,13 +151,20 @@ class SummaryFragment : Fragment() {
         }
     }
 
+    /**
+     * Carga la imagen de la máquina de coser seleccionada en el CardView correspondiente
+     */
     private fun loadImageToCard(imgComponent: ImageView, imgUrl: String?) {
-        val image = sewingMachineController.getImageFromUrl(requireActivity(), imgUrl)
+        val image = sewingMachineController.getImage(requireActivity(), imgUrl)
         imgComponent.setImageBitmap(image)
     }
 
 //##################################################################################################
 
+    /**
+     * Lleva al usuario al fragmento ArduinoConnectionFragment o ArduinoConfigurationFragment
+     * en función del estado de conexión.
+     */
     private fun loadArduinoFragment() {
         val bundle = bundleOf(Constants.SUMMARY to true)
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
@@ -152,6 +174,9 @@ class SummaryFragment : Fragment() {
             navController.navigate(R.id.nav_arduino_connection, bundle)
     }
 
+    /**
+     * Lleva al usuario al fragmento LogoEditorFragment
+     */
     private fun loadLogoFragment() {
         val bundle =
             bundleOf("creation" to false, Constants.LOGO to logoController.getLogo())
@@ -161,6 +186,9 @@ class SummaryFragment : Fragment() {
         navController.navigate(R.id.nav_create_logo, bundle)
     }
 
+    /**
+     * Lleva al usuario al fragmento SewingMachinesListFragment
+     */
     private fun loadSewingMachineFragment() {
         val bundle = bundleOf(Constants.SUMMARY to true)
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
@@ -169,18 +197,25 @@ class SummaryFragment : Fragment() {
 
 //##################################################################################################
 
+    /**
+     * Actualiza la CardView que contiene la imagen de la máquina de coser para que se corresponda
+     * con la seleccionada
+     */
     private fun updateSewingMachineCard() {
         loadImageToCard(imgSewingMachineSummary, sewingMachineController.getSewingMachine().imgUrl)
         txtSewingMachineSummary.text = sewingMachineController.getSewingMachine().name
     }
 
+    /**
+     * Actualiza la CardView que contiene el estado de conexión con el robot para que se corresponda
+     * con este
+     */
     private fun updateArduinoStatus() {
         val hasConnection = bluetoothService.isConnected()
         txtArduinoSummary.text = getString(
             R.string.txt_arduino_summary,
             if (hasConnection) "conectado" else "desconectado"
         )
-
         imgRobotSummary.setImageDrawable(
             getDrawable(
                 requireContext(),
@@ -194,7 +229,10 @@ class SummaryFragment : Fragment() {
 
 //##################################################################################################
 
-    private fun startTranslation() {
+    /**
+     * Evento lanzado al pulsar el botón [btnStartTranslate]
+     */
+    private fun onStartTranslateButtonClick() {
         Thread {
             stateManager.startTranslate()
             translator.image = logoController.getImage(requireActivity())
@@ -202,8 +240,10 @@ class SummaryFragment : Fragment() {
         }.start()
     }
 
-
-    private fun startExecution() {
+    /**
+     * Evento lanzado al pulsar el botón [btnStartExecution]
+     */
+    private fun onStartExecutionButtonClick() {
         bluetoothService.enableBluetoothAndExecute(enableBluetooth) {
             Thread {
                 arduinoCommands.startExecution(
@@ -213,34 +253,10 @@ class SummaryFragment : Fragment() {
         }
     }
 
-    private fun resumeExecution() {
+    /**
+     * Evento lanzado al pulsar el botón [btnResumeExecution]
+     */
+    private fun onResumeExecutionButtonClick() {
         bluetoothService.enableBluetoothAndExecute(enableBluetooth) { arduinoCommands.resumeExecution() }
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param logo Parameter 1.
-         * @param sewingMachine Parameter 2.
-         * @return A new instance of fragment SummaryFragment.
-         */
-        @JvmStatic
-        fun newInstance(logo: Logo, sewingMachine: SewingMachine) =
-            SummaryFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(Constants.LOGO, logo)
-                    putParcelable(Constants.SEWING_MACHINE, sewingMachine)
-                }
-            }
-    }
-
-    private val enableBluetooth = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_CANCELED) {
-            Log.i("BluetoothStitching", "No se ha activado el bluetooth")
-        }
     }
 }

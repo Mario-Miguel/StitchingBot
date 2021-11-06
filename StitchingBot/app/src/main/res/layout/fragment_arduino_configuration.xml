@@ -6,13 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.arduino.ArduinoConfigurationFragment">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <!--Botonera-->
-
         <ImageButton
             android:id="@+id/btnUpArrow"
             android:layout_width="60dp"
@@ -116,10 +114,9 @@
 
         <Button
             android:id="@+id/btnAxisDone"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="50dp"
-            android:layout_marginEnd="10dp"
             android:text="@string/btn_axis_done"
             android:theme="@style/AppTheme.DARKBLUE"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -132,10 +129,8 @@
 
         <Button
             android:id="@+id/btnDisconnect"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="50dp"
             android:text="@string/btn_disconnect"
             android:theme="@style/AppTheme.DARKBLUE"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -145,7 +140,6 @@
             app:layout_constraintStart_toEndOf="@+id/btnAxisDone"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.837" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

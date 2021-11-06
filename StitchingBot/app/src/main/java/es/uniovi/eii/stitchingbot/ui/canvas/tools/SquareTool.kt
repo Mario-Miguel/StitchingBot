@@ -7,12 +7,24 @@ import android.graphics.PointF
 
 class SquareTool : Tool() {
 
-    override fun draw(canvas:Canvas, paint: Paint) {
-        canvas.drawRect(beginCoordinate.x, beginCoordinate.y, endCoordinate.x, endCoordinate.y, paint)
+    override fun draw(canvas: Canvas, paint: Paint) {
+        canvas.drawRect(
+            beginCoordinate.x,
+            beginCoordinate.y,
+            endCoordinate.x,
+            endCoordinate.y,
+            paint
+        )
     }
 
-    override fun touchUp(endCoordinate:PointF, path: Path, canvas: Canvas) {
-        canvas.drawRect(beginCoordinate.x, beginCoordinate.y, endCoordinate.x, endCoordinate.y, paint)
+    override fun touchUp(endCoordinate: PointF, path: Path, canvas: Canvas) {
+        canvas.drawRect(
+            beginCoordinate.x,
+            beginCoordinate.y,
+            endCoordinate.x,
+            endCoordinate.y,
+            paint
+        )
     }
 
 }

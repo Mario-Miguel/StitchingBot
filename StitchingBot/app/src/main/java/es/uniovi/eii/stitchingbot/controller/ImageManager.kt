@@ -1,6 +1,5 @@
 package es.uniovi.eii.stitchingbot.controller
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -17,15 +16,23 @@ import java.util.*
 
 class ImageManager {
 
+    /**
+     * Obtiene una imagen de una url dada
+     *
+     * Abre el archivo especificado en la url y lo rota para que la imagen siempre se vea
+     * correctamente
+     *
+     * @param url Url del archivo que se desea abrir
+     * @param activity Actividad desde la que se llama a la función
+     * @return Bitmap con la imagen cargada y rotada, null si el archivo no existe
+     */
     fun getImageFromUri(url: String?, activity: Activity): Bitmap? {
         var image: Bitmap
-        val selectedUri=Uri.parse(url)
+        val selectedUri = Uri.parse(url)
         if (selectedUri != null) {
             activity.contentResolver.openFileDescriptor(selectedUri, "r")
                 .use { pfd ->
                     if (pfd != null) {
-                        val matrix = Matrix()
-                        matrix.postRotate(180F)
                         image = BitmapFactory.decodeFileDescriptor(pfd.fileDescriptor)
                         //Rotate bitmap
                         val ei = activity.contentResolver.openInputStream(selectedUri)?.let {
@@ -47,12 +54,17 @@ class ImageManager {
                         }
                     }
                 }
-
         }
         return null
     }
 
-
+    /**
+     * Rota una imagen
+     *
+     * @param source Bitmap con la imagen que se desea rotar
+     * @param angle Ángulo que se desea rotar la imagen
+     * @return Bitmap con la imagen rotada
+     */
     private fun rotateImage(source: Bitmap, angle: Float): Bitmap? {
         val matrix = Matrix()
         matrix.postRotate(angle)
@@ -62,34 +74,62 @@ class ImageManager {
         )
     }
 
-    fun deleteImageIfSaved(url: String?){
-        if(!url.isNullOrEmpty()){
+    /**
+     * Elimina una imagen si ya esta guardada en el dispositivo
+     *
+     * @param url de la imagen.
+     */
+    fun deleteImageIfSaved(url: String?) {
+        if (!url.isNullOrEmpty()) {
             deleteImageFile(url)
         }
     }
 
-
+    /**
+     * Elimina una imagen guardada en una url
+     *
+     * @param url url del archivo que se desea eliminar
+     */
     fun deleteImageFile(url: String?) {
-        //TODO hacer mensaje de confirmación
         val file = File(Uri.parse(url).path!!)
         if (file.exists()) {
             file.delete()
         }
     }
 
-
-    fun saveImageReturningUri(bitmap: Bitmap?, activity: Activity):Uri {
+    /**
+     * Guarda una imagen en un archivo y devuelve la dirección de este archivo
+     *
+     * @param bitmap Bitmap con la imagen que se desea guardar
+     * @param activity actividad desde la que se llama a la función
+     *
+     * @return Uri del archivo creado
+     */
+    fun saveImageReturningUri(bitmap: Bitmap?, activity: Activity): Uri {
         val file = createImageFile(activity)
-        saveImageToFile(bitmap, file)
+        saveImageToFile(bitmap, file!!)
         return Uri.fromFile(file)
     }
 
-    fun copyImage(bitmap: Bitmap?, url:String?) {
+    /**
+     * Copia una imagen en un archivo ya creado
+     *
+     * @param bitmap Bitmap con la imagen que se desea guardar
+     * @param url Url del archivo de la imagen
+     */
+    fun copyImage(bitmap: Bitmap?, url: String?) {
         val file = File(Uri.parse(url).path!!)
         saveImageToFile(bitmap, file)
     }
 
-    fun copyImageFromGallery(selectedImage: String, file: File, activity: Activity){
+    /**
+     * Copia una imagen obtenida de la galeria del usuario
+     *
+     * @param selectedImage url de la imagen seleccionada
+     * @param file archivo al que se quiere copiar la imagen
+     * @param activity Actividad desde la que se llama a esta función
+     */
+    fun copyImageFromGallery(selectedImage: String, file: File, activity: Activity) {
         val bitmap = getImageFromUri(
             selectedImage,
             activity
@@ -97,7 +137,12 @@ class ImageManager {
         saveImageToFile(bitmap, file)
     }
 
-
+    /**
+     * Guarda una imagen en un archivo
+     *
+     * @param bitmap Bitmap de la imagen que se desea guardar
+     * @param file archivo en el que se quiere guardar la imagen
+     */
     private fun saveImageToFile(bitmap: Bitmap?, file: File) {
         val destination = FileOutputStream(file)
         if (bitmap != null) {
@@ -107,32 +152,32 @@ class ImageManager {
         destination.close()
     }
 
-
-    @SuppressLint("SimpleDateFormat")
-    fun createImageFile(activity: Activity): File {
-        // Create an image file name
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val storageDir: File? =
-            activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "SEWMACH_${timeStamp}_", /* prefix */
-            ".jpg", /* suffix */
-            storageDir /* directory */
-        )
-    }
-
-    fun createPhotoFile(activity: Activity): File? {
-        // Create the File where the photo should go
+    /**
+     * Crea un archivo para guardar la imagen
+     *
+     * Se crea un nombre para el archivo basado en la fecha y hora en el que se genera,
+     * con el sufijo '.jpg'
+     *
+     * @param activity actividad desde la que se llama al método
+     * @return File generado
+     */
+    fun createImageFile(activity: Activity): File? {
         val photoFile: File? = try {
-            createImageFile(activity)
+            // Create an image file name
+            val timeStamp: String =
+                SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val storageDir: File? =
+                activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            return File.createTempFile(
+                "STITCHING_${timeStamp}_",
+                ".jpg",
+                storageDir
+            )
         } catch (ex: IOException) {
             // Error occurred while creating the File
             Log.i("ImageManager", "Error creando archivo")
             null
         }
-
         return photoFile
     }
-
-
 }

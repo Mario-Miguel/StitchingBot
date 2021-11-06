@@ -14,17 +14,14 @@ import kotlinx.android.synthetic.main.fragment_logos_list.*
 
 class LogosListFragment : Fragment() {
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         setHasOptionsMenu(true)
         return inflater.inflate(R.layout.fragment_logos_list, container, false)
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,7 +46,11 @@ class LogosListFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-
+    /**
+     * Envía al usuario al  fragment LogoEditorFragment
+     *
+     * @param logo logotipo seleccionado
+     */
     private fun navigateToCreation(logo: Logo) {
         val isCreationMode = (logo.id < 0)
         val bundle = bundleOf("creation" to isCreationMode, "logo" to logo)
