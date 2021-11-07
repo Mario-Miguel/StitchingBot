@@ -5,32 +5,64 @@ alto = 65;
 grosor_caja = 5;
 ancho_interior = ancho-(grosor_caja*2);
 largo_interior = largo-(grosor_caja*2);
-alto_interior = alto-grosor_caja;
+alto_interior = alto-grosor_caja+1;
 radio_tornillo = 1.2;
 radio_eje_rodamiento = 13;
 
 //Caja para colocar el motor
 module cajaMotor(){
     difference(){
-        cube([ancho,largo, alto]); 
-        translate([5,5,5])
-            cube([ancho_interior, largo_interior, alto_interior+1]);
+        union(){
+            difference(){
+                cube([ancho,largo, alto]); 
+                translate([5,5,5])
+                    cube([ancho_interior, largo_interior, alto_interior]);
+            }
+            
+            //Sujecciones tornillos
+            sujecciones_tornillos_tapa();
+        }
+        
+        tornillos_tapa(60);
+        //Hueco para el eje del motor -> 21.25+23,75
+        huecoRodamiento(45, 0, 35);
     }
-    
+}
+
+module sujecciones_tornillos_tapa(){
     //Sujecciones tornillos
-    translate([grosor_caja, grosor_caja, 0])
-        cube([grosor_caja, grosor_caja, alto]);
-    translate([ancho_interior, grosor_caja, 0])
-        cube([grosor_caja, grosor_caja, alto]);
-    translate([grosor_caja, largo_interior, 0])
-        cube([grosor_caja, grosor_caja, alto]);
-    translate([ancho_interior, largo_interior, 0])
-        cube([grosor_caja, grosor_caja, alto]);
+    pos_cubos_tornillos = [
+        [grosor_caja,grosor_caja], 
+        [ancho_interior,grosor_caja], 
+        [grosor_caja,largo_interior], 
+        [ancho_interior,largo_interior]
+    ];
+    for(i=[0:len(pos_cubos_tornillos)-1]){
+        translate([pos_cubos_tornillos[i][0], pos_cubos_tornillos[i][1], 0])
+            cube([grosor_caja, grosor_caja, alto]);
+    }
+}
+
+module tornillos_tapa(alto){
+    //Huecos para los tornillos de la tapa
+    pos_tornillos_tapa = [
+        [0,0],
+        [ancho, 0],
+        [0,largo],
+        [ancho,largo]
+    ];
+    for(c=[0:len(pos_tornillos_tapa)-1]){
+        huecoTornillo(
+            abs(grosor_caja-pos_tornillos_tapa[c][0]),       
+            abs(grosor_caja-pos_tornillos_tapa[c][1]), 
+            alto
+        );
+    }
 }
 
 //Tapa de la caja
 module tapa(){
-    cube([110,135, 5]); 
+    cube([ancho,largo, 5]); 
 }
 
 //Hueco para los tornillos para fijar la tapa
@@ -60,30 +92,14 @@ module huecoRodamiento(x, y, z){
 
 //Módulo principal
 module soporteVarilla(conTapa){
-    
-    difference(){
-        cajaMotor();
-        
-        //Huecos para los tornillos
-        huecoTornillo(grosor_caja, grosor_caja, 60);
-        huecoTornillo(ancho-grosor_caja, grosor_caja, 60);
-        huecoTornillo(grosor_caja, largo-grosor_caja, 60);
-        huecoTornillo(ancho-grosor_caja, largo-grosor_caja, 60);
-        
-        //Hueco para el eje del motor -> 21.25+23,75
-        huecoRodamiento(45, 0, 35);
-        
-        
-    }
+    cajaMotor();
+              
     if(conTapa){
         translate([0,0,65]){
             difference(){
                 color("Aqua") tapa();
                 //Huecos para los tornillos
-                huecoTornillo(grosor_caja, grosor_caja, 3);
-                huecoTornillo(ancho-grosor_caja, grosor_caja, 3);
-                huecoTornillo(grosor_caja, largo-grosor_caja, 3);
-                huecoTornillo(ancho-grosor_caja, largo-grosor_caja, 3);
+                tornillos_tapa(3);
 
             }
         }
