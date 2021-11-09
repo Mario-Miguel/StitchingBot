@@ -1,3 +1,6 @@
+/**
+* Genera la extensión de la pieza donde se atornillará la tuerca de la varilla roscada.
+*/
 module sujeccionTuerca(){
     difference(){
         cube([20,25,25]);
@@ -23,20 +26,14 @@ module sujeccionTuerca(){
                 pos_tornillos_varilla[i][0],
                 pos_tornillos_varilla[i][1]);
         }
-        
-//        translate([0,12.5,18])
-//            rotate([0,90,0])
-//                cylinder(h=60, d=3.6, center=true, $fn=360);
-//        translate([0,4.5,10])
-//            rotate([0,90,0])
-//                cylinder(h=60, d=3.6, center=true, $fn=360);
-//        translate([0,21.5,10])
-//            rotate([0,90,0])
-//                cylinder(h=60, d=3.6, center=true, $fn=360);
     }
-    
 }
 
+/**
+* Genera el hueco para colocar un tornillo para fijar la tuerca de la varilla roscada
+*
+* @params x,y,z coordenadas en las que debe estar el hueco.
+*/
 module huecoTornilloVarilla(x, y, z){
     translate([x,y,z])
             rotate([0,90,0])
@@ -48,6 +45,12 @@ module huecoTornilloVarilla(x, y, z){
                 );
 }
 
+
+/**
+* Genera la extensión de la pieza utilizada para dar estabilidad a la pieza.
+*
+* Por ella pasarán las dos varillas roscadas de la parte superior.
+*/
 module sujeccionTuercaLarga(){
     difference(){
         cube([15,25,65]);
@@ -63,11 +66,14 @@ module sujeccionTuercaLarga(){
     }
 }
 
+
+/**
+* Genera las extensiones por las que pasarán las varillas roscadas
+*/
 module sujeccionesTuercas(){
     translate([5,0,25])
         rotate([270,0,0]){
             sujeccionTuerca();
-            
             translate([90,25,0])
                 rotate([0,0,180])
                     sujeccionTuerca();
@@ -76,39 +82,10 @@ module sujeccionesTuercas(){
         }
 }
 
-module pandereta(){
-    
-
-    translate([0,10,0]){
-        translate([5,5,0])
-            difference(){
-                cube([140,90,3]);
-                translate([5,5,0])
-                roundedCube([130,80,25], 3);
-            }
-            
-        difference(){
-            roundedCube([150,100,20], 2);
-            translate([5,5,-1])
-                roundedCube([140,90,25], 3);
-            translate([-1, -1, -3])
-                cube([152, 102, 3]);
-            translate([-1, -1, 15])
-                cube([152, 102, 3]);
-        }
-    }
-    
-}
-
-module roundedCube(d,r) {
-    minkowski() {
-        translate([r,r]) cube([d[0]-2*r, d[1]-2*r, d[2]-2*r]);
-        sphere(r, $fn=50);
-    }
-}
-
-module unionTuercasPandereta(){
-    
+/**
+* Genera la parte que une las sujecciones para las tuercas con el bastidor donde se colocará la tela
+*/
+module unionTuercasBastidor(){
     hull(){
         translate([5,0,0])
             cube([90, 2, 25]);
@@ -117,29 +94,19 @@ module unionTuercasPandereta(){
     }
 }
 
+
+/**
+* Módulo principal del archivo.
+* 
+* Genera la pieza completa creada en este script.
+*/
 module sujeccionTela(){
     translate([0,0,0])
         sujeccionesTuercas();
     translate([0,25,0])
-        unionTuercasPandereta();
-    
-//    translate([0,25,0])
-//        pandereta();
-//    
-//    translate([6.5,41.5,10])
-//        cierre();
+        unionTuercasBastidor();
 }
 
-module cierre(){
-    difference(){
-        roundedCube([137,87,17], 2);
-        translate([5,5,-1])
-            roundedCube([127,77,25], 3);
-        translate([-1, -1, -3])
-            cube([152, 102, 3]);
-        translate([-1, -1, 12])
-            cube([152, 102, 3]);
-    }
-}
 
+//Mostrar la pieza
 sujeccionTela();

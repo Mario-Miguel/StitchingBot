@@ -9,8 +9,10 @@ alto_interior = alto-grosor_caja+1;
 radio_tornillo = 1.2;
 radio_eje_rodamiento = 13;
 
-//Caja para colocar el motor
-module cajaMotor(){
+/**
+* Crea la caja principal donde se colocará el rodamiento
+*/
+module cajaRodamiento(){
     difference(){
         union(){
             difference(){
@@ -29,6 +31,9 @@ module cajaMotor(){
     }
 }
 
+/**
+* Crea los soportes que tiene la caja para poder atornillar la tapa
+*/
 module sujecciones_tornillos_tapa(){
     //Sujecciones tornillos
     pos_cubos_tornillos = [
@@ -43,6 +48,11 @@ module sujecciones_tornillos_tapa(){
     }
 }
 
+/**
+* Crea los huecos para los tornillos que fijan la tapa.
+*
+* @param alto altura de los huecos de los tornillos.
+*/
 module tornillos_tapa(alto){
     //Huecos para los tornillos de la tapa
     pos_tornillos_tapa = [
@@ -60,18 +70,28 @@ module tornillos_tapa(alto){
     }
 }
 
-//Tapa de la caja
+/**
+* Crea la tapa de la pieza
+*/
 module tapa(){
     cube([ancho,largo, 5]); 
 }
 
-//Hueco para los tornillos para fijar la tapa
+/**
+* Crea los huecos para los tornillos para fijar la tapa
+* 
+* @params x,y,z coordenadas utilizadas para colocar el hueco del tornillo.
+*/
 module huecoTornillo(x, y, z){
     translate([x, y, z])
         cylinder(h=10.5, r=radio_tornillo, center=true, $fn=360);
 }
 
-//Huego para sacar el rodamiento
+/**
+* Genera los huecos necesarios para sujetar el rodamiento a la caja
+*
+* @params x,y,z coordenadas utilizadas para centrar el hueco del eje del motor.
+*/
 module huecoRodamiento(x, y, z){
     translate([x, y, z]){
         rotate([90,0,0])
@@ -90,9 +110,15 @@ module huecoRodamiento(x, y, z){
 
 
 
-//Módulo principal
+/**
+* Módulo principal del archivo.
+* 
+* Genera la pieza completa creada en este script.
+*
+* @param conTapa Boolean que indica si se desea mostrar la tapa de la pieza o no
+*/
 module soporteVarilla(conTapa){
-    cajaMotor();
+    cajaRodamiento();
               
     if(conTapa){
         translate([0,0,65]){

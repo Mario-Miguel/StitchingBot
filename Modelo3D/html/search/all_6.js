@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['stitchingbot_24',['StitchingBot',['../index.html',1,'']]],
+  ['soportemotor_25',['soporteMotor',['../SoporteMotor_8scad.html#aa0f424d79b1a0f5368a6c362a2a395fc',1,'soporteMotor(conTapa):&#160;SoporteMotor.scad'],['../SoporteMotor_8scad.html#a629f99c4dbbe384237699e4bcc23213c',1,'soporteMotor(false):&#160;SoporteMotor.scad']]],
+  ['soportemotor_2escad_26',['SoporteMotor.scad',['../SoporteMotor_8scad.html',1,'']]],
+  ['soportemotorsuperior_27',['soporteMotorSuperior',['../SoporteMotorSuperior_8scad.html#a7181fce9aba30b12e35177834d28998e',1,'soporteMotorSuperior(conTapa):&#160;SoporteMotorSuperior.scad'],['../SoporteMotorSuperior_8scad.html#a1415e9b43d398b36134ff553609b7184',1,'soporteMotorSuperior(false):&#160;SoporteMotorSuperior.scad']]],
+  ['soportemotorsuperior_2escad_28',['SoporteMotorSuperior.scad',['../SoporteMotorSuperior_8scad.html',1,'']]],
+  ['soportetela_2escad_29',['SoporteTela.scad',['../SoporteTela_8scad.html',1,'']]],
+  ['soportevarilla_30',['soporteVarilla',['../SoporteVarilla_8scad.html#ab3a36f0ffcdd2e853e70923bfc8e966c',1,'soporteVarilla(conTapa):&#160;SoporteVarilla.scad'],['../SoporteVarilla_8scad.html#a16d35cbab1161fed05d3bb2e3ef8c3f7',1,'soporteVarilla(false):&#160;SoporteVarilla.scad']]],
+  ['soportevarilla_2escad_31',['SoporteVarilla.scad',['../SoporteVarilla_8scad.html',1,'']]],
+  ['soportevarillasuperior_32',['soporteVarillaSuperior',['../SoporteVarillaSuperior_8scad.html#a7e1b1fae320f79533f713661d9c312dd',1,'soporteVarillaSuperior(conTapa):&#160;SoporteVarillaSuperior.scad'],['../SoporteVarillaSuperior_8scad.html#a4c999edea554e2f7c312cdb20713a99f',1,'soporteVarillaSuperior(false):&#160;SoporteVarillaSuperior.scad']]],
+  ['soportevarillasuperior_2escad_33',['SoporteVarillaSuperior.scad',['../SoporteVarillaSuperior_8scad.html',1,'']]],
+  ['stitchingbot_2escad_34',['StitchingBot.scad',['../StitchingBot_8scad.html',1,'']]],
+  ['sujecciones_5ftornillos_5ftapa_35',['sujecciones_tornillos_tapa',['../SoporteMotor_8scad.html#ace7bac4fe9bfd45ac0acb5ea37a51af2',1,'sujecciones_tornillos_tapa():&#160;SoporteMotor.scad'],['../SoporteMotorSuperior_8scad.html#ace7bac4fe9bfd45ac0acb5ea37a51af2',1,'sujecciones_tornillos_tapa():&#160;SoporteMotorSuperior.scad'],['../SoporteVarilla_8scad.html#ace7bac4fe9bfd45ac0acb5ea37a51af2',1,'sujecciones_tornillos_tapa():&#160;SoporteVarilla.scad'],['../SoporteVarillaSuperior_8scad.html#ace7bac4fe9bfd45ac0acb5ea37a51af2',1,'sujecciones_tornillos_tapa():&#160;SoporteVarillaSuperior.scad']]],
+  ['sujeccionestuercas_36',['sujeccionesTuercas',['../SoporteTela_8scad.html#af348e8b28e9e3fea63a1ff761fb59d78',1,'SoporteTela.scad']]],
+  ['sujeccionfinaldecarrera_37',['sujeccionFinalDeCarrera',['../SoporteVarillaSuperior_8scad.html#af975e297b3b8697bee06b813e85bd4ba',1,'SoporteVarillaSuperior.scad']]],
+  ['sujeccionmotor_38',['sujeccionMotor',['../SoporteMotor_8scad.html#aca9239a19e92d8b357b05d9c11bf8c61',1,'sujeccionMotor():&#160;SoporteMotor.scad'],['../SoporteMotorSuperior_8scad.html#aca9239a19e92d8b357b05d9c11bf8c61',1,'sujeccionMotor():&#160;SoporteMotorSuperior.scad']]],
+  ['sujecciontela_39',['sujeccionTela',['../SoporteTela_8scad.html#a0ec7e7cc8f1741681fd5cada181043cc',1,'SoporteTela.scad']]],
+  ['sujecciontuerca_40',['sujeccionTuerca',['../SoporteMotorSuperior_8scad.html#a38ca4610989e7d10160b53de3c3a4791',1,'sujeccionTuerca():&#160;SoporteMotorSuperior.scad'],['../SoporteTela_8scad.html#a38ca4610989e7d10160b53de3c3a4791',1,'sujeccionTuerca():&#160;SoporteTela.scad'],['../SoporteVarillaSuperior_8scad.html#a38ca4610989e7d10160b53de3c3a4791',1,'sujeccionTuerca():&#160;SoporteVarillaSuperior.scad']]],
+  ['sujecciontuercalarga_41',['sujeccionTuercaLarga',['../SoporteTela_8scad.html#a08f1bfdba097765f334bba78e5943d94',1,'SoporteTela.scad']]]
+];

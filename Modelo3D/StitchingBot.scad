@@ -1,3 +1,16 @@
+/**
+ * @file StitchingBot.scad
+ *
+ * @mainpage StitchingBot
+ *
+ * @section description Descripción
+ * Documentación de todas las piezas del modelo 3D del robot StitchingBot.
+ *
+ * @section author Autor
+ * - Mario Miguel Blanco
+ *
+ */
+
 use<SoporteMotor.scad>
 use<SoporteMotorSuperior.scad>
 use<SoporteVarilla.scad>
@@ -16,7 +29,7 @@ translate([390, 0, 0]){
         //Superior
         translate([100,200,18])
             rotate([0,0,90])
-                soporteMotorSuperiorV2(false);
+                soporteMotorSuperior(false);
             }
 }
 
@@ -31,7 +44,7 @@ union(){
     //Superior
     translate([5,300,18])
         rotate([0, 0, 270])    
-            soporteVarillaSuperiorV2(false);
+            soporteVarillaSuperior(false);
 }
 
 

@@ -10,7 +10,9 @@ radio_tornillo = 1.2;
 radio_eje_motor = 12;
 alto_eje_motor = 35;
 
-//Caja para colocar el motor
+/**
+* Crea la caja principal donde se colocará el motor
+*/
 module cajaMotor(){
     difference(){
         union(){
@@ -33,6 +35,9 @@ module cajaMotor(){
     }
 }
 
+/**
+* Crea los soportes que tiene la caja para poder atornillar la tapa
+*/
 module sujecciones_tornillos_tapa(){
     //Sujecciones tornillos
     pos_cubos_tornillos = [
@@ -47,6 +52,12 @@ module sujecciones_tornillos_tapa(){
     }
 }
 
+
+/**
+* Crea los huecos para los tornillos que fijan la tapa.
+*
+* @param alto altura de los huecos de los tornillos.
+*/
 module tornillos_tapa(alto){
     //Huecos para los tornillos de la tapa
     pos_tornillos_tapa = [
@@ -64,18 +75,37 @@ module tornillos_tapa(alto){
     }
 }
 
-//Tapa de la caja
+/**
+* Crea la tapa de la pieza
+*/
 module tapa(){
     cube([ancho, largo, grosor_caja]); 
 }
 
-//Hueco para los tornillos para fijar la tapa
+
+/**
+* Crea los huecos para los tornillos para fijar tanto la tapa como la base del motor
+* 
+* @params x,y,z coordenadas utilizadas para colocar el hueco del tornillo.
+*/
 module huecoTornillo(x, y, z){
     translate([x, y, z])
-        cylinder(h=11, r=radio_tornillo, center=true, $fn=360);
+        cylinder(
+            h=11, 
+            r=radio_tornillo, 
+            center=true, 
+            $fn=360
+        );
 }
 
-//Huego para sacar el eje del motor
+
+/**
+* Genera los huecos necesarios para sujetar el motor a la base metálica y para sacar el eje del motor
+*
+* Los tornillos se encuentran alrededor del hueco del eje.
+*
+* @params x,y,z coordenadas utilizadas para centrar el hueco del eje del motor.
+*/
 module huecoMotor(x, y, z){
     translate([x, y, z])
         rotate([90,0,0])
@@ -97,6 +127,12 @@ module huecoMotor(x, y, z){
     }
 }
 
+
+/**
+* Crea un hueco para atornillar el motor a la base metálica que sirve para fijarlo
+* 
+* @params x,y,z coordenadas en las que debe estar el hueco.
+*/
 module huecoTornilloEje(x, y, z){
     translate([x, y, z]){
             rotate([90,0,0])
@@ -104,6 +140,10 @@ module huecoTornilloEje(x, y, z){
         }
 }
 
+
+/**
+* Crea los huecos de los tornillos donde se sujetará el motor
+*/
 module sujeccionMotor(){
     pos_tornillos_sujeccion=[
         [0,0], 
@@ -122,7 +162,13 @@ module sujeccionMotor(){
 }
 
 
-//Módulo principal
+/**
+* Módulo principal del archivo.
+* 
+* Genera la pieza completa creada en este script.
+*
+* @param conTapa Boolean que indica si se desea mostrar la tapa de la pieza o no
+*/
 module soporteMotor(conTapa){
     cajaMotor();
     
@@ -136,6 +182,7 @@ module soporteMotor(conTapa){
         }
     }
 }
+
 
 //Mostrar la pieza
 soporteMotor(false);

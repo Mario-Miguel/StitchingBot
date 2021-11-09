@@ -13,8 +13,10 @@ ancho_sujeccion_tuerca = 20;
 largo_sujeccion_tuerca = 40;
 alto_sujeccion_tuerca = 35;
 
-//Caja para colocar el motor
-module cajaMotor(){
+/**
+* Crea la caja principal donde se colocará el rodamiento
+*/
+module cajaRodamiento(){
     difference(){
         union(){
             difference(){
@@ -37,6 +39,9 @@ module cajaMotor(){
     
 }
 
+/**
+* Crea los soportes que tiene la caja para poder atornillar la tapa
+*/
 module sujecciones_tornillos_tapa(){
     //Sujecciones tornillos
     pos_cubos_tornillos = [
@@ -51,6 +56,11 @@ module sujecciones_tornillos_tapa(){
     }
 }
 
+/**
+* Crea los huecos para los tornillos que fijan la tapa.
+*
+* @param alto altura de los huecos de los tornillos.
+*/
 module tornillos_tapa(alto){
     //Huecos para los tornillos de la tapa
     pos_tornillos_tapa = [
@@ -68,7 +78,9 @@ module tornillos_tapa(alto){
     }
 }
 
-//Tapa de la caja
+/**
+* Crea la tapa de la pieza
+*/
 module tapa(){
     difference(){
         cube([ancho, largo, grosor_caja]); 
@@ -76,7 +88,11 @@ module tapa(){
     }
 }
 
-//Hueco para los tornillos para fijar la tapa
+/**
+* Crea los huecos para los tornillos para fijar la tapa
+* 
+* @params x,y,z coordenadas utilizadas para colocar el hueco del tornillo.
+*/
 module huecoTornillo(x, y, z){
     translate([x, y, z])
         cylinder(
@@ -88,8 +104,9 @@ module huecoTornillo(x, y, z){
 }
 
 
-
-//Lugar para atornillar la tuerca de la varilla
+/**
+* Genera la extensión de la pieza donde se atornillará la tuerca de la varilla roscada.
+*/
 module sujeccionTuerca(){
     difference(){
         cube([
@@ -127,6 +144,11 @@ module sujeccionTuerca(){
     }
 }
 
+/**
+* Genera el hueco para colocar un tornillo para fijar la tuerca de la varilla roscada
+*
+* @params x,y,z coordenadas en las que debe estar el hueco.
+*/
 module huecoTornilloVarilla(x, y, z){
     translate([x,y,z])
             rotate([0,90,0])
@@ -138,7 +160,11 @@ module huecoTornilloVarilla(x, y, z){
                 );
 }
 
-//Huego para sacar el rodamiento
+/**
+* Genera los huecos necesarios para sujetar el rodamiento a la caja
+*
+* @params x,y,z coordenadas utilizadas para centrar el hueco del eje del motor.
+*/
 module huecoRodamiento(x, y, z){
     translate([x, y, z]){
         rotate([90,0,0])
@@ -166,14 +192,26 @@ module huecoRodamiento(x, y, z){
     }
 }
 
+/**
+* Genera la extensión de la pieza donde se atornillará el final de carrera.
+*
+* @params x,y,z coordenadas utilizadas para centrar el hueco del eje del motor.
+*/
 module sujeccionFinalDeCarrera(){
     cube([15, 35, 40]);
 }
 
-//Módulo principal
-module soporteVarillaSuperiorV2(conTapa){
-    translate([0,0,35]){
-        cajaMotor();
+
+/**
+* Módulo principal del archivo.
+* 
+* Genera la pieza completa creada en este script.
+*
+* @param conTapa Boolean que indica si se desea mostrar la tapa de la pieza o no
+*/
+module soporteVarillaSuperior(conTapa){
+    translate([0,0,alto_sujeccion_tuerca]){
+        cajaRodamiento();
 
         translate([-15, 55, 5])
             sujeccionFinalDeCarrera();
@@ -195,5 +233,5 @@ module soporteVarillaSuperiorV2(conTapa){
 }
 
 //Mostrar la pieza
-soporteVarillaSuperiorV2(false);
+soporteVarillaSuperior(false);
 
