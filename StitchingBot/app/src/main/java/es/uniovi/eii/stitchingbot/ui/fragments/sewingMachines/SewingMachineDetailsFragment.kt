@@ -37,7 +37,9 @@ class SewingMachineDetailsFragment : Fragment() {
      */
     private val getImageFromGallery = registerForActivityResult(
         ActivityResultContracts.GetContent()
-    ) { if (it != null) imagePick(it.toString()) }
+    ) {
+        if (it != null) imagePick(it.toString())
+    }
 
     /**
      * Evento para activar obtener una imagen de la cámara del dispositivo móvil

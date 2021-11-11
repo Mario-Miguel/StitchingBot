@@ -14,9 +14,9 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import org.hamcrest.Description
 import org.hamcrest.Matcher
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.allOf
 import org.hamcrest.TypeSafeMatcher
+import org.hamcrest.core.AllOf.allOf
+import org.hamcrest.core.Is.`is`
 import org.hamcrest.core.IsInstanceOf
 import org.junit.Rule
 import org.junit.Test
@@ -31,7 +31,7 @@ class LogoFragmentsTest {
     var mActivityTestRule = ActivityTestRule(MainActivity::class.java)
 
     @Test
-    fun mainActivityTest2() {
+    fun logosFragmentTest() {
         val textView = onView(
             allOf(
                 withText("Logotipos"),
