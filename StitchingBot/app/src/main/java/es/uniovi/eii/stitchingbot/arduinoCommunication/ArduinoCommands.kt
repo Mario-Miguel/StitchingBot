@@ -65,7 +65,6 @@ object ArduinoCommands {
         val buffer = ByteArray(1024)
         var bytes = 0
         var hasMessage = false
-        Log.i("BluetoothStitching", "Connected thread run")
         BluetoothService.write(START_EXECUTION)
 
         while (actionsSent < ordersToSend.size) {

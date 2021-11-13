@@ -34,5 +34,6 @@ abstract class ToolButton : AppCompatImageButton {
         val width = resources.getDimension(R.dimen.editor_buttons_width).toInt()
         val height = resources.getDimension(R.dimen.editor_buttons_width).toInt()
         layoutParams = LinearLayout.LayoutParams(width, height, 1F)
+        contentDescription = "Botón de la herramienta"
     }
 }

@@ -4,7 +4,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
 import es.uniovi.eii.stitchingbot.model.Logo
 import es.uniovi.eii.stitchingbot.model.SewingMachine
 
@@ -56,9 +55,7 @@ class DatabaseHelper(context: Context) :
      */
     fun getInsertParamsLogosTable(logo: Logo): ContentValues {
         val values = ContentValues()
-        values.put(LogoTable.COLUMN_NAME, logo.title)
         values.put(LogoTable.COLUMN_IMG, logo.imgUrl)
-        values.put(LogoTable.COLUMN_CATEGORY, logo.category)
         return values
     }
 
@@ -70,9 +67,7 @@ class DatabaseHelper(context: Context) :
     fun getAllLogosColumns(): Array<String> {
         return arrayOf(
             LogoTable.ID,
-            LogoTable.COLUMN_NAME,
             LogoTable.COLUMN_IMG,
-            LogoTable.COLUMN_CATEGORY
         )
     }
 
@@ -123,16 +118,12 @@ class DatabaseHelper(context: Context) :
      */
     private object LogoTable {
         const val ID = "id"
-        const val COLUMN_NAME = "name"
         const val COLUMN_IMG = "imgUrl"
-        const val COLUMN_CATEGORY = "category"
 
         fun creation(): String {
             return "CREATE TABLE $TABLE_LOGOS (" +
                     "$ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "$COLUMN_NAME TEXT NOT NULL, " +
-                    "$COLUMN_IMG TEXT NULLABLE, " +
-                    "$COLUMN_CATEGORY TEXT NOT NULL)"
+                    "$COLUMN_IMG TEXT NULLABLE)"
         }
     }
 

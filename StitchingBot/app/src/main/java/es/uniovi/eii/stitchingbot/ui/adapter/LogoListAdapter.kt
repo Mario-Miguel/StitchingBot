@@ -35,7 +35,6 @@ class LogoListAdapter(private var logosList: List<Logo>, private val listener: (
          * @param listener Listener que se desea que tenga el elemento de la vista
          */
         fun bind(logo: Logo, listener: (Logo) -> Unit) = with(itemView) {
-            txtTitleLogo.text = logo.title
             if (logo.imgUrl!!.isNotEmpty())
                 Picasso.get().load(logo.imgUrl).into(imgLogo)
             setOnClickListener { listener(logo) }

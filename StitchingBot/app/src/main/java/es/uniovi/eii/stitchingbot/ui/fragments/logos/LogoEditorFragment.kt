@@ -9,6 +9,7 @@ import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
 import es.uniovi.eii.stitchingbot.controller.LogoController
 import es.uniovi.eii.stitchingbot.ui.canvas.toolsButtons.*
+import es.uniovi.eii.stitchingbot.ui.util.ShowDialog
 import es.uniovi.eii.stitchingbot.util.Constants.CREATION_MODE
 import es.uniovi.eii.stitchingbot.util.Constants.LOGO
 import kotlinx.android.synthetic.main.fragment_logo_editor.*
@@ -127,9 +128,12 @@ class LogoEditorFragment : Fragment() {
      *  Maneja el evento del click en la opción de menú [R.id.action_delete]
      */
     private fun onDeleteLogoMenuClick() {
-        logoController.deleteLogo(requireContext())
-        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-        navController.popBackStack()
+        ShowDialog.showDialogOK(requireContext(), "¿Está seguro de eliminar el logotipo?")
+        { _, _ ->
+            logoController.deleteLogo(requireContext())
+            val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+            navController.popBackStack()
+        }
     }
 
     /**

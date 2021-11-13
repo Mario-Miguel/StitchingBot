@@ -7,22 +7,22 @@
 
         <item
             android:id="@+id/nav_logo_list"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_round_create"
             android:title="@string/menu_logos_list" />
 
         <item
             android:id="@+id/nav_sewing_machines"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_round_create"
             android:title="@string/menu_sewing_machines" />
 
         <item
             android:id="@+id/nav_arduino_connection"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_round_settings"
             android:title="@string/menu_arduino_connection" />
 
         <item
             android:id="@+id/nav_summary"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_round_play_circle_filled"
             android:title="@string/menu_summary"
             android:visible="false" />
 

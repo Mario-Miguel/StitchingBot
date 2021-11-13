@@ -237,8 +237,11 @@ class SewingMachineDetailsFragment : Fragment() {
      *  Maneja el evento del click en la opción de menú [R.id.action_delete]
      */
     private fun onDeleteMachineMenuClick() {
-        sewingMachineController.deleteSewingMachine(requireContext())
-        goBack()
+        ShowDialog.showDialogOK(requireContext(), "¿Está seguro de eliminar la máquina de coser?")
+        { _, _ ->
+            sewingMachineController.deleteSewingMachine(requireContext())
+            goBack()
+        }
     }
 
     /**

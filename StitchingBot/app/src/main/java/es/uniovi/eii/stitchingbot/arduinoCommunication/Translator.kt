@@ -2,11 +2,9 @@ package es.uniovi.eii.stitchingbot.arduinoCommunication
 
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.StateManager
-import es.uniovi.eii.stitchingbot.util.Constants.TAG_TRANSLATE
 import kotlin.math.hypot
 
 object Translator {
@@ -36,7 +34,6 @@ object Translator {
         translationDone = true
         _actualProgress.postValue(0)
         StateManager.changeToInitial()
-        Log.i(TAG_TRANSLATE, "End of processing")
     }
 
     /**

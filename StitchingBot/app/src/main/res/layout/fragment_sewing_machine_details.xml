@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.sewingMachines.SewingMachineDetailsFragment">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -17,6 +16,8 @@
             android:layout_height="200dp"
             android:contentDescription="@string/imgSewingMachineDetails"
             android:src="@drawable/ic_baseline_add_a_photo_24"
+            android:padding="1dp"
+            android:background="@drawable/image_view_border"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -30,20 +31,22 @@
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:hint="@string/txtSewingMachineName"
+            android:theme="@style/AppTheme.DARKBLUE"
             app:endIconMode="clear_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.50"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imgSewingMachineDetails"
-            app:layout_constraintVertical_bias="0.2"
-            android:theme="@style/AppTheme.DARKBLUE">
+            app:layout_constraintVertical_bias="0.2">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etxtSewingMachineName"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:singleLine="true" />
+                android:hint="@string/txtSewingMachineName"
+                android:singleLine="true"
+                android:textColor="#000000" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -54,19 +57,21 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="45dp"
             android:hint="@string/label_motor_steps"
+            android:theme="@style/AppTheme.DARKBLUE"
             app:endIconMode="clear_text"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@+id/txtSewingMachineName"
             app:layout_constraintTop_toBottomOf="@+id/txtSewingMachineName"
-            app:layout_constraintVertical_bias="5"
-            android:theme="@style/AppTheme.DARKBLUE">
+            app:layout_constraintVertical_bias="5">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etxtMotorSteps"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
+                android:hint="@string/label_motor_steps"
                 android:inputType="number"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:textColor="#000000" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -77,10 +82,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:text="@string/btn_try_steps"
+            android:theme="@style/AppTheme.DARKBLUE"
             app:layout_constraintBottom_toBottomOf="@+id/txtMotorSteps"
             app:layout_constraintStart_toEndOf="@+id/txtMotorSteps"
-            app:layout_constraintTop_toTopOf="@+id/txtMotorSteps"
-            android:theme="@style/AppTheme.DARKBLUE"/>
+            app:layout_constraintTop_toTopOf="@+id/txtMotorSteps" />
 
         <Button
             android:id="@+id/btnSewingMachineAction"
@@ -88,10 +93,10 @@
             android:layout_height="56dp"
             android:layout_marginBottom="16dp"
             android:text="@string/btnSewingmachinesActionDefault"
+            android:theme="@style/AppTheme.DARKBLUE"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:theme="@style/AppTheme.DARKBLUE"/>
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageButton
             android:id="@+id/btnDeleteSewingMachine"

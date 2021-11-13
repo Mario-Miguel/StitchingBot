@@ -27,5 +27,6 @@ class EraseToolButton : ToolButton {
             canvas.tool = EraseTool()
         }
         super.setup(canvas)
+        contentDescription = "Botón de la herramienta Borrar"
     }
 }

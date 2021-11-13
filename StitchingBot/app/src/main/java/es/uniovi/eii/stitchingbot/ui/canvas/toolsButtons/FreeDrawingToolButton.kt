@@ -28,5 +28,6 @@ class FreeDrawingToolButton : ToolButton {
             canvas.tool = FreeDrawingTool()
         }
         super.setup(canvas)
+        contentDescription = "Botón de la herramienta Dibujo Libre"
     }
 }

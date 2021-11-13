@@ -26,6 +26,7 @@ class RectangleToolButton : ToolButton {
         setOnClickListener {
             canvas.tool = SquareTool()
         }
+        contentDescription = "Botón de la herramienta Rectángulo"
         super.setup(canvas)
     }
 }

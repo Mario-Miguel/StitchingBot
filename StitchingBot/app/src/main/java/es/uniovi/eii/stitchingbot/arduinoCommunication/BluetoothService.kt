@@ -11,7 +11,6 @@ import android.content.IntentFilter
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import es.uniovi.eii.stitchingbot.util.Constants
 import java.io.IOException
@@ -41,7 +40,6 @@ object BluetoothService {
             if (connectionSocket != null)
                 connectionSocket!!.close()
         } catch (e: IOException) {
-            Log.e(Constants.TAG_BLUETOOTH, "Could not close the client socket", e)
         }
     }
 
@@ -57,11 +55,9 @@ object BluetoothService {
      */
     fun write(input: String) {
         val bytes = input.toByteArray() //converts entered String into bytes
-        Log.i("BluetoothStitching", "Mensaje enviado")
         try {
             mmOutStream.write(bytes)
         } catch (e: IOException) {
-            Log.e("Send Error", "Unable to send message", e)
         }
     }
 
@@ -86,7 +82,6 @@ object BluetoothService {
                 )
             )
             connectionSocket!!.connect()
-            Log.i(Constants.TAG_BLUETOOTH, "Device connected")
             handler.obtainMessage(Constants.CONNECTING_STATUS, 1, -1).sendToTarget()
         } catch (connectException: IOException) {
             closeConnectionSocket()
@@ -184,9 +179,6 @@ object BluetoothService {
      */
     private fun initBluetoothAdapter() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-        if (bluetoothAdapter == null) {
-            Log.i("BluetoothStitching", "No hay bluetooth disponible")
-        }
     }
 
     /**
@@ -196,7 +188,6 @@ object BluetoothService {
      */
     private fun enableBluetooth(enableBluetooth: ActivityResultLauncher<Intent>) {
         if (!bluetoothAdapter!!.isEnabled) {
-            Log.i("BluetoothStitching", "hay bluetooth disponible")
             enableBluetooth.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
         }
     }

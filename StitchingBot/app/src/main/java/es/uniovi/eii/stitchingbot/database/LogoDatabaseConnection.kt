@@ -43,8 +43,6 @@ class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(contex
             val logo = Logo(
                 cursor.getInt(0),
                 cursor.getString(1),
-                cursor.getString(2),
-                cursor.getString(3)
             )
 
             logos.add(logo)
@@ -75,11 +73,8 @@ class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(contex
         val logo = Logo(
             cursor.getInt(0),
             cursor.getString(1),
-            cursor.getString(2),
-            cursor.getString(3)
         )
         cursor.close()
-
         return logo
     }
 

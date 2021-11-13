@@ -13,6 +13,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
+import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.StateManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,7 +30,6 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-
         drawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
@@ -44,6 +44,10 @@ class MainActivity : AppCompatActivity() {
             ), drawerLayout
         )
 
+        StateManager.actualState.observe(this) {
+            val menu = navView.menu
+            menu.findItem(R.id.nav_summary).isVisible = !StateManager.isInitial()
+        }
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
@@ -67,6 +71,4 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
-
-
 }

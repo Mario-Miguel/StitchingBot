@@ -14,11 +14,10 @@ class LogoController {
     /**
      * Método que cambia los parámetros del logotipo guardado
      *
-     * @param title nombre del logotipo
      * @param url dirección donde se guarda la imagen del logotipo
      */
-    private fun setLogo(title: String? = logo.title, url: String? = logo.imgUrl) {
-        val auxLogo = Logo(logo.id, title, url, logo.category)
+    private fun setLogo(url: String? = logo.imgUrl) {
+        val auxLogo = Logo(logo.id, url)
         this.logo = auxLogo
     }
 

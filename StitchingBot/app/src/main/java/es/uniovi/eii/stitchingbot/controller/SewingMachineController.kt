@@ -4,11 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import androidx.core.content.FileProvider
 import es.uniovi.eii.stitchingbot.database.SewingMachineDatabaseConnection
 import es.uniovi.eii.stitchingbot.model.SewingMachine
-import es.uniovi.eii.stitchingbot.util.Constants
 import java.io.File
 
 class SewingMachineController {
@@ -132,7 +130,6 @@ class SewingMachineController {
      */
     fun createImageFileAndDispatchAction(activity: Activity, action: (Uri, File) -> Unit) {
         imageManager.createImageFile(activity)?.also {
-            Log.i(Constants.TAG_SEWINGMACHINE, it.absolutePath)
             val photoURI: Uri = FileProvider.getUriForFile(
                 activity.applicationContext,
                 "es.uniovi.eii.stitchingbot",

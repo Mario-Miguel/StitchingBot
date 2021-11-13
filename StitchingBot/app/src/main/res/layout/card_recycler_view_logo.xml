@@ -3,28 +3,21 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp">
+    android:layout_margin="8dp"
+    android:elevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Media -->
         <ImageView
             android:id="@+id/imgLogo"
             android:layout_width="match_parent"
             android:layout_height="194dp"
             android:contentDescription="@string/img_logo"
-            android:scaleType="centerCrop" />
-
-        <!-- Title, secondary and supporting text -->
-        <TextView
-            android:id="@+id/txtTitleLogo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/logo_name"
-            android:textAppearance="?attr/textAppearanceHeadline6" />
+            android:scaleType="centerCrop"
+            android:background="@color/primaryDarkColorGray"/>
 
     </LinearLayout>
 

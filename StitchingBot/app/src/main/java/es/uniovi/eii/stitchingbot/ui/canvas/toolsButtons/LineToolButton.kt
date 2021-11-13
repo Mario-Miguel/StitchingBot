@@ -27,5 +27,6 @@ class LineToolButton : ToolButton {
             canvas.tool = LineTool()
         }
         super.setup(canvas)
+        contentDescription = "Botón de la herramienta Línea"
     }
 }

@@ -27,5 +27,7 @@ class CircleToolButton : ToolButton {
             canvas.tool = CircleTool()
         }
         super.setup(canvas)
+
+        contentDescription = "Botón de la herramienta Círculo"
     }
 }

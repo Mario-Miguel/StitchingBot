@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Environment
-import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import java.io.File
 import java.io.FileOutputStream
@@ -29,7 +28,7 @@ class ImageManager {
     fun getImageFromUri(url: String?, activity: Activity): Bitmap? {
         var image: Bitmap
         val selectedUri = Uri.parse(url)
-        if (selectedUri != null) {
+        if (selectedUri != null && !url.isNullOrEmpty()) {
             activity.contentResolver.openFileDescriptor(selectedUri, "r")
                 .use { pfd ->
                     if (pfd != null) {
@@ -163,7 +162,6 @@ class ImageManager {
      */
     fun createImageFile(activity: Activity): File? {
         val photoFile: File? = try {
-            // Create an image file name
             val timeStamp: String =
                 SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
             val storageDir: File? =
@@ -174,8 +172,6 @@ class ImageManager {
                 storageDir
             )
         } catch (ex: IOException) {
-            // Error occurred while creating the File
-            Log.i("ImageManager", "Error creando archivo")
             null
         }
         return photoFile
