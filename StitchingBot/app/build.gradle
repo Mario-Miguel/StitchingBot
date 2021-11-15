@@ -74,8 +74,11 @@ dependencies {
 
     //Espresso
     def espressoVersion = "3.3.0"
+    //noinspection GradleDependency
     androidTestImplementation("androidx.test.espresso:espresso-core:$espressoVersion")
+    //noinspection GradleDependency
     androidTestImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion")
+    //noinspection GradleDependency
     androidTestImplementation("androidx.test.espresso:espresso-intents:$espressoVersion")
     androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
     
