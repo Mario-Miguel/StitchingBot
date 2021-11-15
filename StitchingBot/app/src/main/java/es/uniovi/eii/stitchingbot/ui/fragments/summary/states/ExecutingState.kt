@@ -15,4 +15,8 @@ class ExecutingState : State() {
         summaryFragment.btnStartExecution.visibility = View.GONE
         summaryFragment.pbExecution.visibility = View.VISIBLE
     }
+
+    override fun toString(): String {
+        return "ExecutingState"
+    }
 }

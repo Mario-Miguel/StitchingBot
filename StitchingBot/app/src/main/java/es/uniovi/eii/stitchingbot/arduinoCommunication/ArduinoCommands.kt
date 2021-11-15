@@ -1,9 +1,12 @@
 package es.uniovi.eii.stitchingbot.arduinoCommunication
 
-import android.util.Log
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.*
+import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.ExecutingState
+import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.PausedState
+import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.StateManager
+import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.StoppedState
 import es.uniovi.eii.stitchingbot.util.Constants.ASK_FOR_ACTIONS
 import es.uniovi.eii.stitchingbot.util.Constants.CONFIGURE_PULLEY
 import es.uniovi.eii.stitchingbot.util.Constants.PAUSE_EXECUTION
@@ -49,6 +52,27 @@ object ArduinoCommands {
         val ordersToSend = createOrdersToSendStrings(translation)
 
         beginSendingAndReceivingOrders(ordersToSend)
+
+        actionsSent = 0
+        stateManager.changeTo(StoppedState())
+        privateActualProgress.postValue(0)
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun startExecutionTesting(
+    ) {
+        privateActualProgress.postValue(0)
+        BluetoothService.startedProcess = true
+        stateManager.changeTo(ExecutingState())
+        //Se necesita esperar por que el valor del estado se actualice para continuar con el test
+        //Esto es causado por el método postValue, actualiza los valores asíncronamente
+        while (stateManager.isInitial()) {
+        }
+
+        //El valor del estado actual ya se ha actualizado, por lo que se simula el envío de señales
+        while (!stateManager.isInitial()) {
+            Thread.sleep(1000)
+        }
 
         actionsSent = 0
         stateManager.changeTo(StoppedState())

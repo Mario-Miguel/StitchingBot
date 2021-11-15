@@ -26,6 +26,10 @@ class StoppedState : State() {
         summaryFragment.pbExecution.visibility = View.GONE
     }
 
+    override fun toString(): String {
+        return "StoppedState"
+    }
+
     /**
      *  Comprueba si se puede comenzar la ejecución
      *

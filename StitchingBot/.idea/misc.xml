@@ -36,7 +36,7 @@
         <entry key="app/src/main/res/layout/content_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/device_list_item.xml" value="0.11481481481481481" />
         <entry key="app/src/main/res/layout/dropdown_menu_item.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/fragment_arduino_configuration.xml" value="0.15925925925925927" />
+        <entry key="app/src/main/res/layout/fragment_arduino_configuration.xml" value="0.18" />
         <entry key="app/src/main/res/layout/fragment_arduino_connection.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_create_logo.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_logo_editor.xml" value="0.22" />

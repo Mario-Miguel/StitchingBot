@@ -2,6 +2,7 @@ package es.uniovi.eii.stitchingbot.database
 
 import android.content.ContentValues
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import es.uniovi.eii.stitchingbot.model.Logo
 
 class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(context) {
@@ -78,4 +79,10 @@ class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(contex
         return logo
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun deleteAllData() {
+        super.open()
+        database!!.execSQL("delete from ${DatabaseHelper.TABLE_LOGOS}")
+        super.close()
+    }
 }

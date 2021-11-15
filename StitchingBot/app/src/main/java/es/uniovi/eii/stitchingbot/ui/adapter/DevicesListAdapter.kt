@@ -18,7 +18,7 @@ class DevicesListAdapter(private val listener: (BluetoothDevice) -> Unit) :
     )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(devices[position], listener)
+        holder.bind(devices[position], listener, position)
     }
 
     override fun getItemCount() = devices.size
@@ -51,7 +51,7 @@ class DevicesListAdapter(private val listener: (BluetoothDevice) -> Unit) :
          * @param device dispositivo que se desea mapear
          * @param listener Listener que se desea que tenga el elemento de la vista
          */
-        fun bind(device: BluetoothDevice, listener: (BluetoothDevice) -> Unit) {
+        fun bind(device: BluetoothDevice, listener: (BluetoothDevice) -> Unit, id: Int) {
             if (device.name.isNullOrEmpty()) {
                 itemView.txtDeviceName.text =
                     itemView.context.getString(R.string.txt_device_name_unknown)
@@ -64,6 +64,7 @@ class DevicesListAdapter(private val listener: (BluetoothDevice) -> Unit) :
             else
                 itemView.txtDeviceExtras.text = device.address
 
+            itemView.idDevice.text = id.toString()
             itemView.setOnClickListener { listener(device) }
         }
     }
