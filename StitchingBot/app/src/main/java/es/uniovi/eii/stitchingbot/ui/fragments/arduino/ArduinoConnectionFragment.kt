@@ -134,7 +134,7 @@ class ArduinoConnectionFragment : Fragment() {
     private fun onDeviceClick(bluetoothDevice: BluetoothDevice) {
         Thread {
             this@ArduinoConnectionFragment.requireActivity().runOnUiThread {
-                progressBar.visibility = View.VISIBLE
+                this@ArduinoConnectionFragment.progressBar.visibility = View.VISIBLE
                 requireActivity().window.setFlags(
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
@@ -142,12 +142,18 @@ class ArduinoConnectionFragment : Fragment() {
             }
 
             configureHandler()
-            createConnection(bluetoothDevice)
-
-            this@ArduinoConnectionFragment.requireActivity().runOnUiThread {
-                progressBar.visibility = View.GONE
-                requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            createConnection(bluetoothDevice){
+                this@ArduinoConnectionFragment.requireActivity().runOnUiThread {
+                    this@ArduinoConnectionFragment.progressBar.visibility = View.GONE
+                    requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                }
             }
+
+            /*if (this@ArduinoConnectionFragment.isVisible)
+                this@ArduinoConnectionFragment.requireActivity().runOnUiThread {
+                    this@ArduinoConnectionFragment.progressBar.visibility = View.GONE
+                    requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                }*/
         }.start()
     }
 
@@ -167,8 +173,8 @@ class ArduinoConnectionFragment : Fragment() {
      *
      * @param bluetoothDevice dispositivo con el que se quiere establecer una conexión
      */
-    private fun createConnection(bluetoothDevice: BluetoothDevice) {
-        bluetoothService.tryToConnect(bluetoothDevice)
+    private fun createConnection(bluetoothDevice: BluetoothDevice, callback: () -> Unit) {
+        bluetoothService.tryToConnect(bluetoothDevice, callback)
     }
 
     /**

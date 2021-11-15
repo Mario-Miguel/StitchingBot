@@ -2,6 +2,7 @@ package es.uniovi.eii.stitchingbot.arduinoCommunication
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.StateManager
@@ -26,14 +27,14 @@ object Translator {
     /**
      * Inicia el proceso de traducción del logotipo en órdenes a enviar al robot.
      */
-    fun run() {
+    fun run(callback: () -> Unit) {
         isInExecution = true
         _actualProgress.postValue(0)
         translation = processData(image)
         isInExecution = false
         translationDone = true
         _actualProgress.postValue(0)
-        StateManager.changeToInitial()
+        callback()
     }
 
     /**
@@ -67,12 +68,17 @@ object Translator {
             }
         }
         val orderedCoords = createCoordArray(coords).map {
-            Pair(
-                (it.first * FACTOR_AJUSTE) + 16,
-                (it.second * FACTOR_AJUSTE) + 16
-            )
+            calculateAdjustedCoord(it)
         }.filterIndexed { i, _ -> i % 2 == 0 }.toMutableList()
         return orderedCoords
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun calculateAdjustedCoord(actualCoord: Pair<Int, Int>): Pair<Int, Int> {
+        return Pair(
+            (actualCoord.first * FACTOR_AJUSTE) + 16,
+            (actualCoord.second * FACTOR_AJUSTE) + 16
+        )
     }
 
     /**
@@ -83,6 +89,8 @@ object Translator {
      */
     private fun createCoordArray(coords: MutableList<Pair<Int, Int>>): MutableList<Pair<Int, Int>> {
         val orderedCoordenates = mutableListOf<Pair<Int, Int>>()
+        if (coords.size == 0) return coords
+
         var actualCoord = coords[0]
         orderedCoordenates.add(actualCoord)
         var checkCoordInHorizontal = true

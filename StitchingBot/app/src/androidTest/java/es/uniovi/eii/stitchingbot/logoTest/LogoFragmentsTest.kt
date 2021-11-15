@@ -1,37 +1,52 @@
-package es.uniovi.eii.stitchingbot
+package es.uniovi.eii.stitchingbot.logoTest
 
 
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
 import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.filters.LargeTest
-import androidx.test.rule.ActivityTestRule
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
+import androidx.test.platform.app.InstrumentationRegistry
+import es.uniovi.eii.stitchingbot.MainActivity
+import es.uniovi.eii.stitchingbot.R
+import es.uniovi.eii.stitchingbot.database.LogoDatabaseConnection
+import es.uniovi.eii.stitchingbot.database.SewingMachineDatabaseConnection
 import org.hamcrest.Description
 import org.hamcrest.Matcher
+import org.hamcrest.Matchers
 import org.hamcrest.TypeSafeMatcher
 import org.hamcrest.core.AllOf.allOf
 import org.hamcrest.core.Is.`is`
 import org.hamcrest.core.IsInstanceOf
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @LargeTest
-@RunWith(AndroidJUnit4::class)
+@RunWith(AndroidJUnit4ClassRunner::class)
 class LogoFragmentsTest {
 
     @Rule
     @JvmField
-    var mActivityTestRule = ActivityTestRule(MainActivity::class.java)
+    var mActivityTestRule = ActivityScenarioRule(MainActivity::class.java)
+
+    @After
+    fun afterTesting() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        LogoDatabaseConnection(context).deleteAllData()
+        SewingMachineDatabaseConnection(context).deleteAllData()
+    }
 
     @Test
-    fun logosFragmentTest() {
+    fun runTest() {
         val textView = onView(
             allOf(
                 withText("Logotipos"),
@@ -220,6 +235,20 @@ class LogoFragmentsTest {
             )
         )
         actionMenuItemView2.perform(click())
+
+        val materialButton3 = onView(
+            Matchers.allOf(
+                withId(android.R.id.button1), withText("OK"),
+                childAtPosition(
+                    childAtPosition(
+                        withId(R.id.buttonPanel),
+                        0
+                    ),
+                    3
+                )
+            )
+        )
+        materialButton3.perform(ViewActions.scrollTo(), click())
 
         val textView5 = onView(
             allOf(

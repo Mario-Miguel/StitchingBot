@@ -24,6 +24,8 @@ import es.uniovi.eii.stitchingbot.model.SewingMachine
 import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.StateManager
 import es.uniovi.eii.stitchingbot.ui.util.ShowDialog
 import es.uniovi.eii.stitchingbot.util.*
+import es.uniovi.eii.stitchingbot.util.Constants.TAG_TRANSLATE
+import kotlinx.android.synthetic.main.fragment_arduino_connection.*
 import kotlinx.android.synthetic.main.fragment_summary.*
 
 class SummaryFragment : Fragment() {
@@ -138,11 +140,16 @@ class SummaryFragment : Fragment() {
      */
     private fun updateProgressBar(completionMessage: String, newProgress: Int) {
         pbExecution.progress = newProgress
+        Log.i(
+            TAG_TRANSLATE,
+            "Progress 0 - $newProgress - ${stateManager.actualState.value.toString()}"
+        )
         if (newProgress == 0) {
             if (this@SummaryFragment.isVisible)
                 stateManager.showInterface(this)
         }
         if (newProgress == 100) {
+            Log.i(TAG_TRANSLATE, "Progress: 100 - $newProgress")
             if (this@SummaryFragment.isVisible) {
                 stateManager.changeToInitial()
                 stateManager.showInterface(this)
@@ -236,7 +243,7 @@ class SummaryFragment : Fragment() {
         Thread {
             stateManager.startTranslate()
             translator.image = logoController.getImage(requireActivity())
-            translator.run()
+            translator.run { StateManager.changeToInitial() }
         }.start()
     }
 

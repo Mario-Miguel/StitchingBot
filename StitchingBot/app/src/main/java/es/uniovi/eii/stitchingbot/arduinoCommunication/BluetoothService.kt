@@ -12,6 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.VisibleForTesting
 import es.uniovi.eii.stitchingbot.util.Constants
 import java.io.IOException
 import java.io.InputStream
@@ -28,7 +29,7 @@ object BluetoothService {
     var startedProcess = false
 
     init {
-        setHandler()
+        setHandlerCommands({}, {})
         initBluetoothAdapter()
     }
 
@@ -73,7 +74,7 @@ object BluetoothService {
      *
      * @param bluetoothDevice Dispositivo bluetooth con el que establecer conexión
      */
-    fun tryToConnect(bluetoothDevice: BluetoothDevice) {
+    fun tryToConnect(bluetoothDevice: BluetoothDevice, callback: () -> Unit) {
         bluetoothAdapter!!.cancelDiscovery()
         try {
             setConnectionSocket(
@@ -86,8 +87,29 @@ object BluetoothService {
         } catch (connectException: IOException) {
             closeConnectionSocket()
             handler.obtainMessage(Constants.CONNECTING_STATUS, -1, -1).sendToTarget()
+        } finally {
+            callback()
         }
     }
+
+    /**
+     * Método que intenta conectar el dispositivo móvil con el dispositivo bluetooth seleccionado.
+     *
+     * Este método tan solo es utilizado con propósitos de testing.
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun tryToConnectTesting(callback: () -> Unit) {
+        bluetoothAdapter!!.cancelDiscovery()
+        try {
+            handler.obtainMessage(Constants.CONNECTING_STATUS, 1, -1).sendToTarget()
+        } catch (connectException: IOException) {
+            closeConnectionSocket()
+            handler.obtainMessage(Constants.CONNECTING_STATUS, -1, -1).sendToTarget()
+        } finally {
+            callback()
+        }
+    }
+
 
     /**
      * Inicia el recibidor
@@ -236,4 +258,5 @@ object BluetoothService {
             bluetoothAdapter!!.cancelDiscovery()
         }
     }
+
 }
