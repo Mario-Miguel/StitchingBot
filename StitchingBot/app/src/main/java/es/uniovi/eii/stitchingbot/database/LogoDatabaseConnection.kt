@@ -79,10 +79,4 @@ class LogoDatabaseConnection(context: Context) : DatabaseConnection<Logo>(contex
         return logo
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun deleteAllData() {
-        super.open()
-        database!!.execSQL("delete from ${DatabaseHelper.TABLE_LOGOS}")
-        super.close()
-    }
 }

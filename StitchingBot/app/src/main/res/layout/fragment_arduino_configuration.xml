@@ -19,6 +19,7 @@
             android:src="@drawable/ic_baseline_arrow_up_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.122" />
@@ -31,7 +32,7 @@
             android:src="@drawable/ic_baseline_arrow_down_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.507"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.301" />
@@ -44,10 +45,10 @@
             android:src="@drawable/ic_baseline_arrow_left_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.327"
+            app:layout_constraintHorizontal_bias="0.32"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.211" />
+            app:layout_constraintVertical_bias="0.21" />
 
         <ImageButton
             android:id="@+id/btnRightArrow"
@@ -57,10 +58,10 @@
             android:src="@drawable/ic_baseline_arrow_right_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.669"
+            app:layout_constraintHorizontal_bias="0.68"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.211" />
+            app:layout_constraintVertical_bias="0.21" />
         <!--Final de botonera-->
 
         <Button
@@ -71,7 +72,7 @@
             android:theme="@style/AppTheme.DARKBLUE"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.503"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.468" />
@@ -83,14 +84,14 @@
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:hint="@string/label_motor_steps"
+            android:theme="@style/AppTheme.DARKBLUE"
             app:endIconMode="clear_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="@+id/btnAxisDone"
             app:layout_constraintTop_toBottomOf="@+id/btnAutoHome"
-            app:layout_constraintVertical_bias="0.263"
-            android:theme="@style/AppTheme.DARKBLUE">
+            app:layout_constraintVertical_bias="0.263">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -106,17 +107,16 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:text="@string/btn_try_steps"
+            android:theme="@style/AppTheme.DARKBLUE"
             app:layout_constraintBottom_toBottomOf="@+id/txtMotorSteps"
             app:layout_constraintEnd_toEndOf="@+id/btnDisconnect"
             app:layout_constraintStart_toEndOf="@+id/txtMotorSteps"
-            app:layout_constraintTop_toTopOf="@+id/txtMotorSteps"
-            android:theme="@style/AppTheme.DARKBLUE"/>
+            app:layout_constraintTop_toTopOf="@+id/txtMotorSteps" />
 
         <Button
             android:id="@+id/btnAxisDone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
             android:text="@string/btn_axis_done"
             android:theme="@style/AppTheme.DARKBLUE"
             app:layout_constraintBottom_toBottomOf="parent"

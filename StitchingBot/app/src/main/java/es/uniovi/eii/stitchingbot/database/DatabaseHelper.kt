@@ -21,6 +21,7 @@ class DatabaseHelper(context: Context) :
         onCreate(db)
     }
 
+
     /**
      * Devuelve los parámetros a insertar de una máquina de coser
      *

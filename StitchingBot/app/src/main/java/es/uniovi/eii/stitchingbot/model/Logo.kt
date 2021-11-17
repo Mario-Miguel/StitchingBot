@@ -4,8 +4,8 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class Logo(
-    val id: Int = 0,
-    val imgUrl: String? = "",
+    var id: Int = 0,
+    var imgUrl: String? = "",
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
@@ -31,4 +31,16 @@ data class Logo(
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        return if (other is Logo)
+            this.imgUrl == other.imgUrl
+        else
+            false
+    }
+
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + (imgUrl?.hashCode() ?: 0)
+        return result
+    }
 }

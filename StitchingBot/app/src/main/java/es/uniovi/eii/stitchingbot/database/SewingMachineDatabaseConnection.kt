@@ -55,10 +55,5 @@ class SewingMachineDatabaseConnection(context: Context) :
         return machines
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun deleteAllData() {
-        super.open()
-        database!!.execSQL("delete from ${DatabaseHelper.TABLE_SEWING_MACHINES}")
-        super.close()
-    }
+
 }

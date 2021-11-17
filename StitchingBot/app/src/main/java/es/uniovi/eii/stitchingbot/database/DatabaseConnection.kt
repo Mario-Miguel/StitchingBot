@@ -25,6 +25,10 @@ abstract class DatabaseConnection<T>(context: Context)  {
         dbHelper!!.close()
     }
 
+    fun deleteAllData() {
+        dbHelper!!.onUpgrade(database, 0, 0)
+    }
+
     /**
      * Añade un elemento a la base de datos
      *
