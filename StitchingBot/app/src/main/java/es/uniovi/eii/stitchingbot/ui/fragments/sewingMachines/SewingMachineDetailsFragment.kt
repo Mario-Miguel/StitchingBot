@@ -3,13 +3,11 @@ package es.uniovi.eii.stitchingbot.ui.fragments.sewingMachines
 import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
@@ -23,10 +21,11 @@ import kotlinx.android.synthetic.main.fragment_sewing_machine_details.*
 
 class SewingMachineDetailsFragment : Fragment() {
 
-    @RequiresApi(Build.VERSION_CODES.Q)
+
     private val permissions = arrayOf(
         Manifest.permission.CAMERA,
-        Manifest.permission.ACCESS_MEDIA_LOCATION
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
     private var isCreation: Boolean = false
@@ -60,7 +59,7 @@ class SewingMachineDetailsFragment : Fragment() {
                     granted = false
                     if (it.key == "android.permission.CAMERA")
                         nonGrantedPermissions.add("Camera")
-                    else {
+                    else if (it.key == "android.permission.READ_EXTERNAL_STORAGE"){
                         nonGrantedPermissions.add("Almacenamiento")
                     }
                 }
@@ -88,7 +87,6 @@ class SewingMachineDetailsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_sewing_machine_details, container, false)
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -150,7 +148,6 @@ class SewingMachineDetailsFragment : Fragment() {
     /**
      * Carga la pantalla por defecto que se le mostrará al usuario
      */
-    @RequiresApi(Build.VERSION_CODES.Q)
     private fun loadDefaultScreen() {
         btnSewingMachineAction.setOnClickListener { onSewingMachineActionClick() }
         imgSewingMachineDetails.setOnClickListener {

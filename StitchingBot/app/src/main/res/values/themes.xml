@@ -58,7 +58,6 @@
     <!-- Button Styles-->
     <style name="Button"  parent="Widget.AppCompat.Button"/>
 
-
     <style name="Widget.App.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
         <item name="materialThemeOverlay">@style/myCustomThemeForNormalFab</item>
     </style>
@@ -67,6 +66,5 @@
         <item name="colorSecondary">@color/primaryDarkColorBlue</item>
         <item name="colorOnSecondary">@android:color/white</item>
     </style>
-
 
 </resources>

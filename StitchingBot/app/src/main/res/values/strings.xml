@@ -20,7 +20,6 @@
     <string name="available_devices_header">Dispositivos disponibles</string>
     <string name="connected_devices_header">Dispositivos emparejados</string>
     <string name="fab_find_devices">Buscar dispositivos</string>
-
     <string name="search_button_description">Botón de búsqueda</string>
     <string name="txt_devices_list_header">Dispositivos encontrados</string>
     <string name="menu_arduino_connection">Configuración del robot</string>
@@ -59,4 +58,5 @@
     <string name="btn_sewing_machine_text">Modificar</string>
     <string name="action_add">Añadir</string>
     <string name="hint_etxt_Sewing_machine_name">Nombre de la máquina de coser</string>
+    <string name="btn_done_modify">Modificar</string>
 </resources>

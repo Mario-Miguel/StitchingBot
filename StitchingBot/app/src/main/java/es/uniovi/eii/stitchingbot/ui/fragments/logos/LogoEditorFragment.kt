@@ -30,14 +30,15 @@ class LogoEditorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initializeButtons()
-        loadButtonToolbar()
         if (arguments != null) {
             isCreation = requireArguments().getBoolean(CREATION_MODE)
             logoController.setLogo(requireArguments().getParcelable(LOGO)!!)
             if (logoController.getLogo().id >= 0)
                 showLogoImage()
         }
+
+        initializeButtons()
+        loadButtonToolbar()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -81,6 +82,12 @@ class LogoEditorFragment : Fragment() {
      * Inicializa los listeners de los botones de la vista
      */
     private fun initializeButtons() {
+        if(isCreation){
+            btnSew.visibility=View.GONE
+        }
+        else {
+            btnDone.text = getString(R.string.btn_done_modify)
+        }
         btnDone.setOnClickListener { onDoneButtonClick() }
         btnSew.setOnClickListener { onSewButtonClick() }
     }
@@ -101,6 +108,8 @@ class LogoEditorFragment : Fragment() {
             saveLogo()
         else
             modifyLogo()
+        val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+        navController.popBackStack()
     }
 
     /**
@@ -142,6 +151,13 @@ class LogoEditorFragment : Fragment() {
     private fun onSewButtonClick() {
         val bundle = bundleOf("logo" to logoController.getLogo())
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
+        val entryLabel = navController.previousBackStackEntry!!.destination.label
+
+        if(entryLabel == getString(R.string.menu_summary)){
+            navController.popBackStack()
+            navController.popBackStack()
+        }
+
         navController.navigate(R.id.nav_summary, bundle)
     }
 

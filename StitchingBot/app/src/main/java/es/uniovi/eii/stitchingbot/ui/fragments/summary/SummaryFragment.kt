@@ -188,8 +188,6 @@ class SummaryFragment : Fragment() {
         val bundle =
             bundleOf("creation" to false, Constants.LOGO to logoController.getLogo())
         val navController = requireActivity().findNavController(R.id.nav_host_fragment)
-        navController.popBackStack()
-        navController.popBackStack()
         navController.navigate(R.id.nav_create_logo, bundle)
     }
 

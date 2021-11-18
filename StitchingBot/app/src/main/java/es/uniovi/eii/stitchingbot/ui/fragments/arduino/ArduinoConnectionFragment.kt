@@ -149,11 +149,6 @@ class ArduinoConnectionFragment : Fragment() {
                 }
             }
 
-            /*if (this@ArduinoConnectionFragment.isVisible)
-                this@ArduinoConnectionFragment.requireActivity().runOnUiThread {
-                    this@ArduinoConnectionFragment.progressBar.visibility = View.GONE
-                    requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-                }*/
         }.start()
     }
 

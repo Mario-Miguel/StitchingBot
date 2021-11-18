@@ -3,22 +3,16 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_margin="4dp"
     android:elevation="4dp">
 
-    <LinearLayout
+    <ImageView
+        android:id="@+id/imgLogo"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="180dp"
+        android:background="@color/primaryDarkColorGray"
+        android:contentDescription="@string/img_logo"
+        android:scaleType="centerCrop" />
 
-        <ImageView
-            android:id="@+id/imgLogo"
-            android:layout_width="match_parent"
-            android:layout_height="194dp"
-            android:contentDescription="@string/img_logo"
-            android:scaleType="centerCrop"
-            android:background="@color/primaryDarkColorGray"/>
-
-    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
