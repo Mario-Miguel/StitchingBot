@@ -486,7 +486,9 @@ void runPulleyMotor() {
   }
 }
 
-//#############################################################################################
+/**
+ * Mueve el robot hacia abajo
+ */
 void moveDown() {
   
   int yMovement = stepperY1.currentPosition()-16;
@@ -508,8 +510,10 @@ void moveDown() {
   
   delay(100);
 }
-//#############################################################################################
 
+/**
+ * Mueve el robot hacia la izquierda
+ */
 void moveLeft() {
   int xMovement = stepperX.currentPosition() - 16;
 
@@ -525,8 +529,10 @@ void moveLeft() {
   }
   delay(100);
 }
-//#############################################################################################
 
+/**
+ * Mueve el robot hacia la derecha
+ */
 void moveRight() {
   int xMovement =stepperX.currentPosition()+16;
 
@@ -543,8 +549,10 @@ void moveRight() {
   }
   delay(100);
 }
-//#############################################################################################
 
+/**
+ * Mueve el robot hacia arriba
+ */
 void moveUp() {
   int yMovement = stepperY1.currentPosition()+16;
 
@@ -553,8 +561,6 @@ void moveUp() {
 
   stepperY1.setSpeed(250);
   stepperY2.setSpeed(250);
-
-
 
   while (!endOfPathY() && stepperY1.distanceToGo() != 0) {
 

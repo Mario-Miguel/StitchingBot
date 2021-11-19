@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['stitchingbot_38',['StitchingBot',['../index.html',1,'']]],
+  ['setup_39',['setup',['../motor__controller_8ino.html#a4fc01d736fe50cf5b977f755b675f11d',1,'motor_controller.ino']]],
+  ['start_5fautohome_40',['START_AUTOHOME',['../motor__controller_8ino.html#a82bedca8c625ae2765b4742838325c78',1,'motor_controller.ino']]],
+  ['start_5fexecution_41',['START_EXECUTION',['../motor__controller_8ino.html#a93a2531f6a1ae44ae488c14bc8710305',1,'motor_controller.ino']]],
+  ['startactiontime_42',['startActionTime',['../motor__controller_8ino.html#a2693b7579b7c29004f7be2c4d708a974',1,'motor_controller.ino']]],
+  ['startautohome_43',['startAutohome',['../motor__controller_8ino.html#acf1d5d7c464b801aa2ad301ea1aa9b3e',1,'motor_controller.ino']]],
+  ['step_5fpulley_44',['STEP_PULLEY',['../motor__controller_8ino.html#a85ceec4f649f90d72ef6ba50f17b41dd',1,'motor_controller.ino']]],
+  ['stepperpulley_45',['stepperPulley',['../motor__controller_8ino.html#ae4b66bac0b571cc1378e0c5e500f59b2',1,'motor_controller.ino']]],
+  ['stepperpulleysteps_46',['stepperPulleySteps',['../motor__controller_8ino.html#a4ba08c48ae4d9a067cb5079cbe2a77c3',1,'motor_controller.ino']]],
+  ['stepperx_47',['stepperX',['../motor__controller_8ino.html#afda0b4a3b38d93ab5ef5786a339f24aa',1,'motor_controller.ino']]],
+  ['steppery1_48',['stepperY1',['../motor__controller_8ino.html#a5a8607c5df4dad84608c099f968af540',1,'motor_controller.ino']]],
+  ['steppery2_49',['stepperY2',['../motor__controller_8ino.html#a51bc6045dabd993227326ac0e26e12bb',1,'motor_controller.ino']]],
+  ['stepx_50',['STEPX',['../motor__controller_8ino.html#aefce719403b8e70b97befc54aa7947d2',1,'motor_controller.ino']]],
+  ['stepy_5f1_51',['STEPY_1',['../motor__controller_8ino.html#afe3a1bfa8bbe56484a0cd53fbb9a6c4a',1,'motor_controller.ino']]],
+  ['stepy_5f2_52',['STEPY_2',['../motor__controller_8ino.html#add07a1e34bf1df68d8e94d012c41ec03',1,'motor_controller.ino']]],
+  ['stop_5fexecution_53',['STOP_EXECUTION',['../motor__controller_8ino.html#ad922515b5f46489ba25cb2bbae59998c',1,'motor_controller.ino']]]
+];
