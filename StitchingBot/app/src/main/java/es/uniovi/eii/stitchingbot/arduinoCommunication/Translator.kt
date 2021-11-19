@@ -10,8 +10,8 @@ import kotlin.math.hypot
 
 object Translator {
     private const val POINT: Int = 1
-    private const val HEIGHT: Int = 375
-    private const val WIDTH: Int = 375
+    private const val HEIGHT: Int = 250
+    private const val WIDTH: Int = 250
     private const val FACTOR_AJUSTE: Int = 6
 
     var image: Bitmap = Bitmap.createBitmap(HEIGHT, WIDTH, Bitmap.Config.ARGB_8888)

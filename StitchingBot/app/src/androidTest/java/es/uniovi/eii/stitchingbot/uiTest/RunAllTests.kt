@@ -1,14 +1,13 @@
 package es.uniovi.eii.stitchingbot.uiTest
 
+import androidx.test.espresso.accessibility.AccessibilityChecks
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import es.uniovi.eii.stitchingbot.database.LogoDatabaseConnection
-import es.uniovi.eii.stitchingbot.database.SewingMachineDatabaseConnection
 import es.uniovi.eii.stitchingbot.uiTest.arduinoConfigurationTest.ArduinoConfigurationFragmentTest
 import es.uniovi.eii.stitchingbot.uiTest.logoTest.LogoFragmentsTest
 import es.uniovi.eii.stitchingbot.uiTest.sewingMachineTest.SewingMachinesFragmentTest
 import es.uniovi.eii.stitchingbot.uiTest.summaryTest.SummaryFragmentTest
-import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
 import org.junit.runners.Suite
@@ -29,5 +28,13 @@ class RunAllTests {
         ldc.open()
         ldc.deleteAllData()
         ldc.close()
+        enableAccessibilityChecks()
+    }
+
+    companion object{
+        @Before @JvmStatic
+        fun enableAccessibilityChecks() {
+            AccessibilityChecks.enable()
+        }
     }
 }

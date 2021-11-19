@@ -3,6 +3,8 @@ package es.uniovi.eii.stitchingbot.arduinoCommunication
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import es.uniovi.eii.stitchingbot.model.Logo
+import es.uniovi.eii.stitchingbot.model.SewingMachine
 import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.ExecutingState
 import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.PausedState
 import es.uniovi.eii.stitchingbot.ui.fragments.summary.states.StateManager
@@ -23,6 +25,10 @@ object ArduinoCommands {
     private val privateActualProgress = MutableLiveData<Int>()
     val actualProgress: LiveData<Int>
         get() = privateActualProgress
+
+    val privateLogo = MutableLiveData<Logo>()
+    val privateMachine = MutableLiveData<SewingMachine>()
+
 
 
     /**

@@ -1,6 +1,7 @@
 package es.uniovi.eii.stitchingbot.ui.fragments.summary
 
 import android.app.Activity
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.os.bundleOf
+import androidx.core.os.persistableBundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import es.uniovi.eii.stitchingbot.R
@@ -61,14 +63,20 @@ class SummaryFragment : Fragment() {
         pbExecution.visibility = View.GONE
     }
 
+    override fun onResume() {
+        super.onResume()
+        stateManager.showInterface(this)
+
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         loadButtonsListeners()
         loadIncomingResources()
         loadCardViews()
         loadLiveDataObservers()
     }
+
 
 //##################################################################################################
 
@@ -95,10 +103,16 @@ class SummaryFragment : Fragment() {
                     translator.translationDone = false
                 }
                 logoController.setLogo(auxLogo)
+                arduinoCommands.privateLogo.value = auxLogo
             }
         }
-        if (logoController.isLogoSelected()) {
-            loadImageToCard(imgLogoSummary, logoController.getLogo().imgUrl)
+
+        if (arguments == null
+            && arduinoCommands.privateLogo.value != null
+            && arduinoCommands.privateMachine.value != null
+        ) {
+            logoController.setLogo(arduinoCommands.privateLogo.value!!)
+            sewingMachineController.setSewingMachine(arduinoCommands.privateMachine.value!!)
         }
     }
 
@@ -117,9 +131,15 @@ class SummaryFragment : Fragment() {
         )
             ?.observe(viewLifecycleOwner) {
                 sewingMachineController.setSewingMachine(it)
+                arduinoCommands.privateMachine.value = it
                 updateSewingMachineCard()
             }
+
         updateArduinoStatus()
+
+        if (logoController.isLogoSelected()) {
+            loadImageToCard(imgLogoSummary, logoController.getLogo().imgUrl)
+        }
     }
 
     /**

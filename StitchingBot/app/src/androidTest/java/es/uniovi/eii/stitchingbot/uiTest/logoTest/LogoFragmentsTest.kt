@@ -114,14 +114,6 @@ class LogoFragmentsTest {
         )
         button.check(matches(isDisplayed()))
 
-        val button2 = onView(
-            allOf(
-                withId(R.id.btnSew), withText("COSER"),
-                withParent(withParent(IsInstanceOf.instanceOf(android.widget.FrameLayout::class.java))),
-                isDisplayed()
-            )
-        )
-        button2.check(matches(isDisplayed()))
 
         val materialButton = onView(
             allOf(
@@ -137,24 +129,6 @@ class LogoFragmentsTest {
             )
         )
         materialButton.perform(click())
-
-        val appCompatImageButton = onView(
-            allOf(
-                withContentDescription("Navigate up"),
-                childAtPosition(
-                    allOf(
-                        withId(R.id.toolbar),
-                        childAtPosition(
-                            withClassName(`is`("com.google.android.material.appbar.AppBarLayout")),
-                            0
-                        )
-                    ),
-                    1
-                ),
-                isDisplayed()
-            )
-        )
-        appCompatImageButton.perform(click())
 
         val recyclerView = onView(
             allOf(

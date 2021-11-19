@@ -198,6 +198,7 @@ void loop() {
     }
     else if (receivedString.indexOf(STOP_EXECUTION) >= 0) {
       Serial1.println(STOP_EXECUTION);
+      Serial.println("EXECUTION STOPPED");
       actionCounter = 0;
       resetArrays();
       entradaLeida = false;
@@ -205,6 +206,21 @@ void loop() {
       areActionsRemaining = false;
       isPaused = false;
       delay(100);
+    }
+    else if(receivedString.indexOf(UP) >= 0){
+      moveUp();
+    }
+    else if(receivedString.indexOf(LEFT) >= 0){
+      moveLeft();
+    }
+    else if(receivedString.indexOf(DOWN) >= 0){
+      moveDown();
+    }
+    else if(receivedString.indexOf(RIGHT) >= 0){
+      moveRight();
+    }
+    else if(receivedString.indexOf(START_AUTOHOME) >= 0){
+      startAutohome();
     }
     else if (receivedString == START_EXECUTION) {
       startAutohome();
@@ -215,7 +231,7 @@ void loop() {
       receivedString = "";
       
       delay(100);
-    }
+    }   
     else {
       createActions(receivedString);
       areActionsRemaining = true;
@@ -265,7 +281,7 @@ void startAutohome() {
   stepperY1.setCurrentPosition(0);
   stepperY2.setCurrentPosition(0);
 
-  stepperX.moveTo(1500);
+  stepperX.moveTo(2000);
   stepperY1.moveTo(50);
   stepperY2.moveTo(50);
 
@@ -468,4 +484,84 @@ void runPulleyMotor() {
   while ((stepperPulley.distanceToGo() != 0)) {
     stepperPulley.runSpeed();
   }
+}
+
+//#############################################################################################
+void moveDown() {
+  
+  int yMovement = stepperY1.currentPosition()-16;
+
+  stepperY1.moveTo(yMovement);
+  stepperY2.moveTo(yMovement);
+
+  stepperY1.setSpeed(-250);
+  stepperY2.setSpeed(-250);
+
+
+
+  while (!endOfPathY() && stepperY1.distanceToGo() != 0) {
+    if (!endOfPathY() && stepperY1.distanceToGo() != 0) {
+      stepperY1.runSpeed();
+      stepperY2.runSpeed();
+    }
+  }
+  
+  delay(100);
+}
+//#############################################################################################
+
+void moveLeft() {
+  int xMovement = stepperX.currentPosition() - 16;
+
+  stepperX.moveTo(xMovement);
+
+  stepperX.setSpeed(-250);
+
+  while (!endOfPathX() && stepperX.distanceToGo() != 0) {
+
+    if (!endOfPathX() && stepperX.distanceToGo() != 0)
+      stepperX.runSpeed();
+
+  }
+  delay(100);
+}
+//#############################################################################################
+
+void moveRight() {
+  int xMovement =stepperX.currentPosition()+16;
+
+
+  stepperX.moveTo(xMovement);
+
+  stepperX.setSpeed(250);
+
+
+
+  while (!endOfPathX() && stepperX.distanceToGo() != 0) {
+    if (!endOfPathX() && stepperX.distanceToGo() != 0)
+      stepperX.runSpeed();
+  }
+  delay(100);
+}
+//#############################################################################################
+
+void moveUp() {
+  int yMovement = stepperY1.currentPosition()+16;
+
+  stepperY1.moveTo(yMovement);
+  stepperY2.moveTo(yMovement);
+
+  stepperY1.setSpeed(250);
+  stepperY2.setSpeed(250);
+
+
+
+  while (!endOfPathY() && stepperY1.distanceToGo() != 0) {
+
+    if (!endOfPathY() && stepperY1.distanceToGo() != 0) {
+      stepperY1.runSpeed();
+      stepperY2.runSpeed();
+    }
+  }
+  delay(100);
 }

@@ -37,8 +37,9 @@ class SewingMachinesFragmentTest {
     @JvmField
     var mGrantPermissionRule: GrantPermissionRule =
         GrantPermissionRule.grant(
-            "android.permission.ACCESS_MEDIA_LOCATION",
-            "android.permission.CAMERA"
+            "android.permission.CAMERA",
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE"
         )
 
     @After

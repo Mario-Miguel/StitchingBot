@@ -23,6 +23,7 @@ import es.uniovi.eii.stitchingbot.uiTest.arduinoConfigurationTest.ArduinoConnect
 import es.uniovi.eii.stitchingbot.database.LogoDatabaseConnection
 import es.uniovi.eii.stitchingbot.database.SewingMachineDatabaseConnection
 import io.mockk.unmockkAll
+import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Description
@@ -103,6 +104,17 @@ class SummaryFragmentTest {
             )
         )
         materialButton.perform(click())
+
+        val recyclerView2 = onView(
+            allOf(
+                withId(R.id.rvLogoList),
+                childAtPosition(
+                    withClassName(CoreMatchers.`is`("androidx.core.widget.NestedScrollView")),
+                    0
+                )
+            )
+        )
+        recyclerView2.perform(actionOnItemAtPosition<ViewHolder>(0, click()))
 
         val materialButton2 = onView(
             allOf(

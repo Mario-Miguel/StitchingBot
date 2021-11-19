@@ -172,6 +172,8 @@ class CanvasView : View {
         return cutBitmap
     }
 
+
+
     /**
      * Cambia la imagen del canvas por la que se le pasa como parámetro
      *
