@@ -156,20 +156,18 @@ class SummaryFragment : Fragment() {
     }
 
     /**
+     * Actualiza la barra de progreso, mostrándola u ocultándola
      *
+     * @param completionMessage mensaje que se ha de mostrar al tener un progreso del 100%.
+     * @param newProgress progreso actual de la barra de progreso.
      */
     private fun updateProgressBar(completionMessage: String, newProgress: Int) {
         pbExecution.progress = newProgress
-        Log.i(
-            TAG_TRANSLATE,
-            "Progress 0 - $newProgress - ${stateManager.actualState.value.toString()}"
-        )
         if (newProgress == 0) {
             if (this@SummaryFragment.isVisible)
                 stateManager.showInterface(this)
         }
         if (newProgress == 100) {
-            Log.i(TAG_TRANSLATE, "Progress: 100 - $newProgress")
             if (this@SummaryFragment.isVisible) {
                 stateManager.changeToInitial()
                 stateManager.showInterface(this)
